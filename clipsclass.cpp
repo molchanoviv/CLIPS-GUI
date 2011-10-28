@@ -32,13 +32,30 @@ void CLIPSClass::assertStringSlot(QString fact, bool ret)
 
 void CLIPSClass::retractSlot(int factNumber, bool ret)
 {
-	factNumber>0 ? factNumber = factNumber-1 : factNumber = 0;
-	void* ptr = factPointers.at(factNumber);
-	Retract(ptr);
-	if(ret)
-		emit outputSignal("");
-	QString facts = factsSlot(false);
-	emit factsChangedSignal(facts);
+	void* ptr=NULL;
+	do
+	{
+		ptr = GetNextFact(ptr);
+		if(ptr!=NULL)
+		{
+			if(factNumber == FactIndex(ptr))
+			{
+				Retract(ptr);
+				if(ret)
+					emit outputSignal("");
+				QString facts = factsSlot(false);
+				emit factsChangedSignal(facts);
+			}
+		}
+	}
+	while(ptr!=NULL);
+//	factNumber>0 ? factNumber = factNumber-1 : factNumber = 0;
+//	void* ptr = factPointers.at(factNumber);
+//	Retract(ptr);
+//	if(ret)
+//		emit outputSignal("");
+//	QString facts = factsSlot(false);
+//	emit factsChangedSignal(facts);
 }
 
 void CLIPSClass::saveFactsSlot(QString path)
