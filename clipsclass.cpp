@@ -49,13 +49,6 @@ void CLIPSClass::retractSlot(int factNumber, bool ret)
 		}
 	}
 	while(ptr!=NULL);
-//	factNumber>0 ? factNumber = factNumber-1 : factNumber = 0;
-//	void* ptr = factPointers.at(factNumber);
-//	Retract(ptr);
-//	if(ret)
-//		emit outputSignal("");
-//	QString facts = factsSlot(false);
-//	emit factsChangedSignal(facts);
 }
 
 void CLIPSClass::saveFactsSlot(QString path)
