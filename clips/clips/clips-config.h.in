@@ -1,0 +1,4 @@
+#ifndef CLIPSCONFIG_H
+#define CLIPS_HELPFILE "@CLIPS_HELPFILE@"
+#endif // CLIPSCONFIG_H
+
