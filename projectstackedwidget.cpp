@@ -105,6 +105,7 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	this->addWidget(classesWidget);
 
 	connect(duplicationButton, SIGNAL(toggled(bool)), this, SLOT(duplicationProxySlot(bool)));
+	connect(removeFactButton, SIGNAL(clicked()), this, SLOT(removeFactSlot()));
 }
 
 
@@ -121,7 +122,7 @@ void ProjectStackedWidget::addFactSlot()
 void ProjectStackedWidget::removeFactSlot()
 {
 	QList<QListWidgetItem*> facts = factsListWidget->selectedItems();
-//	clips->retractSlot(facts.at(0)->data(Qt::UserRole).toInt(), false);
+	emit removeFactSignal(facts.at(0)->data(Qt::UserRole).toInt(), false);
 }
 
 void ProjectStackedWidget::refreshFacts(QString facts)

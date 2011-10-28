@@ -27,6 +27,7 @@ private:
 signals:
 	void addFactSignal(QString, bool);
 	void setFactDuplicationSignal(bool, bool);
+	void removeFactSignal(int, bool);
 
 public slots:
 	void refreshFacts(QString);
