@@ -122,7 +122,8 @@ void ProjectStackedWidget::addFactSlot()
 void ProjectStackedWidget::removeFactSlot()
 {
 	QList<QListWidgetItem*> facts = factsListWidget->selectedItems();
-	emit removeFactSignal(facts.at(0)->data(Qt::UserRole).toInt(), false);
+	if(!facts.isEmpty())
+		emit removeFactSignal(facts.at(0)->data(Qt::UserRole).toInt(), false);
 }
 
 void ProjectStackedWidget::refreshFacts(QString facts)

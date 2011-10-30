@@ -45,8 +45,13 @@ void consoleClass::exec()
 		pos = retractCommandRx.indexIn(str.toLower());
 		if (pos > -1)
 		{
-			int fact = retractCommandRx.cap(5).toInt();
-			emit retractSignal(fact, true);
+			if(!retractCommandRx.cap(5).isEmpty())
+			{
+				int fact = retractCommandRx.cap(5).toInt();
+				emit retractSignal(fact, true);
+			}
+			else
+				output("");
 		}
 		/*************************Сохранить*факты*в*файл*****************************/
 		QRegExp saveFactsCommandRx(".*(сохранить|записать).* в .* файл (.*)");
@@ -67,6 +72,13 @@ void consoleClass::exec()
 		if(str.contains(setFactDuplicationFalseRx))
 		{
 			emit setFactDuplicationSignal(false, true);
+		}
+		/************************Создать*проект**************************************/
+		QRegExp createProjectRx(".*создать.* проект.*");
+		if(str.contains(createProjectRx))
+		{
+			emit createProjectSignal();
+			output("");
 		}
 	}
 	//output("");

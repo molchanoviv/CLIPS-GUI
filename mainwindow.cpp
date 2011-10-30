@@ -57,6 +57,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(console, SIGNAL(retractSignal(int,bool)), clips, SLOT(retractSlot(int,bool)));
 	connect(console, SIGNAL(saveFactsSignal(QString)), clips, SLOT(saveFactsSlot(QString)));
 	connect(console, SIGNAL(setFactDuplicationSignal(bool,bool)), clips, SLOT(setFactDuplicationSlot(bool,bool)));
+	connect(console, SIGNAL(createProjectSignal()), this, SLOT(newProject()));
 	connect(clips, SIGNAL(factsChangedSignal(QString)), projectWidget, SLOT(refreshFacts(QString)));
 	connect(clips, SIGNAL(outputSignal(QString)), console, SLOT(output(QString)));
 	readSettings();
@@ -248,8 +249,11 @@ int MainWindow::removeFolder(QDir dir)
 void MainWindow::closeEvent(QCloseEvent *event)
 {
 	Q_UNUSED(event);
-	StringPair pair = projectsList.at(projectIndex);
-	clips->saveFactsSlot(pair.second+"/facts.clp");
+	if(!projectsList.isEmpty())
+	{
+		StringPair pair = projectsList.at(projectIndex);
+		clips->saveFactsSlot(pair.second+"/facts.clp");
+	}
 	writeSettings();
 };
 

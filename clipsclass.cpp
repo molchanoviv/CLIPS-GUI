@@ -1,6 +1,6 @@
 #include <iostream>
-#include <fcntl.h>
-#include <unistd.h>
+//#include <fcntl.h>
+//#include <unistd.h>
 #include "clipsclass.h"
 
 CLIPSClass::CLIPSClass(QObject *parent) :
@@ -22,7 +22,7 @@ char* CLIPSClass::toChar(QString string)
 void CLIPSClass::assertStringSlot(QString fact, bool ret)
 {
 	fact.append(")").prepend("(");
-	factPointers << AssertString(toChar(fact));
+	AssertString(toChar(fact));
 	if(ret)
 		emit outputSignal("");
 	QString facts = factsSlot(false);
@@ -53,16 +53,13 @@ void CLIPSClass::retractSlot(int factNumber, bool ret)
 
 void CLIPSClass::saveFactsSlot(QString path)
 {
-	int ret = SaveFacts(toChar(path),LOCAL_SAVE,NULL);
-	qDebug()<<ret;
+	SaveFacts(toChar(path),LOCAL_SAVE,NULL);
 	emit outputSignal("");
-//	QString facts = factsSlot(false);
-//	emit factsChangedSignal(facts);
 }
 
 void CLIPSClass::loadFactsSlot(QString path)
 {
-	int ret = LoadFacts(toChar(path));
+	LoadFacts(toChar(path));
 	emit outputSignal("");
 	QString facts = factsSlot(false);
 	emit factsChangedSignal(facts);
@@ -70,14 +67,13 @@ void CLIPSClass::loadFactsSlot(QString path)
 
 void CLIPSClass::saveSlot(QString path)
 {
-	int ret = Save(toChar(path));
-	qDebug()<<ret;
+	Save(toChar(path));
 	emit outputSignal("");
 }
 
 void CLIPSClass::loadSlot(QString path)
 {
-	int ret = Load(toChar(path));
+	Load(toChar(path));
 	emit outputSignal("");
 	QString facts = factsSlot(false);
 	emit factsChangedSignal(facts);

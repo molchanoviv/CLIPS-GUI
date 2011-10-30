@@ -27,7 +27,6 @@ signals:
 
 protected:
 	char* toChar(QString);
-	QList<void*> factPointers;
 
 };
 

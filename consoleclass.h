@@ -25,6 +25,8 @@ signals:
 	void retractSignal(int, bool);
 	void saveFactsSignal(QString);
 	void setFactDuplicationSignal(bool, bool);
+	void createProjectSignal();
+	void openProjectSignal();
 
 
 public slots:
