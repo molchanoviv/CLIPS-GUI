@@ -29,7 +29,15 @@ FORMS    += mainwindow.ui \
 LIBS += -lboost_thread -lclips
 LIBS += -L/usr/lib
 
-OTHER_FILES +=
+OTHER_FILES += \
+    README \
+    TODO
 
 RESOURCES += \
     resources.qrc
+
+
+
+
+
+

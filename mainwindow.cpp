@@ -75,7 +75,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::newProject()
 {
-	//Запилить проверку на пустоту имени и пути
 	NewProjectDialog dialog(this);
 	if(dialog.exec() == QDialog::Accepted)
 	{
@@ -89,9 +88,11 @@ void MainWindow::newProject()
 			if(msgBox.exec() == QMessageBox::Save)
 				clips->saveFactsSlot(projectPair.second+"/facts.clp");
 		}
-		disableWidgets(false);
 		QString projectName = dialog.projectNameLineEdit->text();
 		QString projectPath = dialog.projectPathLineEdit->text();
+		if(projectName.isEmpty() || projectPath.isEmpty())
+			return;
+		disableWidgets(false);
 		projectsTreeWidget->clear();
 		QTreeWidgetItem *item = new QTreeWidgetItem();
 		item->setText(0, projectName);
@@ -132,7 +133,6 @@ void MainWindow::newProject()
 
 void MainWindow::openProject()
 {
-	//Запилить проверку на пустоту имени и пути
 	QString fileName = QFileDialog::getOpenFileName(this, tr("Open Project"), QDir::homePath(), tr("GLIPS-GUI Projects (*.clp.prj);;All files (*.*)"));
 	if(!fileName.isEmpty())
 	{
@@ -146,11 +146,13 @@ void MainWindow::openProject()
 			if(msgBox.exec() == QMessageBox::Save)
 				clips->saveFactsSlot(projectPair.second+"/facts.clp");
 		}
-		disableWidgets(false);
 		QSettings settings(fileName, QSettings::IniFormat);
 		settings.beginGroup("project");
 		QString projectName = settings.value("name").toString();
 		settings.endGroup();
+		if(projectName.isEmpty())
+			return;
+		disableWidgets(false);
 		projectsTreeWidget->clear();
 		QTreeWidgetItem *item = new QTreeWidgetItem();
 		item->setText(0, projectName);
