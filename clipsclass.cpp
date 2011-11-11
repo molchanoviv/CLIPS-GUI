@@ -54,13 +54,13 @@ void CLIPSClass::retractSlot(int factNumber, bool ret)
 void CLIPSClass::saveFactsSlot(QString path)
 {
 	SaveFacts(toChar(path),LOCAL_SAVE,NULL);
-	emit outputSignal("");
+//	emit outputSignal("");
 }
 
 void CLIPSClass::loadFactsSlot(QString path)
 {
 	LoadFacts(toChar(path));
-	emit outputSignal("");
+//	emit outputSignal("");
 	QString facts = factsSlot(false);
 	emit factsChangedSignal(facts);
 }
@@ -68,13 +68,13 @@ void CLIPSClass::loadFactsSlot(QString path)
 void CLIPSClass::saveSlot(QString path)
 {
 	Save(toChar(path));
-	emit outputSignal("");
+//	emit outputSignal("");
 }
 
 void CLIPSClass::loadSlot(QString path)
 {
 	Load(toChar(path));
-	emit outputSignal("");
+//	emit outputSignal("");
 	QString facts = factsSlot(false);
 	emit factsChangedSignal(facts);
 }

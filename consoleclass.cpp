@@ -24,6 +24,7 @@ void consoleClass::exec()
 	QRegExp command_split_rx("\\. ");
 	QStringList commands = cmd.split(command_split_rx);
 	QString str;
+	bool haveCommands = false;
 	foreach(str, commands)
 	{
 		/************************Создать*факт************************************/
@@ -33,12 +34,14 @@ void consoleClass::exec()
 		{
 			QString fact = assertStringCommandRx.cap(5).simplified();
 			emit assertStringSignal(fact, true);
+			haveCommands = true;
 		}
 		/*************************Показать*все*факты*******************************/
 		QRegExp factsCommandRx("(.*)(отобразить|показать|вывести)(.*)(факты)(.*)");
 		if(str.contains(factsCommandRx))
 		{
 			emit factsSignal(1);
+			haveCommands = true;
 		}
 		/*************************Удалить*факт*************************************/
 		QRegExp retractCommandRx("(.*)(удалить|стереть)(.*)(факт) ([0-9]*)(.*)");
@@ -52,6 +55,7 @@ void consoleClass::exec()
 			}
 			else
 				output("");
+			haveCommands = true;
 		}
 		/*************************Сохранить*факты*в*файл*****************************/
 		QRegExp saveFactsCommandRx(".*(сохранить|записать).* в .* файл (.*)");
@@ -60,18 +64,21 @@ void consoleClass::exec()
 		{
 			QString fact = saveFactsCommandRx.cap(2);
 			emit saveFactsSignal(fact);
+			haveCommands = true;
 		}
 		/*************************Включить*дублирование*фактов***********************/
 		QRegExp setFactDuplicationTrueRx(".*включить.* дублирование.*фактов.*");
 		if(str.contains(setFactDuplicationTrueRx))
 		{
 			emit setFactDuplicationSignal(true, true);
+			haveCommands = true;
 		}
 		/************************Выключить*дублирование*фактов***********************/
 		QRegExp setFactDuplicationFalseRx(".*выключить.* дублирование.*фактов.*");
 		if(str.contains(setFactDuplicationFalseRx))
 		{
 			emit setFactDuplicationSignal(false, true);
+			haveCommands = true;
 		}
 		/************************Создать*проект**************************************/
 		QRegExp createProjectRx(".*создать.* проект.*");
@@ -79,23 +86,26 @@ void consoleClass::exec()
 		{
 			emit createProjectSignal();
 			output("");
+			haveCommands = true;
 		}
 		/************************Открыть*проект**************************************/
 		QRegExp openProjectRx(".*открыть.* проект.*");
 		if(str.contains(openProjectRx))
 		{
 			emit openProjectSignal();
-//			output("");
+			output("");
+			haveCommands = true;
 		}
 		/************************Выйти*из*программы**********************************/
 		QRegExp quitRx(".*выход|выйти|закрыть.*");
 		if(str.contains(quitRx))
 		{
 			emit quitSignal();
-//			output("");
+			haveCommands = true;
 		}
 	}
-	//output("");
+	if(!haveCommands)
+		output("");
 }
 
 void consoleClass::insertPrompt(bool insertNewBlock)
@@ -125,6 +135,8 @@ void consoleClass::historyAdd(QString cmd)
 
 void consoleClass::historyBack()
 {
+	if(history->isEmpty())
+		return;
 	if(!historyPos)
 		return;
 	QTextCursor cursor = textCursor();
@@ -138,6 +150,8 @@ void consoleClass::historyBack()
 
 void consoleClass::historyForward()
 {
+	if(history->isEmpty())
+		return;
 	if(historyPos == history->length())
 		return;
 	QTextCursor cursor = textCursor();
