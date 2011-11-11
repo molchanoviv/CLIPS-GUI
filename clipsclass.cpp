@@ -82,6 +82,7 @@ void CLIPSClass::loadSlot(QString path)
 void CLIPSClass::clearSlot()
 {
 	Clear();
+	emit clearSignal();
 }
 
 void CLIPSClass::setFactDuplicationSlot(bool state, bool ret)

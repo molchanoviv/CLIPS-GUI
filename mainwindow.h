@@ -39,8 +39,8 @@ private:
 	QTreeWidget *projectsTreeWidget;
 	ProjectStackedWidget *projectWidget;
 	int removeFolder(QDir);
-	int projectIndex;
-	QList<StringPair> projectsList;
+	void disableWidgets(bool);
+	StringPair projectPair;
 
 
 private slots:
@@ -50,11 +50,11 @@ private slots:
 	void openProject();
 	void closeProject();
 	void removeProject();
-	void changeProjectSlot(int);
+	void saveProject();
+	void saveProjectAs();
 
 signals:
 	void treeWidgetItemClickedSignal(int);
-	void changeProjectSignal(int);
 };
 
 #endif // MAINWINDOW_H

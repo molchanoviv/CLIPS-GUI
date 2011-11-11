@@ -149,3 +149,12 @@ void ProjectStackedWidget::duplicationProxySlot(bool state)
 {
 	emit setFactDuplicationSignal(state, false);
 }
+
+void ProjectStackedWidget::clearSlot()
+{
+	templatesListWidget->clear();
+	factsListWidget->clear();
+	rulesListWidget->clear();
+	functionsListWidget->clear();
+	classesListWidget->clear();
+}

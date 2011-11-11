@@ -24,6 +24,7 @@ public slots:
 signals:
 	void outputSignal(QString);
 	void factsChangedSignal(QString);
+	void clearSignal();
 
 protected:
 	char* toChar(QString);

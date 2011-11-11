@@ -34,6 +34,7 @@ public slots:
 	void addFactSlot();
 	void removeFactSlot();
 	void duplicationProxySlot(bool);
+	void clearSlot();
 
 };
 

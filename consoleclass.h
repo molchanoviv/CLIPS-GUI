@@ -27,7 +27,7 @@ signals:
 	void setFactDuplicationSignal(bool, bool);
 	void createProjectSignal();
 	void openProjectSignal();
-
+	void quitSignal();
 
 public slots:
 	void exec();

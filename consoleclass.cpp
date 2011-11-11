@@ -80,6 +80,20 @@ void consoleClass::exec()
 			emit createProjectSignal();
 			output("");
 		}
+		/************************Открыть*проект**************************************/
+		QRegExp openProjectRx(".*открыть.* проект.*");
+		if(str.contains(openProjectRx))
+		{
+			emit openProjectSignal();
+//			output("");
+		}
+		/************************Выйти*из*программы**********************************/
+		QRegExp quitRx(".*выход|выйти|закрыть.*");
+		if(str.contains(quitRx))
+		{
+			emit quitSignal();
+//			output("");
+		}
 	}
 	//output("");
 }

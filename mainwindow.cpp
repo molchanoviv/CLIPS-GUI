@@ -19,9 +19,13 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->actionOpen->setIcon(QIcon::fromTheme("fileopen"));
 	ui->actionRemove->setIcon(QIcon::fromTheme("remove"));
 	ui->actionClose->setIcon(QIcon::fromTheme("document-close"));
+	ui->actionSave->setIcon(QIcon::fromTheme("document-save"));
+	ui->actionSave_As->setIcon(QIcon::fromTheme("document-save"));
 	QToolBar *projectToolbar = new QToolBar;
 	projectToolbar->addAction(ui->actionNew);
 	projectToolbar->addAction(ui->actionOpen);
+	projectToolbar->addAction(ui->actionSave);
+	projectToolbar->addAction(ui->actionSave_As);
 	projectToolbar->addAction(ui->actionClose);
 	projectToolbar->addAction(ui->actionRemove);
 	addToolBar(projectToolbar);
@@ -44,6 +48,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	clips = new CLIPSClass;
 	connect(ui->actionNew, SIGNAL(triggered()), this, SLOT(newProject()));
 	connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(openProject()));
+	connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(saveProject()));
+	connect(ui->actionSave_As, SIGNAL(triggered()), this, SLOT(saveProjectAs()));
 	connect(ui->actionClose, SIGNAL(triggered()), this, SLOT(closeProject()));
 	connect(ui->actionRemove, SIGNAL(triggered()), this, SLOT(removeProject()));
 	connect(projectsTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(treeWidgetItemClicked(QTreeWidgetItem*,int)));
@@ -51,27 +57,42 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(projectWidget, SIGNAL(setFactDuplicationSignal(bool,bool)), clips, SLOT(setFactDuplicationSlot(bool,bool)));
 	connect(projectWidget, SIGNAL(removeFactSignal(int,bool)), clips, SLOT(retractSlot(int,bool)));
 	connect(this, SIGNAL(treeWidgetItemClickedSignal(int)), projectWidget, SLOT(setCurrentIndex(int)));
-	connect(this, SIGNAL(changeProjectSignal(int)), this, SLOT(changeProjectSlot(int)));
 	connect(console, SIGNAL(assertStringSignal(QString,bool)), clips, SLOT(assertStringSlot(QString,bool)));
 	connect(console, SIGNAL(factsSignal(bool)), clips, SLOT(factsSlot(bool)));
 	connect(console, SIGNAL(retractSignal(int,bool)), clips, SLOT(retractSlot(int,bool)));
 	connect(console, SIGNAL(saveFactsSignal(QString)), clips, SLOT(saveFactsSlot(QString)));
 	connect(console, SIGNAL(setFactDuplicationSignal(bool,bool)), clips, SLOT(setFactDuplicationSlot(bool,bool)));
 	connect(console, SIGNAL(createProjectSignal()), this, SLOT(newProject()));
+	connect(console, SIGNAL(openProjectSignal()), this, SLOT(openProject()));
+	connect(console, SIGNAL(quitSignal()), qApp, SLOT(quit()));
 	connect(clips, SIGNAL(factsChangedSignal(QString)), projectWidget, SLOT(refreshFacts(QString)));
+	connect(clips, SIGNAL(clearSignal()), projectWidget, SLOT(clearSlot()));
 	connect(clips, SIGNAL(outputSignal(QString)), console, SLOT(output(QString)));
+	disableWidgets(true);
 	readSettings();
-	projectIndex = 0;
 }
 
 
 void MainWindow::newProject()
 {
+	//Запилить проверку на пустоту имени и пути
 	NewProjectDialog dialog(this);
 	if(dialog.exec() == QDialog::Accepted)
 	{
+		if(!projectPair.first.isEmpty())
+		{
+			QMessageBox msgBox;
+			msgBox.setText(tr("You have opened Project. This project will be closed."));
+			msgBox.setInformativeText(tr("Do you want to save your changes?"));
+			msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard);
+			msgBox.setDefaultButton(QMessageBox::Save);
+			if(msgBox.exec() == QMessageBox::Save)
+				clips->saveFactsSlot(projectPair.second+"/facts.clp");
+		}
+		disableWidgets(false);
 		QString projectName = dialog.projectNameLineEdit->text();
 		QString projectPath = dialog.projectPathLineEdit->text();
+		projectsTreeWidget->clear();
 		QTreeWidgetItem *item = new QTreeWidgetItem();
 		item->setText(0, projectName);
 		item->setText(1, QString::number(projectsTreeWidget->topLevelItemCount()));
@@ -102,10 +123,8 @@ void MainWindow::newProject()
 		out << "[project]\n";
 		out<<"name="+projectName+"\n";
 		file.close();
-		QPair<QString, QString> pair;
-		pair.first = projectName;
-		pair.second = projectPath+"/"+projectName+"/"+projectName;
-		projectsList<<pair;
+		projectPair.first = projectName;
+		projectPair.second = projectPath+"/"+projectName+"/"+projectName;
 		projectWidget->refreshFacts(clips->factsSlot(false));
 	}
 
@@ -113,13 +132,26 @@ void MainWindow::newProject()
 
 void MainWindow::openProject()
 {
+	//Запилить проверку на пустоту имени и пути
 	QString fileName = QFileDialog::getOpenFileName(this, tr("Open Project"), QDir::homePath(), tr("GLIPS-GUI Projects (*.clp.prj);;All files (*.*)"));
 	if(!fileName.isEmpty())
 	{
+		if(!projectPair.first.isEmpty())
+		{
+			QMessageBox msgBox;
+			msgBox.setText(tr("You have opened project. This project will be closed."));
+			msgBox.setInformativeText(tr("Do you want to save your changes?"));
+			msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard);
+			msgBox.setDefaultButton(QMessageBox::Save);
+			if(msgBox.exec() == QMessageBox::Save)
+				clips->saveFactsSlot(projectPair.second+"/facts.clp");
+		}
+		disableWidgets(false);
 		QSettings settings(fileName, QSettings::IniFormat);
 		settings.beginGroup("project");
 		QString projectName = settings.value("name").toString();
 		settings.endGroup();
+		projectsTreeWidget->clear();
 		QTreeWidgetItem *item = new QTreeWidgetItem();
 		item->setText(0, projectName);
 		item->setText(1, QString::number(projectsTreeWidget->topLevelItemCount()));
@@ -141,88 +173,67 @@ void MainWindow::openProject()
 		projectsTreeWidget->insertTopLevelItem(0, item);
 		item->setExpanded(1);
 		projectsTreeWidget->clearSelection();
-		StringPair pair;
-		pair.first = projectName;
-		pair.second = fileName.remove(fileName.lastIndexOf(QRegExp("(/|\\\\)")), fileName.length());
-		projectsList<<pair;
-		int newIndex = projectsList.count()-1;
-		if(newIndex>0)
-		{
-			StringPair oldPair = projectsList.at(projectIndex);
-			clips->saveFactsSlot(oldPair.second+"/facts.clp");
-			clips->clearSlot();
-			clips->loadFactsSlot(pair.second+"/facts.clp");
-			projectIndex = newIndex;
-		}
-		else
-		{
-			clips->clearSlot();
-			clips->loadFactsSlot(pair.second+"/facts.clp");
-		}
+		if(!projectPair.first.isEmpty())
+			saveProject();
+		projectPair.first = projectName;
+		projectPair.second = fileName.remove(fileName.lastIndexOf(QRegExp("(/|\\\\)")), fileName.length());
+		clips->clearSlot();
+		clips->loadFactsSlot(projectPair.second+"/facts.clp");
 		projectWidget->refreshFacts(clips->factsSlot(false));
 	}
 }
 
 void MainWindow::closeProject()
 {
-	int index = 0;
-	if(!projectsTreeWidget->selectedItems().isEmpty())
-	{
-		QTreeWidgetItem *item = projectsTreeWidget->selectedItems().first();
-		if(!item->parent())
-			index = projectsTreeWidget->indexOfTopLevelItem(item);
-		else
-			index = projectsTreeWidget->indexOfTopLevelItem(item->parent());
-		projectsTreeWidget->takeTopLevelItem(index);
-		projectsList.removeAt(index);
-	}
-	else
-	{
-		QMessageBox::warning(this, tr("No selected projects"),
-					tr("No selected projects. Select project in projects tree and retry close it"),
-					QMessageBox::Ok, QMessageBox::Ok);
-	}
+	saveProject();
+	clips->clearSlot();
+	projectsTreeWidget->clear();
+	projectPair.first.clear();
+	projectPair.second.clear();
+	disableWidgets(true);
 }
 
 void MainWindow::removeProject()
 {
-	int index = 0;
-	if(!projectsTreeWidget->selectedItems().isEmpty())
+	QMessageBox msgBox;
+	msgBox.setText(tr("This action remove project from disc"));
+	msgBox.setInformativeText(tr("Do you want to proceed?"));
+	msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+	msgBox.setDefaultButton(QMessageBox::Yes);
+	if(msgBox.exec() == QMessageBox::Yes)
 	{
-		QString path = "";
-		QTreeWidgetItem *item = projectsTreeWidget->selectedItems().first();
-		if(!item->parent())
-		{
-			path = item->text(2);
-			index = projectsTreeWidget->indexOfTopLevelItem(item);
-		}
-		else
-		{
-			path = item->parent()->text(2);
-			index = projectsTreeWidget->indexOfTopLevelItem(item->parent());
-		}
-		projectsTreeWidget->takeTopLevelItem(index);
-		projectsList.removeAt(index);
-		removeFolder(QDir(path));
-	}
-	else
-	{
-		QMessageBox::warning(this, tr("No selected projects"),
-					tr("No selected projects. Select project in projects tree and retry remove it"),
-					QMessageBox::Ok, QMessageBox::Ok);
+		saveProject();
+		clips->clearSlot();
+		projectsTreeWidget->clear();
+		removeFolder(QDir(projectPair.second));
+		projectPair.first.clear();
+		projectPair.second.clear();
+		disableWidgets(true);
 	}
 }
 
-void MainWindow::changeProjectSlot(int newIndex)
+void MainWindow::saveProject()
 {
-	if(newIndex!=projectIndex)
+	clips->saveFactsSlot(projectPair.second+"/facts.clp");
+}
+
+void MainWindow::saveProjectAs()
+{
+	QString fileName = QFileDialog::getSaveFileName(this, tr("Save Project"), QDir::homePath(), tr("All files (*.*)"));
+	if(!fileName.isEmpty())
 	{
-		StringPair oldPair = projectsList.at(projectIndex);
-		StringPair newPair = projectsList.at(newIndex);
-		clips->saveFactsSlot(oldPair.second+"/facts.clp");
-		clips->clearSlot();
-		clips->loadFactsSlot(newPair.second+"/facts.clp");
-		projectIndex = newIndex;
+		QDir dir;
+		dir.mkpath(fileName);
+		QString projectPath = fileName;
+		QString projectName = fileName.remove(0, fileName.lastIndexOf(QRegExp("(/|\\\\)"))+1);
+		QFile file(projectPath+"/"+projectName+".clp.prj");
+		if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+			qDebug()<<"can not open file";
+		QTextStream out(&file);
+		out << "[project]\n";
+		out<<"name="+projectName+"\n";
+		file.close();
+		clips->saveFactsSlot(projectPath+"/facts.clp");
 	}
 }
 
@@ -246,13 +257,28 @@ int MainWindow::removeFolder(QDir dir)
 	return res;
 }
 
+void MainWindow::disableWidgets(bool state)
+{
+	projectsTreeWidget->setDisabled(state);
+	projectWidget->setDisabled(state);
+	ui->actionSave->setDisabled(state);
+	ui->actionSave_As->setDisabled(state);
+	ui->actionClose->setDisabled(state);
+	ui->actionRemove->setDisabled(state);
+}
+
 void MainWindow::closeEvent(QCloseEvent *event)
 {
 	Q_UNUSED(event);
-	if(!projectsList.isEmpty())
+	if(!projectPair.first.isEmpty())
 	{
-		StringPair pair = projectsList.at(projectIndex);
-		clips->saveFactsSlot(pair.second+"/facts.clp");
+		QMessageBox msgBox;
+		msgBox.setText(tr("You have opened project."));
+		msgBox.setInformativeText(tr("Do you want to save a project before quit?"));
+		msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+		msgBox.setDefaultButton(QMessageBox::Yes);
+		if(msgBox.exec() == QMessageBox::Yes)
+			saveProject();
 	}
 	writeSettings();
 };
@@ -289,15 +315,9 @@ void MainWindow::treeWidgetItemClicked(QTreeWidgetItem* item, int column)
 	bool ok;
 	Q_UNUSED(column);
 	if(!item->parent())
-	{
-		emit changeProjectSignal(item->text(1).toInt(&ok, 10));
 		emit treeWidgetItemClickedSignal(0);
-	}
 	else
-	{
-		emit changeProjectSignal(item->parent()->text(1).toInt(&ok, 10));
 		emit treeWidgetItemClickedSignal(item->parent()->indexOfChild(item));
-	}
 }
 
 MainWindow::~MainWindow()
