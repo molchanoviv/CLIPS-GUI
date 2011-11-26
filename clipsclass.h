@@ -27,7 +27,6 @@ signals:
 	void clearSignal();
 
 protected:
-	char* toChar(QString);
 
 };
 

@@ -9,20 +9,10 @@ CLIPSClass::CLIPSClass(QObject *parent) :
 	InitializeEnvironment();
 }
 
-char* CLIPSClass::toChar(QString string)
-{
-	std::string str = string.toStdString();
-	char* str_ptr = new char[ str.length() + 1 ]();
-	strcpy( str_ptr, str.c_str() );
-	return str_ptr;
-	//delete[] str_ptr;
-
-}
-
 void CLIPSClass::assertStringSlot(QString fact, bool ret)
 {
 	fact.append(")").prepend("(");
-	AssertString(toChar(fact));
+	AssertString(fact.toLocal8Bit().data());
 	if(ret)
 		emit outputSignal("");
 	QString facts = factsSlot(false);
@@ -53,13 +43,13 @@ void CLIPSClass::retractSlot(int factNumber, bool ret)
 
 void CLIPSClass::saveFactsSlot(QString path)
 {
-	SaveFacts(toChar(path),LOCAL_SAVE,NULL);
+	SaveFacts(path.toLocal8Bit().data(),LOCAL_SAVE,NULL);
 //	emit outputSignal("");
 }
 
 void CLIPSClass::loadFactsSlot(QString path)
 {
-	LoadFacts(toChar(path));
+	LoadFacts(path.toLocal8Bit().data());
 //	emit outputSignal("");
 	QString facts = factsSlot(false);
 	emit factsChangedSignal(facts);
@@ -67,13 +57,13 @@ void CLIPSClass::loadFactsSlot(QString path)
 
 void CLIPSClass::saveSlot(QString path)
 {
-	Save(toChar(path));
+	Save(path.toLocal8Bit().data());
 //	emit outputSignal("");
 }
 
 void CLIPSClass::loadSlot(QString path)
 {
-	Load(toChar(path));
+	Load(path.toLocal8Bit().data());
 //	emit outputSignal("");
 	QString facts = factsSlot(false);
 	emit factsChangedSignal(facts);
