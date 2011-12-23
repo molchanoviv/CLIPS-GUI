@@ -10,6 +10,8 @@
 #include <QLabel>
 #include <QWidget>
 
+typedef QPair<bool, QString> slotsPair;
+
 class ProjectStackedWidget : public QStackedWidget
 {
 	Q_OBJECT
@@ -28,6 +30,7 @@ signals:
 	void addFactSignal(QString, bool);
 	void setFactDuplicationSignal(bool, bool);
 	void removeFactSignal(int, bool);
+	void addTemplateSignal(QString, QList<slotsPair>);
 
 public slots:
 	void refreshFacts(QString);
@@ -35,6 +38,8 @@ public slots:
 	void removeFactSlot();
 	void duplicationProxySlot(bool);
 	void clearSlot();
+	void addTemplateSlot();
+	void refreshTemplates(QString);
 
 };
 

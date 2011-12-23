@@ -106,6 +106,7 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 
 	connect(duplicationButton, SIGNAL(toggled(bool)), this, SLOT(duplicationProxySlot(bool)));
 	connect(removeFactButton, SIGNAL(clicked()), this, SLOT(removeFactSlot()));
+	connect(addTemplateButton, SIGNAL(clicked()), this, SLOT(addTemplateSlot()));
 }
 
 
@@ -145,9 +146,44 @@ void ProjectStackedWidget::refreshFacts(QString facts)
 	}
 }
 
+void ProjectStackedWidget::refreshTemplates(QString facts)
+{
+	templatesListWidget->clear();
+	QStringList list = facts.split("\n");
+	list.removeFirst();
+	list.removeLast();
+	QString str;
+	foreach(str, list)
+	{
+		//QStringList fact;
+		//fact = str.split(" ", QString::SkipEmptyParts);
+		//QString num = fact.at(0);
+		//int index = num.remove(0, 2).toInt();
+		//QString name = fact.at(1);
+		QListWidgetItem *item = new QListWidgetItem(templatesListWidget);
+		//item->setData(Qt::UserRole, index);
+		//item->setText(name);
+		item->setText(str);
+	}
+}
+
 void ProjectStackedWidget::duplicationProxySlot(bool state)
 {
 	emit setFactDuplicationSignal(state, false);
+}
+
+void ProjectStackedWidget::addTemplateSlot()
+{
+	QString name = "mytemplate";
+	slotsPair firstPair;
+	firstPair.first = true;
+	firstPair.second = "first-slot";
+	slotsPair secondPair;
+	secondPair.first = false;
+	secondPair.second = "second-slot";
+	QList<slotsPair> slotsList;
+	slotsList<<firstPair<<secondPair;
+	emit addTemplateSignal(name, slotsList);
 }
 
 void ProjectStackedWidget::clearSlot()

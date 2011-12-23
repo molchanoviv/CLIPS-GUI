@@ -11,13 +11,13 @@ MainWindow::MainWindow(QWidget *parent) :
 {
 	ui->setupUi(this);
 	connect(ui->actionAbout_Qt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
-	ui->actionShow_Hide_console->setIcon(QIcon::fromTheme("terminal"));
-	ui->actionQuit->setIcon(QIcon::fromTheme("exit"));
+	ui->actionShow_Hide_console->setIcon(QIcon::fromTheme("utilities-terminal"));
+	ui->actionQuit->setIcon(QIcon::fromTheme("dialog-close"));
 	ui->mainToolBar->addAction(ui->actionShow_Hide_console);
 	ui->mainToolBar->addAction(ui->actionQuit);
-	ui->actionNew->setIcon(QIcon::fromTheme("filenew"));
-	ui->actionOpen->setIcon(QIcon::fromTheme("fileopen"));
-	ui->actionRemove->setIcon(QIcon::fromTheme("remove"));
+	ui->actionNew->setIcon(QIcon::fromTheme("document-new"));
+	ui->actionOpen->setIcon(QIcon::fromTheme("document-open"));
+	ui->actionRemove->setIcon(QIcon::fromTheme("edit-delete"));
 	ui->actionClose->setIcon(QIcon::fromTheme("document-close"));
 	ui->actionSave->setIcon(QIcon::fromTheme("document-save"));
 	ui->actionSave_As->setIcon(QIcon::fromTheme("document-save"));
@@ -56,6 +56,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(projectWidget, SIGNAL(addFactSignal(QString,bool)), clips, SLOT(assertStringSlot(QString,bool)));
 	connect(projectWidget, SIGNAL(setFactDuplicationSignal(bool,bool)), clips, SLOT(setFactDuplicationSlot(bool,bool)));
 	connect(projectWidget, SIGNAL(removeFactSignal(int,bool)), clips, SLOT(retractSlot(int,bool)));
+	connect(projectWidget, SIGNAL(addTemplateSignal(QString,QList<slotsPair>)), clips, SLOT(deftemplateSlot(QString,QList<slotsPair>)));
 	connect(this, SIGNAL(treeWidgetItemClickedSignal(int)), projectWidget, SLOT(setCurrentIndex(int)));
 	connect(console, SIGNAL(assertStringSignal(QString,bool)), clips, SLOT(assertStringSlot(QString,bool)));
 	connect(console, SIGNAL(factsSignal(bool)), clips, SLOT(factsSlot(bool)));
@@ -66,10 +67,12 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(console, SIGNAL(openProjectSignal()), this, SLOT(openProject()));
 	connect(console, SIGNAL(quitSignal()), qApp, SLOT(quit()));
 	connect(clips, SIGNAL(factsChangedSignal(QString)), projectWidget, SLOT(refreshFacts(QString)));
+	connect(clips, SIGNAL(templatesChangedSignal(QString)), projectWidget, SLOT(refreshTemplates(QString)));
 	connect(clips, SIGNAL(clearSignal()), projectWidget, SLOT(clearSlot()));
 	connect(clips, SIGNAL(outputSignal(QString)), console, SLOT(output(QString)));
 	disableWidgets(true);
 	readSettings();
+
 }
 
 
@@ -314,7 +317,8 @@ void MainWindow::readSettings()
 
 void MainWindow::treeWidgetItemClicked(QTreeWidgetItem* item, int column)
 {
-	bool ok;
+	//bool ok;
+
 	Q_UNUSED(column);
 	if(!item->parent())
 		emit treeWidgetItemClickedSignal(0);

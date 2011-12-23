@@ -26,7 +26,7 @@ HEADERS  += mainwindow.h \
 FORMS    += mainwindow.ui \
     newprojectdialog.ui
 
-LIBS += -lboost_thread -lclips
+LIBS += -lclips #-lboost_thread
 LIBS += -L/usr/lib
 
 OTHER_FILES += \
