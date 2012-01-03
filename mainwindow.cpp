@@ -130,6 +130,7 @@ void MainWindow::newProject()
 		projectPair.first = projectName;
 		projectPair.second = projectPath+"/"+projectName+"/"+projectName;
 		projectWidget->refreshFacts(clips->factsSlot(false));
+		projectWidget->refreshTemplates(clips->templatesSlot(false));
 	}
 
 }
@@ -185,6 +186,7 @@ void MainWindow::openProject()
 		clips->clearSlot();
 		clips->loadFactsSlot(projectPair.second+"/facts.clp");
 		projectWidget->refreshFacts(clips->factsSlot(false));
+		projectWidget->refreshTemplates(clips->templatesSlot(false));
 	}
 }
 
