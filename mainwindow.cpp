@@ -57,6 +57,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(projectWidget, SIGNAL(setFactDuplicationSignal(bool,bool)), clips, SLOT(setFactDuplicationSlot(bool,bool)));
 	connect(projectWidget, SIGNAL(removeFactSignal(int,bool)), clips, SLOT(retractSlot(int,bool)));
 	connect(projectWidget, SIGNAL(addTemplateSignal(QString,QList<slotsPair>)), clips, SLOT(deftemplateSlot(QString,QList<slotsPair>)));
+	connect(projectWidget, SIGNAL(removeTemplateSignal(QString,bool)), clips, SLOT(unDeftemplateSlot(QString,bool)));
 	connect(this, SIGNAL(treeWidgetItemClickedSignal(int)), projectWidget, SLOT(setCurrentIndex(int)));
 	connect(console, SIGNAL(assertStringSignal(QString,bool)), clips, SLOT(assertStringSlot(QString,bool)));
 	connect(console, SIGNAL(factsSignal(bool)), clips, SLOT(factsSlot(bool)));
@@ -66,8 +67,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(console, SIGNAL(createProjectSignal()), this, SLOT(newProject()));
 	connect(console, SIGNAL(openProjectSignal()), this, SLOT(openProject()));
 	connect(console, SIGNAL(quitSignal()), qApp, SLOT(quit()));
-	connect(clips, SIGNAL(factsChangedSignal(QString)), projectWidget, SLOT(refreshFacts(QString)));
-	connect(clips, SIGNAL(templatesChangedSignal(QString)), projectWidget, SLOT(refreshTemplates(QString)));
+	connect(clips, SIGNAL(factsChangedSignal(QStringList)), projectWidget, SLOT(refreshFacts(QStringList)));
+	connect(clips, SIGNAL(templatesChangedSignal(QStringList)), projectWidget, SLOT(refreshTemplates(QStringList)));
 	connect(clips, SIGNAL(clearSignal()), projectWidget, SLOT(clearSlot()));
 	connect(clips, SIGNAL(outputSignal(QString)), console, SLOT(output(QString)));
 	disableWidgets(true);
@@ -186,6 +187,7 @@ void MainWindow::openProject()
 		clips->clearSlot();
 		clips->loadFactsSlot(projectPair.second+"/facts.clp");
 		projectWidget->refreshFacts(clips->factsSlot(false));
+		clips->loadSlot(projectPair.second+"/all.clp");
 		projectWidget->refreshTemplates(clips->templatesSlot(false));
 	}
 }
@@ -222,6 +224,7 @@ void MainWindow::removeProject()
 void MainWindow::saveProject()
 {
 	clips->saveFactsSlot(projectPair.second+"/facts.clp");
+	clips->saveSlot(projectPair.second+"/all.clp");
 }
 
 void MainWindow::saveProjectAs()
@@ -241,6 +244,7 @@ void MainWindow::saveProjectAs()
 		out<<"name="+projectName+"\n";
 		file.close();
 		clips->saveFactsSlot(projectPath+"/facts.clp");
+		clips->saveSlot(projectPath+"/all.clp");
 	}
 }
 

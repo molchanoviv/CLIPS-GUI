@@ -9,6 +9,7 @@
 #include <QGroupBox>
 #include <QLabel>
 #include <QWidget>
+#include <QStringList>
 
 typedef QPair<bool, QString> slotsPair;
 
@@ -31,15 +32,17 @@ signals:
 	void setFactDuplicationSignal(bool, bool);
 	void removeFactSignal(int, bool);
 	void addTemplateSignal(QString, QList<slotsPair>);
+	void removeTemplateSignal(QString, bool);
 
 public slots:
-	void refreshFacts(QString);
+	void refreshFacts(QStringList);
 	void addFactSlot();
 	void removeFactSlot();
 	void duplicationProxySlot(bool);
 	void clearSlot();
 	void addTemplateSlot();
-	void refreshTemplates(QString);
+	void removeTemplateSlot();
+	void refreshTemplates(QStringList);
 
 };
 

@@ -15,8 +15,10 @@ void CLIPSClass::assertStringSlot(QString fact, bool ret)
 	AssertString(fact.toLocal8Bit().data());
 	if(ret)
 		emit outputSignal("");
-	QString facts = factsSlot(false);
+	QStringList facts = factsSlot(false);
 	emit factsChangedSignal(facts);
+	QStringList templates = templatesSlot(false);
+	emit templatesChangedSignal(templates);
 
 }
 
@@ -33,7 +35,7 @@ void CLIPSClass::retractSlot(int factNumber, bool ret)
 				Retract(ptr);
 				if(ret)
 					emit outputSignal("");
-				QString facts = factsSlot(false);
+				QStringList facts = factsSlot(false);
 				emit factsChangedSignal(facts);
 			}
 		}
@@ -62,7 +64,17 @@ void CLIPSClass::deftemplateSlot(QString name, QList<slotsPair> slotsList)
 	QString path = file.fileName();
 	file.close();
 	Load(path.toLocal8Bit().data());
-	QString templates = templatesSlot(false);
+	QStringList templates = templatesSlot(false);
+	emit templatesChangedSignal(templates);
+}
+
+void CLIPSClass::unDeftemplateSlot(QString name, bool ret)
+{
+	void* tmplPtr = FindDeftemplate(name.simplified().toLocal8Bit().data());
+	if(!IsDeftemplateDeletable(tmplPtr))
+		return;
+	Undeftemplate(tmplPtr);
+	QStringList templates = templatesSlot(false);
 	emit templatesChangedSignal(templates);
 }
 
@@ -76,7 +88,7 @@ void CLIPSClass::loadFactsSlot(QString path)
 {
 	LoadFacts(path.toLocal8Bit().data());
 //	emit outputSignal("");
-	QString facts = factsSlot(false);
+	QStringList facts = factsSlot(false);
 	emit factsChangedSignal(facts);
 }
 
@@ -90,8 +102,10 @@ void CLIPSClass::loadSlot(QString path)
 {
 	Load(path.toLocal8Bit().data());
 //	emit outputSignal("");
-	QString facts = factsSlot(false);
+	QStringList facts = factsSlot(false);
 	emit factsChangedSignal(facts);
+	QStringList templates = templatesSlot(false);
+	emit templatesChangedSignal(templates);
 }
 
 void CLIPSClass::clearSlot()
@@ -107,43 +121,56 @@ void CLIPSClass::setFactDuplicationSlot(bool state, bool ret)
 		emit outputSignal("");
 }
 
-QString CLIPSClass::factsSlot(bool ret)
+QStringList CLIPSClass::factsSlot(bool ret)
 {
-
-	char buf[16384]={0};
-	int fdpipe[2];
-	pipe( fdpipe);
-	int old=dup(fileno(stdout));
-	dup2(fdpipe[1], fileno(stdout));
-	Facts("stdout", NULL, -1, -1, -1);
-	int r = read(fdpipe[0],buf,sizeof(buf));
-	buf[r]=0;
-	dup2(old, fileno(stdout));
-	std::string str(buf);
-	QString string;
-	string = string.fromStdString(str).trimmed();
+	QStringList factsList;
+	void* ptr=NULL;
+	int factNumber = 0;
+	do
+	{
+		ptr = GetNextFact(ptr);
+		char buf[16384]={0};
+		if(ptr!=NULL)
+		{
+			factNumber = FactIndex(ptr);
+			GetFactPPForm(buf,sizeof(buf), ptr);
+			factsList<<QString(buf);
+		}
+	}
+	while(ptr!=NULL);
 	if(ret)
+	{
+		QString string, str;
+		foreach(str, factsList)
+			string += " "+str;
 		emit outputSignal(string);
-	return string;
+	}
+	return factsList;
 }
 
-QString CLIPSClass::templatesSlot(bool ret)
+QStringList CLIPSClass::templatesSlot(bool ret)
 {
-
-	char buf[16384]={0};
-	int fdpipe[2];
-	pipe( fdpipe);
-	int old=dup(fileno(stdout));
-	dup2(fdpipe[1], fileno(stdout));
-	ListDeftemplates("stdout", NULL);
-	int r = read(fdpipe[0],buf,sizeof(buf));
-	buf[r]=0;
-	dup2(old, fileno(stdout));
-	std::string str(buf);
-	QString string;
-	string = string.fromStdString(str).trimmed();
+	DATA_OBJECT retVal;
+	char *tempPtr;
+	void *multifieldPtr;
+	QStringList templatesList;
+	GetDeftemplateList(&retVal, NULL);
+	multifieldPtr = GetValue(retVal);
+	for (int i = GetDOBegin(retVal); i <= GetDOEnd(retVal); i++)
+	{
+		if ((GetMFType(multifieldPtr,i) == STRING) ||(GetMFType(multifieldPtr,i) == SYMBOL))
+		{
+			tempPtr = ValueToString(GetMFValue(multifieldPtr,i));
+			templatesList<<QString(tempPtr);
+		}
+	}
 	if(ret)
+	{
+		QString string, str;
+		foreach(str, templatesList)
+			string += " "+str;
 		emit outputSignal(string);
-	return string;
+	}
+	return templatesList;
 }
 

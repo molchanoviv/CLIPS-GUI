@@ -1,6 +1,10 @@
 #include "projectstackedwidget.h"
+#include "addtemplatedialog.h"
 #include <QInputDialog>
 #include <QListWidgetItem>
+#include <QList>
+#include <QCheckBox>
+#include <QDebug>
 
 ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	QStackedWidget(parent)
@@ -8,10 +12,6 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	/**************************Templates***************************************/
 	QGroupBox *templatesWidget = new QGroupBox(tr("Templates"));
 	QVBoxLayout *templatesLayout = new QVBoxLayout;
-	QPushButton *button = new QPushButton(tr("..."));
-	QHBoxLayout *templatesTopLayout = new QHBoxLayout;
-	templatesTopLayout->addWidget(button);
-	templatesTopLayout->addStretch();
 	templatesListWidget = new QListWidget;
 	QPushButton *addTemplateButton = new QPushButton(tr("Add Template"));
 	QPushButton *removeTemplateButton = new QPushButton(tr("Remove Template"));
@@ -19,7 +19,6 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	templatesBottomLayout->addStretch();
 	templatesBottomLayout->addWidget(addTemplateButton);
 	templatesBottomLayout->addWidget(removeTemplateButton);
-	templatesLayout->addLayout(templatesTopLayout);
 	templatesLayout->addWidget(templatesListWidget);
 	templatesLayout->addLayout(templatesBottomLayout);
 	templatesWidget->setLayout(templatesLayout);
@@ -28,17 +27,14 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	QVBoxLayout *factsLayout = new QVBoxLayout;
 	QPushButton *duplicationButton = new QPushButton(tr("Enable Duplication"));
 	duplicationButton->setCheckable(true);
-	QHBoxLayout *factsTopLayout = new QHBoxLayout;
-	factsTopLayout->addWidget(duplicationButton);
-	factsTopLayout->addStretch();
 	factsListWidget = new QListWidget;
 	QPushButton *addFactButton = new QPushButton(tr("Add Fact"));
 	QPushButton *removeFactButton = new QPushButton(tr("Remove Fact"));
 	QHBoxLayout *factsBottomLayout = new QHBoxLayout;
+	factsBottomLayout->addWidget(duplicationButton);
 	factsBottomLayout->addStretch();
 	factsBottomLayout->addWidget(addFactButton);
 	factsBottomLayout->addWidget(removeFactButton);
-	factsLayout->addLayout(factsTopLayout);
 	factsLayout->addWidget(factsListWidget);
 	factsLayout->addLayout(factsBottomLayout);
 	factsWidget->setLayout(factsLayout);
@@ -46,10 +42,6 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	/*****************************Rules****************************************/
 	QGroupBox *rulesWidget = new QGroupBox(tr("Rules"));
 	QVBoxLayout *rulesLayout = new QVBoxLayout;
-	QPushButton *ruleButton = new QPushButton(tr("..."));
-	QHBoxLayout *rulesTopLayout = new QHBoxLayout;
-	rulesTopLayout->addWidget(ruleButton);
-	rulesTopLayout->addStretch();
 	rulesListWidget = new QListWidget;
 	QPushButton *addRuleButton = new QPushButton(tr("Add Rule"));
 	QPushButton *removeRuleButton = new QPushButton(tr("Remove Rule"));
@@ -57,17 +49,12 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	rulesBottomLayout->addStretch();
 	rulesBottomLayout->addWidget(addRuleButton);
 	rulesBottomLayout->addWidget(removeRuleButton);
-	rulesLayout->addLayout(rulesTopLayout);
 	rulesLayout->addWidget(rulesListWidget);
 	rulesLayout->addLayout(rulesBottomLayout);
 	rulesWidget->setLayout(rulesLayout);
 	/*****************************Functions************************************/
 	QGroupBox *functionsWidget = new QGroupBox(tr("Functions"));
 	QVBoxLayout *functionsLayout = new QVBoxLayout;
-	QPushButton *functionButton = new QPushButton(tr("..."));
-	QHBoxLayout *functionsTopLayout = new QHBoxLayout;
-	functionsTopLayout->addWidget(functionButton);
-	functionsTopLayout->addStretch();
 	functionsListWidget = new QListWidget;
 	QPushButton *addFunctionButton = new QPushButton(tr("Add Function"));
 	QPushButton *removeFunctionButton = new QPushButton(tr("Remove Function"));
@@ -75,17 +62,12 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	functionsBottomLayout->addStretch();
 	functionsBottomLayout->addWidget(addFunctionButton);
 	functionsBottomLayout->addWidget(removeFunctionButton);
-	functionsLayout->addLayout(functionsTopLayout);
 	functionsLayout->addWidget(functionsListWidget);
 	functionsLayout->addLayout(functionsBottomLayout);
 	functionsWidget->setLayout(functionsLayout);
 	/*****************************Classes**************************************/
 	QGroupBox *classesWidget = new QGroupBox(tr("Classes"));
 	QVBoxLayout *classesLayout = new QVBoxLayout;
-	QPushButton *classButton = new QPushButton(tr("..."));
-	QHBoxLayout *classesTopLayout = new QHBoxLayout;
-	classesTopLayout->addWidget(classButton);
-	classesTopLayout->addStretch();
 	classesListWidget = new QListWidget;
 	QPushButton *addClassButton = new QPushButton(tr("Add Class"));
 	QPushButton *removeClassButton = new QPushButton(tr("Remove Class"));
@@ -93,7 +75,6 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	classesBottomLayout->addStretch();
 	classesBottomLayout->addWidget(addClassButton);
 	classesBottomLayout->addWidget(removeClassButton);
-	classesLayout->addLayout(classesTopLayout);
 	classesLayout->addWidget(classesListWidget);
 	classesLayout->addLayout(classesBottomLayout);
 	classesWidget->setLayout(classesLayout);
@@ -107,6 +88,7 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	connect(duplicationButton, SIGNAL(toggled(bool)), this, SLOT(duplicationProxySlot(bool)));
 	connect(removeFactButton, SIGNAL(clicked()), this, SLOT(removeFactSlot()));
 	connect(addTemplateButton, SIGNAL(clicked()), this, SLOT(addTemplateSlot()));
+	connect(removeTemplateButton, SIGNAL(clicked()), this, SLOT(removeTemplateSlot()));
 }
 
 
@@ -127,11 +109,11 @@ void ProjectStackedWidget::removeFactSlot()
 		emit removeFactSignal(facts.at(0)->data(Qt::UserRole).toInt(), false);
 }
 
-void ProjectStackedWidget::refreshFacts(QString facts)
+void ProjectStackedWidget::refreshFacts(QStringList list)
 {
 	factsListWidget->clear();
-	QStringList list = facts.split("\n");
-	list.removeLast();
+	//QStringList list = facts.split("\n");
+	//list.removeLast();
 	QString str;
 	foreach(str, list)
 	{
@@ -146,23 +128,13 @@ void ProjectStackedWidget::refreshFacts(QString facts)
 	}
 }
 
-void ProjectStackedWidget::refreshTemplates(QString facts)
+void ProjectStackedWidget::refreshTemplates(QStringList templates)
 {
 	templatesListWidget->clear();
-	QStringList list = facts.split("\n");
-	list.removeFirst();
-	list.removeLast();
 	QString str;
-	foreach(str, list)
+	foreach(str, templates)
 	{
-		//QStringList fact;
-		//fact = str.split(" ", QString::SkipEmptyParts);
-		//QString num = fact.at(0);
-		//int index = num.remove(0, 2).toInt();
-		//QString name = fact.at(1);
 		QListWidgetItem *item = new QListWidgetItem(templatesListWidget);
-		//item->setData(Qt::UserRole, index);
-		//item->setText(name);
 		item->setText(str);
 	}
 }
@@ -174,16 +146,38 @@ void ProjectStackedWidget::duplicationProxySlot(bool state)
 
 void ProjectStackedWidget::addTemplateSlot()
 {
-	QString name = "mytemplate";
-	slotsPair firstPair;
-	firstPair.first = true;
-	firstPair.second = "first-slot";
-	slotsPair secondPair;
-	secondPair.first = false;
-	secondPair.second = "second-slot";
-	QList<slotsPair> slotsList;
-	slotsList<<firstPair<<secondPair;
-	emit addTemplateSignal(name, slotsList);
+	bool ok;
+	int i = QInputDialog::getInt(this, tr("Slots count"), tr("Enter slots count:"), 1, 1, 100, 1, &ok);
+	if (ok)
+	{
+		addTemplateDialog dialog(this,i);
+		if(dialog.exec() == QDialog::Accepted)
+		{
+			QString name = dialog.nameLineEdit->text();
+			if(name.isEmpty())
+				return;
+			QList<QCheckBox *> checkBoxList = dialog.checkBoxList;
+			QList<QLineEdit *> lineEditList = dialog.lineEditList;
+			QList<slotsPair> slotsList;
+			for(int i=0; i<lineEditList.count();i++)
+			{
+				slotsPair pair;
+				pair.first = checkBoxList.at(i)->checkState();
+				pair.second = lineEditList.at(i)->text();
+				if(pair.second.isEmpty())
+					return;
+				slotsList.append(pair);
+			}
+			emit addTemplateSignal(name, slotsList);
+		}
+	}
+}
+
+void ProjectStackedWidget::removeTemplateSlot()
+{
+	QList<QListWidgetItem*> templates = templatesListWidget->selectedItems();
+	if(!templates.isEmpty())
+		emit removeTemplateSignal(templates.at(0)->text(), false);
 }
 
 void ProjectStackedWidget::clearSlot()
