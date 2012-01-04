@@ -1,9 +1,0 @@
-[Desktop Entry]
-Name=XCLIPS
-GenericName=XCLIPS Expert System
-Exec=xclips
-Icon=xclips
-Terminal=false
-Type=Application
-Categories=Development;Building;IDE;Education;Science;ArtificialIntelligence;ComputerScience;Robotics;
-Version=1.0
