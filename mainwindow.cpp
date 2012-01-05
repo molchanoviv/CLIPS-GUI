@@ -1,8 +1,12 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "consoleclass.h"
+#include "addtemplatedialog.h"
 #include "newprojectdialog.h"
+#include "addfactbytemplatedialog.h"
 #include <QToolBar>
+#include <QInputDialog>
+#include <QCheckBox>
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -53,11 +57,14 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(ui->actionClose, SIGNAL(triggered()), this, SLOT(closeProject()));
 	connect(ui->actionRemove, SIGNAL(triggered()), this, SLOT(removeProject()));
 	connect(projectsTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(treeWidgetItemClicked(QTreeWidgetItem*,int)));
-	connect(projectWidget, SIGNAL(addFactSignal(QString,bool)), clips, SLOT(assertStringSlot(QString,bool)));
 	connect(projectWidget, SIGNAL(setFactDuplicationSignal(bool,bool)), clips, SLOT(setFactDuplicationSlot(bool,bool)));
 	connect(projectWidget, SIGNAL(removeFactSignal(int,bool)), clips, SLOT(retractSlot(int,bool)));
-	connect(projectWidget, SIGNAL(addTemplateSignal(QString,QList<slotsPair>)), clips, SLOT(deftemplateSlot(QString,QList<slotsPair>)));
 	connect(projectWidget, SIGNAL(removeTemplateSignal(QString,bool)), clips, SLOT(unDeftemplateSlot(QString,bool)));
+	connect(projectWidget->addFactButton, SIGNAL(clicked()), this, SLOT(addFactSlot()));
+	connect(projectWidget->addFactByTemplateButton, SIGNAL(clicked()), this, SLOT(addFactByTemplateSlot()));
+	connect(projectWidget->addTemplateButton, SIGNAL(clicked()), this, SLOT(addTemplateSlot()));
+	connect(this, SIGNAL(addFactSignal(QString,bool)), clips, SLOT(assertStringSlot(QString,bool)));
+	connect(this,SIGNAL(addTemplateSignal(QString,QList<slotsPair>)), clips, SLOT(deftemplateSlot(QString,QList<slotsPair>)));
 	connect(this, SIGNAL(treeWidgetItemClickedSignal(int)), projectWidget, SLOT(setCurrentIndex(int)));
 	connect(console, SIGNAL(assertStringSignal(QString,bool)), clips, SLOT(assertStringSlot(QString,bool)));
 	connect(console, SIGNAL(factsSignal(bool)), clips, SLOT(factsSlot(bool)));
@@ -130,8 +137,8 @@ void MainWindow::newProject()
 		file.close();
 		projectPair.first = projectName;
 		projectPair.second = projectPath+"/"+projectName+"/"+projectName;
-		projectWidget->refreshFacts(clips->factsSlot(false));
 		projectWidget->refreshTemplates(clips->templatesSlot(false));
+		projectWidget->refreshFacts(clips->factsSlot(false));
 	}
 
 }
@@ -185,10 +192,72 @@ void MainWindow::openProject()
 		projectPair.first = projectName;
 		projectPair.second = fileName.remove(fileName.lastIndexOf(QRegExp("(/|\\\\)")), fileName.length());
 		clips->clearSlot();
-		clips->loadFactsSlot(projectPair.second+"/facts.clp");
-		projectWidget->refreshFacts(clips->factsSlot(false));
 		clips->loadSlot(projectPair.second+"/all.clp");
 		projectWidget->refreshTemplates(clips->templatesSlot(false));
+		clips->loadFactsSlot(projectPair.second+"/facts.clp");
+		projectWidget->refreshFacts(clips->factsSlot(false));
+
+	}
+}
+
+void MainWindow::addFactSlot()
+{
+	bool ok;
+	QString text = QInputDialog::getText(this, tr("Add Fact"), tr("Fact name:"), QLineEdit::Normal, tr("Fact"), &ok);
+	if (ok && !text.isEmpty())
+		emit addFactSignal(text, false);
+}
+
+void MainWindow::addFactByTemplateSlot()
+{
+	QStringList templatesList;
+	QList<slotsPair> slotsValuesList;
+	templatesList = clips->templatesSlot(false);
+	bool ok;
+	QString templateName = QInputDialog::getItem(this, tr("Select Template"), tr("Template:"), templatesList, 0, false, &ok);
+	if (ok && !templateName.isEmpty())
+	{
+		QList<slotsPair> list = clips->getTemplateInformation(templateName);
+		if(list.isEmpty())
+			return;
+		addFactByTemplateDialog dialog(this, &list);
+		if(dialog.exec() == QDialog::Accepted)
+		{
+			for(int i=0; i<list.count(); i++)
+				slotsValuesList.append(slotsPair(list.at(i).first, dialog.lineEditList.at(i)->text()));
+			clips->assertSlot(templateName, slotsValuesList, false);
+		}
+		if(slotsValuesList.isEmpty())
+			return;
+	}
+}
+
+void MainWindow::addTemplateSlot()
+{
+	bool ok;
+	int i = QInputDialog::getInt(this, tr("Slots count"), tr("Enter slots count:"), 1, 1, 100, 1, &ok);
+	if (ok)
+	{
+		addTemplateDialog dialog(this,i);
+		if(dialog.exec() == QDialog::Accepted)
+		{
+			QString name = dialog.nameLineEdit->text();
+			if(name.isEmpty())
+				return;
+			QList<QCheckBox *> checkBoxList = dialog.checkBoxList;
+			QList<QLineEdit *> lineEditList = dialog.lineEditList;
+			QList<slotsPair> slotsList;
+			for(int i=0; i<lineEditList.count();i++)
+			{
+				slotsPair pair;
+				pair.first = checkBoxList.at(i)->checkState();
+				pair.second = lineEditList.at(i)->text();
+				if(pair.second.isEmpty())
+					return;
+				slotsList.append(pair);
+			}
+			emit addTemplateSignal(name, slotsList);
+		}
 	}
 }
 

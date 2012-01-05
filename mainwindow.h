@@ -45,16 +45,20 @@ private:
 
 private slots:
 	void treeWidgetItemClicked(QTreeWidgetItem*,int);
-
 	void newProject();
 	void openProject();
 	void closeProject();
 	void removeProject();
 	void saveProject();
 	void saveProjectAs();
+	void addFactSlot();
+	void addFactByTemplateSlot();
+	void addTemplateSlot();
 
 signals:
 	void treeWidgetItemClickedSignal(int);
+	void addFactSignal(QString, bool);
+	void addTemplateSignal(QString, QList<slotsPair>);
 };
 
 #endif // MAINWINDOW_H

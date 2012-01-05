@@ -16,18 +16,21 @@ SOURCES += main.cpp\
     clipsclass.cpp \
     projectstackedwidget.cpp \
     newprojectdialog.cpp \
-    addtemplatedialog.cpp
+    addtemplatedialog.cpp \
+    addfactbytemplatedialog.cpp
 
 HEADERS  += mainwindow.h \
     consoleclass.h \
     clipsclass.h \
     projectstackedwidget.h \
     newprojectdialog.h \
-    addtemplatedialog.h
+    addtemplatedialog.h \
+    addfactbytemplatedialog.h
 
 FORMS    += mainwindow.ui \
     newprojectdialog.ui \
-    addtemplatedialog.ui
+    addtemplatedialog.ui \
+    addfactbytemplatedialog.ui
 
 LIBS += -lclips #-lboost_thread
 LIBS += -L/usr/lib

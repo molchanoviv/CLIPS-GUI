@@ -1,7 +1,6 @@
 #include <iostream>
-//#include <fcntl.h>
-//#include <unistd.h>
 #include "clipsclass.h"
+#include <QRegExpValidator>
 
 CLIPSClass::CLIPSClass(QObject *parent) :
 	QObject(parent)
@@ -20,6 +19,111 @@ void CLIPSClass::assertStringSlot(QString fact, bool ret)
 	QStringList templates = templatesSlot(false);
 	emit templatesChangedSignal(templates);
 
+}
+
+void CLIPSClass::assertSlot(QString templateName, QList<slotsPair> slotsList, bool ret)
+{
+	QRegExp floatRx("[0-9]+[\\.][0-9]*");
+	QRegExp intRx("[0-9]*");
+	void *newFact;
+	void *templatePtr;
+	void *theMultifield;
+	DATA_OBJECT theValue;
+	IncrementGCLocks();
+	templatePtr = FindDeftemplate(templateName.toLocal8Bit().data());
+	newFact = CreateFact(templatePtr);
+	if (newFact == NULL)
+		return;
+	DATA_OBJECT sltVal;
+	QStringList sltNames;
+	DeftemplateSlotNames(templatePtr, &sltVal);
+	void *multifieldPtr;
+	char *sltName;
+	multifieldPtr = GetValue(sltVal);
+	for (int i = GetDOBegin(sltVal); i <= GetDOEnd(sltVal); i++)
+	{
+		if ((GetMFType(multifieldPtr,i) == STRING) ||(GetMFType(multifieldPtr,i) == SYMBOL))
+		{
+			sltName = ValueToString(GetMFValue(multifieldPtr,i));
+			sltNames.append(QString(sltName));
+		}
+	}
+	for(int i=0; i<slotsList.count(); i++)
+	{
+		if(!slotsList.at(i).first)
+		{
+			QRegExpValidator validator(floatRx, 0);
+			int pos = 0;
+			QString slotVal = slotsList.at(i).second;
+			if(validator.validate(slotVal, pos) != QValidator::Acceptable)
+			{
+				QRegExpValidator validator(intRx, 0);
+				if(validator.validate(slotVal, pos) != QValidator::Acceptable)
+				{
+					theValue.type = SYMBOL;
+					theValue.value = AddSymbol(slotVal.toLocal8Bit().data());
+				}
+				else
+				{
+					theValue.type = FLOAT;
+					theValue.value = AddDouble(slotVal.toFloat());
+				}
+			}
+			else
+			{
+				theValue.type = INTEGER;
+				theValue.value = AddLong(slotVal.toInt());
+			}
+			PutFactSlot(newFact, sltNames.at(i).toLocal8Bit().data(), &theValue);
+		}
+		else
+		{
+			QStringList mltSltVal = slotsList.at(i).second.split(" ");
+			if(mltSltVal.isEmpty())
+				return;
+			theMultifield = CreateMultifield(mltSltVal.count());
+
+			for(int t=0; t<mltSltVal.count(); t++)
+			{
+				QRegExpValidator validator(floatRx, 0);
+				int pos = 0;
+				QString slotVal = slotsList.at(t).second;
+				if(validator.validate(slotVal, pos) != QValidator::Acceptable)
+				{
+					QRegExpValidator validator(intRx, 0);
+					if(validator.validate(slotVal, pos) != QValidator::Acceptable)
+					{
+						SetMFType(theMultifield,t+1,SYMBOL);
+						SetMFValue(theMultifield,t+1,AddSymbol(mltSltVal.at(t).toLocal8Bit().data()));
+					}
+					else
+					{
+						SetMFType(theMultifield,t+1,FLOAT);
+						SetMFValue(theMultifield,t+1,AddDouble(mltSltVal.at(t).toFloat()));
+					}
+				}
+				else
+				{
+					SetMFType(theMultifield,t+1,INTEGER);
+					SetMFValue(theMultifield,t+1,AddLong(mltSltVal.at(t).toInt()));
+				}
+			}
+			SetDOBegin(theValue,1);
+			SetDOEnd(theValue,mltSltVal.count()+1);
+			theValue.type = MULTIFIELD;
+			theValue.value = theMultifield;
+			PutFactSlot(newFact, sltNames.at(i).toLocal8Bit().data(), &theValue);
+		}
+	}
+	AssignFactSlotDefaults(newFact);
+	DecrementGCLocks();
+	Assert(newFact);
+	if(ret)
+		emit outputSignal("");
+	QStringList facts = factsSlot(false);
+	emit factsChangedSignal(facts);
+	QStringList templates = templatesSlot(false);
+	emit templatesChangedSignal(templates);
 }
 
 void CLIPSClass::retractSlot(int factNumber, bool ret)
@@ -74,8 +178,31 @@ void CLIPSClass::unDeftemplateSlot(QString name, bool ret)
 	if(!IsDeftemplateDeletable(tmplPtr))
 		return;
 	Undeftemplate(tmplPtr);
+	if(ret)
+		emit outputSignal("");
 	QStringList templates = templatesSlot(false);
 	emit templatesChangedSignal(templates);
+}
+
+QList<slotsPair> CLIPSClass::getTemplateInformation(QString name)
+{
+	QList<slotsPair> info;
+	DATA_OBJECT sltVal;
+	void* tmplPtr = FindDeftemplate(name.toLocal8Bit().data());
+	DeftemplateSlotNames(tmplPtr, &sltVal);
+	void *multifieldPtr;
+	char *sltName;
+	multifieldPtr = GetValue(sltVal);
+	for (int i = GetDOBegin(sltVal); i <= GetDOEnd(sltVal); i++)
+	{
+		if ((GetMFType(multifieldPtr,i) == STRING) ||(GetMFType(multifieldPtr,i) == SYMBOL))
+		{
+			sltName = ValueToString(GetMFValue(multifieldPtr,i));
+			bool ok = DeftemplateSlotMultiP(tmplPtr, sltName);
+			info.append(slotsPair(ok, QString(sltName)));
+		}
+	}
+	return info;
 }
 
 void CLIPSClass::saveFactsSlot(QString path)
@@ -125,14 +252,12 @@ QStringList CLIPSClass::factsSlot(bool ret)
 {
 	QStringList factsList;
 	void* ptr=NULL;
-	int factNumber = 0;
 	do
 	{
 		ptr = GetNextFact(ptr);
 		char buf[16384]={0};
 		if(ptr!=NULL)
 		{
-			factNumber = FactIndex(ptr);
 			GetFactPPForm(buf,sizeof(buf), ptr);
 			factsList<<QString(buf);
 		}

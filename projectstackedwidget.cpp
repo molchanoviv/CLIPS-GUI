@@ -1,10 +1,8 @@
 #include "projectstackedwidget.h"
-#include "addtemplatedialog.h"
-#include <QInputDialog>
 #include <QListWidgetItem>
 #include <QList>
-#include <QCheckBox>
 #include <QDebug>
+#include <QRegExp>
 
 ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	QStackedWidget(parent)
@@ -13,7 +11,7 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	QGroupBox *templatesWidget = new QGroupBox(tr("Templates"));
 	QVBoxLayout *templatesLayout = new QVBoxLayout;
 	templatesListWidget = new QListWidget;
-	QPushButton *addTemplateButton = new QPushButton(tr("Add Template"));
+	addTemplateButton = new QPushButton(tr("Add Template"));
 	QPushButton *removeTemplateButton = new QPushButton(tr("Remove Template"));
 	QHBoxLayout *templatesBottomLayout = new QHBoxLayout;
 	templatesBottomLayout->addStretch();
@@ -28,17 +26,18 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	QPushButton *duplicationButton = new QPushButton(tr("Enable Duplication"));
 	duplicationButton->setCheckable(true);
 	factsListWidget = new QListWidget;
-	QPushButton *addFactButton = new QPushButton(tr("Add Fact"));
+	addFactButton = new QPushButton(tr("Add Fact"));
+	addFactByTemplateButton = new QPushButton(tr("Add Fact By Template"));
 	QPushButton *removeFactButton = new QPushButton(tr("Remove Fact"));
 	QHBoxLayout *factsBottomLayout = new QHBoxLayout;
 	factsBottomLayout->addWidget(duplicationButton);
 	factsBottomLayout->addStretch();
+	factsBottomLayout->addWidget(addFactByTemplateButton);
 	factsBottomLayout->addWidget(addFactButton);
 	factsBottomLayout->addWidget(removeFactButton);
 	factsLayout->addWidget(factsListWidget);
 	factsLayout->addLayout(factsBottomLayout);
 	factsWidget->setLayout(factsLayout);
-	connect(addFactButton, SIGNAL(clicked()), this, SLOT(addFactSlot()));
 	/*****************************Rules****************************************/
 	QGroupBox *rulesWidget = new QGroupBox(tr("Rules"));
 	QVBoxLayout *rulesLayout = new QVBoxLayout;
@@ -87,19 +86,7 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 
 	connect(duplicationButton, SIGNAL(toggled(bool)), this, SLOT(duplicationProxySlot(bool)));
 	connect(removeFactButton, SIGNAL(clicked()), this, SLOT(removeFactSlot()));
-	connect(addTemplateButton, SIGNAL(clicked()), this, SLOT(addTemplateSlot()));
 	connect(removeTemplateButton, SIGNAL(clicked()), this, SLOT(removeTemplateSlot()));
-}
-
-
-void ProjectStackedWidget::addFactSlot()
-{
-	bool ok;
-	QString text = QInputDialog::getText(this, tr("Add Fact"),
-						tr("Fact name:"), QLineEdit::Normal,
-						tr("Fact"), &ok);
-	if (ok && !text.isEmpty())
-		emit addFactSignal(text, false);
 }
 
 void ProjectStackedWidget::removeFactSlot()
@@ -112,16 +99,13 @@ void ProjectStackedWidget::removeFactSlot()
 void ProjectStackedWidget::refreshFacts(QStringList list)
 {
 	factsListWidget->clear();
-	//QStringList list = facts.split("\n");
-	//list.removeLast();
 	QString str;
 	foreach(str, list)
 	{
-		QStringList fact;
-		fact = str.split(" ", QString::SkipEmptyParts);
-		QString num = fact.at(0);
-		int index = num.remove(0, 2).toInt();
-		QString name = fact.at(1);
+		QString name = str;
+		int index = str.remove(str.indexOf(" "), str.length() - str.indexOf(" ")).remove(0, 2).toInt();
+		name.remove(0, name.indexOf(" "));
+		name = name.simplified();
 		QListWidgetItem *item = new QListWidgetItem(factsListWidget);
 		item->setData(Qt::UserRole, index);
 		item->setText(name);
@@ -142,35 +126,6 @@ void ProjectStackedWidget::refreshTemplates(QStringList templates)
 void ProjectStackedWidget::duplicationProxySlot(bool state)
 {
 	emit setFactDuplicationSignal(state, false);
-}
-
-void ProjectStackedWidget::addTemplateSlot()
-{
-	bool ok;
-	int i = QInputDialog::getInt(this, tr("Slots count"), tr("Enter slots count:"), 1, 1, 100, 1, &ok);
-	if (ok)
-	{
-		addTemplateDialog dialog(this,i);
-		if(dialog.exec() == QDialog::Accepted)
-		{
-			QString name = dialog.nameLineEdit->text();
-			if(name.isEmpty())
-				return;
-			QList<QCheckBox *> checkBoxList = dialog.checkBoxList;
-			QList<QLineEdit *> lineEditList = dialog.lineEditList;
-			QList<slotsPair> slotsList;
-			for(int i=0; i<lineEditList.count();i++)
-			{
-				slotsPair pair;
-				pair.first = checkBoxList.at(i)->checkState();
-				pair.second = lineEditList.at(i)->text();
-				if(pair.second.isEmpty())
-					return;
-				slotsList.append(pair);
-			}
-			emit addTemplateSignal(name, slotsList);
-		}
-	}
 }
 
 void ProjectStackedWidget::removeTemplateSlot()
