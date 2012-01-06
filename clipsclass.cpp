@@ -147,6 +147,44 @@ void CLIPSClass::retractSlot(int factNumber, bool ret)
 	while(ptr!=NULL);
 }
 
+void CLIPSClass::deffactsSlot(QString name, QStringList factsList)
+{
+	QString factsstr;
+
+	for(int i=0; i<factsList.count(); i++)
+	{
+		factsstr += "( "+factsList.at(i)+" ) ";
+	}
+	QString command = "(deffacts "+name+" "+factsstr+")";
+	QFile file(QDir::tempPath()+"/tmpfile");
+	if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+		return;
+	QTextStream out(&file);
+	out<<command;
+	QString path = file.fileName();
+	file.close();
+	Load(path.toLocal8Bit().data());
+	file.remove();
+	QStringList deffacts = factsListSlot(false);
+	emit deffactsChangedSignal(deffacts);
+	QStringList templates = templatesSlot(false);
+	emit templatesChangedSignal(templates);
+}
+
+void CLIPSClass::unDeffactsSlot(QString name, bool ret)
+{
+	void* tmplPtr = FindDeffacts(name.simplified().toLocal8Bit().data());
+	if(!IsDeffactsDeletable(tmplPtr))
+		return;
+	Undeffacts(tmplPtr);
+	if(ret)
+		emit outputSignal("");
+	QStringList deffacts = factsListSlot(false);
+	emit deffactsChangedSignal(deffacts);
+	QStringList templates = templatesSlot(false);
+	emit templatesChangedSignal(templates);
+}
+
 void CLIPSClass::deftemplateSlot(QString name, QList<slotsPair> slotsList)
 {
 	QString slotsstr;
@@ -168,6 +206,7 @@ void CLIPSClass::deftemplateSlot(QString name, QList<slotsPair> slotsList)
 	QString path = file.fileName();
 	file.close();
 	Load(path.toLocal8Bit().data());
+	file.remove();
 	QStringList templates = templatesSlot(false);
 	emit templatesChangedSignal(templates);
 }
@@ -248,6 +287,32 @@ void CLIPSClass::setFactDuplicationSlot(bool state, bool ret)
 		emit outputSignal("");
 }
 
+QStringList CLIPSClass::templatesSlot(bool ret)
+{
+	DATA_OBJECT retVal;
+	char *tempPtr;
+	void *multifieldPtr;
+	QStringList templatesList;
+	GetDeftemplateList(&retVal, NULL);
+	multifieldPtr = GetValue(retVal);
+	for (int i = GetDOBegin(retVal); i <= GetDOEnd(retVal); i++)
+	{
+		if ((GetMFType(multifieldPtr,i) == STRING) ||(GetMFType(multifieldPtr,i) == SYMBOL))
+		{
+			tempPtr = ValueToString(GetMFValue(multifieldPtr,i));
+			templatesList<<QString(tempPtr);
+		}
+	}
+	if(ret)
+	{
+		QString string, str;
+		foreach(str, templatesList)
+			string += " "+str;
+		emit outputSignal(string);
+	}
+	return templatesList;
+}
+
 QStringList CLIPSClass::factsSlot(bool ret)
 {
 	QStringList factsList;
@@ -273,29 +338,29 @@ QStringList CLIPSClass::factsSlot(bool ret)
 	return factsList;
 }
 
-QStringList CLIPSClass::templatesSlot(bool ret)
+QStringList CLIPSClass::factsListSlot(bool ret)
 {
+	QStringList deffactsList;
 	DATA_OBJECT retVal;
 	char *tempPtr;
 	void *multifieldPtr;
-	QStringList templatesList;
-	GetDeftemplateList(&retVal, NULL);
+	GetDeffactsList(&retVal, NULL);
 	multifieldPtr = GetValue(retVal);
 	for (int i = GetDOBegin(retVal); i <= GetDOEnd(retVal); i++)
 	{
 		if ((GetMFType(multifieldPtr,i) == STRING) ||(GetMFType(multifieldPtr,i) == SYMBOL))
 		{
 			tempPtr = ValueToString(GetMFValue(multifieldPtr,i));
-			templatesList<<QString(tempPtr);
+			deffactsList<<QString(tempPtr);
 		}
 	}
 	if(ret)
 	{
 		QString string, str;
-		foreach(str, templatesList)
+		foreach(str, deffactsList)
 			string += " "+str;
 		emit outputSignal(string);
 	}
-	return templatesList;
+	return deffactsList;
 }
 

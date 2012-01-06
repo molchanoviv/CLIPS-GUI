@@ -17,7 +17,8 @@ SOURCES += main.cpp\
     projectstackedwidget.cpp \
     newprojectdialog.cpp \
     addtemplatedialog.cpp \
-    addfactbytemplatedialog.cpp
+    addfactbytemplatedialog.cpp \
+    adddeffactsdialog.cpp
 
 HEADERS  += mainwindow.h \
     consoleclass.h \
@@ -25,12 +26,14 @@ HEADERS  += mainwindow.h \
     projectstackedwidget.h \
     newprojectdialog.h \
     addtemplatedialog.h \
-    addfactbytemplatedialog.h
+    addfactbytemplatedialog.h \
+    adddeffactsdialog.h
 
 FORMS    += mainwindow.ui \
     newprojectdialog.ui \
     addtemplatedialog.ui \
-    addfactbytemplatedialog.ui
+    addfactbytemplatedialog.ui \
+    adddeffactsdialog.ui
 
 LIBS += -lclips #-lboost_thread
 LIBS += -L/usr/lib
@@ -41,6 +44,8 @@ OTHER_FILES += \
 
 RESOURCES += \
     resources.qrc
+
+TRANSLATIONS += translations/CLIPS-GUI_ru.ts
 
 
 

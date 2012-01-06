@@ -16,6 +16,7 @@ public slots:
 	void assertStringSlot(QString, bool);
 	void assertSlot(QString, QList<slotsPair>, bool);
 	QStringList factsSlot(bool);
+	QStringList factsListSlot(bool);
 	QStringList templatesSlot(bool);
 	void retractSlot(int, bool);
 	void saveFactsSlot(QString);
@@ -25,12 +26,15 @@ public slots:
 	void clearSlot();
 	void setFactDuplicationSlot(bool, bool);
 	void deftemplateSlot(QString, QList<slotsPair>);
+	void deffactsSlot(QString, QStringList);
 	void unDeftemplateSlot(QString, bool);
+	void unDeffactsSlot(QString, bool);
 	QList<slotsPair> getTemplateInformation(QString);
 
 signals:
 	void outputSignal(QString);
 	void factsChangedSignal(QStringList);
+	void deffactsChangedSignal(QStringList);
 	void templatesChangedSignal(QStringList);
 	void clearSignal();
 

@@ -2,7 +2,7 @@
 #include <QGridLayout>
 #include <QLabel>
 #include <QLineEdit>
-#include <QRegExpValidator>
+//#include <QRegExpValidator>
 
 addFactByTemplateDialog::addFactByTemplateDialog(QWidget *parent, QList<slotsPair> *slotsList) :
 	QDialog(parent)
@@ -10,8 +10,8 @@ addFactByTemplateDialog::addFactByTemplateDialog(QWidget *parent, QList<slotsPai
 	setupUi(this);
 	if(slotsList->isEmpty())
 		return;
-	QRegExp rx("\\S*");
-	QValidator *validator = new QRegExpValidator(rx, this);
+	//QRegExp rx("\\S*");
+	//QValidator *validator = new QRegExpValidator(rx, this);
 	QGridLayout *mainLayout = new QGridLayout;
 	int i=0;
 	for(i ;i<slotsList->count(); i++)
@@ -21,7 +21,7 @@ addFactByTemplateDialog::addFactByTemplateDialog(QWidget *parent, QList<slotsPai
 		if(!slotsList->at(i).first)
 		{
 			mltSltLbl = "slot";
-			lineEdit->setValidator(validator);
+			//lineEdit->setValidator(validator);
 		}
 		else
 			mltSltLbl = "multislot";

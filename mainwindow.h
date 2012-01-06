@@ -52,12 +52,20 @@ private slots:
 	void saveProject();
 	void saveProjectAs();
 	void addFactSlot();
+	void refreshTemplatesSlot();
+	void refreshFactsSlot();
+	void refreshDeffactsSlot();
+	void refreshRulesSlot();
+	void refreshFunctionsSlot();
+	void refreshClassesSlot();
 	void addFactByTemplateSlot();
+	void addFactsListSlot();
 	void addTemplateSlot();
 
 signals:
 	void treeWidgetItemClickedSignal(int);
 	void addFactSignal(QString, bool);
+	void addFactsListSignal(QString, QStringList);
 	void addTemplateSignal(QString, QList<slotsPair>);
 };
 

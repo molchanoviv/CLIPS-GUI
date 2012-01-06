@@ -4,6 +4,7 @@
 #include "addtemplatedialog.h"
 #include "newprojectdialog.h"
 #include "addfactbytemplatedialog.h"
+#include "adddeffactsdialog.h"
 #include <QToolBar>
 #include <QInputDialog>
 #include <QCheckBox>
@@ -17,6 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(ui->actionAbout_Qt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
 	ui->actionShow_Hide_console->setIcon(QIcon::fromTheme("utilities-terminal"));
 	ui->actionQuit->setIcon(QIcon::fromTheme("dialog-close"));
+	ui->mainToolBar->setWindowTitle(tr("Main Toolbar"));
 	ui->mainToolBar->addAction(ui->actionShow_Hide_console);
 	ui->mainToolBar->addAction(ui->actionQuit);
 	ui->actionNew->setIcon(QIcon::fromTheme("document-new"));
@@ -25,7 +27,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->actionClose->setIcon(QIcon::fromTheme("document-close"));
 	ui->actionSave->setIcon(QIcon::fromTheme("document-save"));
 	ui->actionSave_As->setIcon(QIcon::fromTheme("document-save"));
-	QToolBar *projectToolbar = new QToolBar;
+	QToolBar *projectToolbar = new QToolBar(tr("Project Toolbar"));
 	projectToolbar->addAction(ui->actionNew);
 	projectToolbar->addAction(ui->actionOpen);
 	projectToolbar->addAction(ui->actionSave);
@@ -58,12 +60,21 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(ui->actionRemove, SIGNAL(triggered()), this, SLOT(removeProject()));
 	connect(projectsTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(treeWidgetItemClicked(QTreeWidgetItem*,int)));
 	connect(projectWidget, SIGNAL(setFactDuplicationSignal(bool,bool)), clips, SLOT(setFactDuplicationSlot(bool,bool)));
-	connect(projectWidget, SIGNAL(removeFactSignal(int,bool)), clips, SLOT(retractSlot(int,bool)));
 	connect(projectWidget, SIGNAL(removeTemplateSignal(QString,bool)), clips, SLOT(unDeftemplateSlot(QString,bool)));
+	connect(projectWidget, SIGNAL(removeFactSignal(int,bool)), clips, SLOT(retractSlot(int,bool)));
+	connect(projectWidget, SIGNAL(removeFactsListSignal(QString,bool)), clips, SLOT(unDeffactsSlot(QString,bool)));
 	connect(projectWidget->addFactButton, SIGNAL(clicked()), this, SLOT(addFactSlot()));
 	connect(projectWidget->addFactByTemplateButton, SIGNAL(clicked()), this, SLOT(addFactByTemplateSlot()));
 	connect(projectWidget->addTemplateButton, SIGNAL(clicked()), this, SLOT(addTemplateSlot()));
+	connect(projectWidget->addDeffactButton, SIGNAL(clicked()), this, SLOT(addFactsListSlot()));
+	connect(projectWidget->refreshTemplatesButton, SIGNAL(clicked()), this, SLOT(refreshTemplatesSlot()));
+	connect(projectWidget->refreshFactsButton, SIGNAL(clicked()), this, SLOT(refreshFactsSlot()));
+	connect(projectWidget->refreshDeffactsButton, SIGNAL(clicked()), this, SLOT(refreshDeffactsSlot()));
+	connect(projectWidget->refreshRulesButton, SIGNAL(clicked()), this, SLOT(refreshRulesSlot()));
+	connect(projectWidget->refreshFunctionsButton, SIGNAL(clicked()), this, SLOT(refreshFunctionsSlot()));
+	connect(projectWidget->refreshClassesButton, SIGNAL(clicked()), this, SLOT(refreshClassesSlot()));
 	connect(this, SIGNAL(addFactSignal(QString,bool)), clips, SLOT(assertStringSlot(QString,bool)));
+	connect(this, SIGNAL(addFactsListSignal(QString,QStringList)), clips, SLOT(deffactsSlot(QString,QStringList)));
 	connect(this,SIGNAL(addTemplateSignal(QString,QList<slotsPair>)), clips, SLOT(deftemplateSlot(QString,QList<slotsPair>)));
 	connect(this, SIGNAL(treeWidgetItemClickedSignal(int)), projectWidget, SLOT(setCurrentIndex(int)));
 	connect(console, SIGNAL(assertStringSignal(QString,bool)), clips, SLOT(assertStringSlot(QString,bool)));
@@ -75,6 +86,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(console, SIGNAL(openProjectSignal()), this, SLOT(openProject()));
 	connect(console, SIGNAL(quitSignal()), qApp, SLOT(quit()));
 	connect(clips, SIGNAL(factsChangedSignal(QStringList)), projectWidget, SLOT(refreshFacts(QStringList)));
+	connect(clips, SIGNAL(deffactsChangedSignal(QStringList)), projectWidget, SLOT(refreshDeffacts(QStringList)));
 	connect(clips, SIGNAL(templatesChangedSignal(QStringList)), projectWidget, SLOT(refreshTemplates(QStringList)));
 	connect(clips, SIGNAL(clearSignal()), projectWidget, SLOT(clearSlot()));
 	connect(clips, SIGNAL(outputSignal(QString)), console, SLOT(output(QString)));
@@ -112,6 +124,8 @@ void MainWindow::newProject()
 		templatesItem->setText(0, tr("Templates"));
 		QTreeWidgetItem *factsItem = new QTreeWidgetItem();
 		factsItem->setText(0, tr("Facts"));
+		QTreeWidgetItem *deffactsItem = new QTreeWidgetItem();
+		deffactsItem->setText(0, tr("FactsList"));
 		QTreeWidgetItem *rulesItem = new QTreeWidgetItem();
 		rulesItem->setText(0, tr("Rules"));
 		QTreeWidgetItem *functionsItem = new QTreeWidgetItem();
@@ -120,6 +134,7 @@ void MainWindow::newProject()
 		classesItem->setText(0, tr("Classes"));
 		item->addChild(templatesItem);
 		item->addChild(factsItem);
+		item->addChild(deffactsItem);
 		item->addChild(rulesItem);
 		item->addChild(functionsItem);
 		item->addChild(classesItem);
@@ -139,6 +154,7 @@ void MainWindow::newProject()
 		projectPair.second = projectPath+"/"+projectName+"/"+projectName;
 		projectWidget->refreshTemplates(clips->templatesSlot(false));
 		projectWidget->refreshFacts(clips->factsSlot(false));
+		projectWidget->refreshDeffacts(clips->factsListSlot(false));
 	}
 
 }
@@ -173,6 +189,8 @@ void MainWindow::openProject()
 		templatesItem->setText(0, tr("Templates"));
 		QTreeWidgetItem *factsItem = new QTreeWidgetItem();
 		factsItem->setText(0, tr("Facts"));
+		QTreeWidgetItem *deffactsItem = new QTreeWidgetItem();
+		deffactsItem->setText(0, tr("FactsList"));
 		QTreeWidgetItem *rulesItem = new QTreeWidgetItem();
 		rulesItem->setText(0, tr("Rules"));
 		QTreeWidgetItem *functionsItem = new QTreeWidgetItem();
@@ -181,6 +199,7 @@ void MainWindow::openProject()
 		classesItem->setText(0, tr("Classes"));
 		item->addChild(templatesItem);
 		item->addChild(factsItem);
+		item->addChild(deffactsItem);
 		item->addChild(rulesItem);
 		item->addChild(functionsItem);
 		item->addChild(classesItem);
@@ -196,6 +215,7 @@ void MainWindow::openProject()
 		projectWidget->refreshTemplates(clips->templatesSlot(false));
 		clips->loadFactsSlot(projectPair.second+"/facts.clp");
 		projectWidget->refreshFacts(clips->factsSlot(false));
+		projectWidget->refreshDeffacts(clips->factsListSlot(false));
 
 	}
 }
@@ -229,6 +249,29 @@ void MainWindow::addFactByTemplateSlot()
 		}
 		if(slotsValuesList.isEmpty())
 			return;
+	}
+}
+
+void MainWindow::addFactsListSlot()
+{
+	bool ok;
+	int i = QInputDialog::getInt(this, tr("Facts count"), tr("Enter facts count:"), 1, 1, 100, 1, &ok);
+	if (ok)
+	{
+		addDeffactsDialog dialog(this, i);
+		if(dialog.exec() == QDialog::Accepted)
+		{
+			QString name = dialog.nameLineEdit->text();
+			if(name.isEmpty())
+				return;
+			QList<QLineEdit *> lineEditList = dialog.lineEditList;
+			QStringList factsList;
+			for(int i=0; i<lineEditList.count();i++)
+			{
+				factsList.append(lineEditList.at(i)->text());
+			}
+			emit addFactsListSignal(name, factsList);
+		}
 	}
 }
 
@@ -401,7 +444,39 @@ void MainWindow::treeWidgetItemClicked(QTreeWidgetItem* item, int column)
 		emit treeWidgetItemClickedSignal(item->parent()->indexOfChild(item));
 }
 
+void MainWindow::refreshTemplatesSlot()
+{
+	projectWidget->refreshTemplates(clips->templatesSlot(false));
+}
+
+void MainWindow::refreshFactsSlot()
+{
+	projectWidget->refreshFacts(clips->factsSlot(false));
+}
+
+void MainWindow::refreshDeffactsSlot()
+{
+	projectWidget->refreshDeffacts(clips->factsListSlot(false));
+}
+
+void MainWindow::refreshRulesSlot()
+{
+	//
+}
+
+void MainWindow::refreshFunctionsSlot()
+{
+	//
+}
+
+void MainWindow::refreshClassesSlot()
+{
+	//
+}
+
 MainWindow::~MainWindow()
 {
 	delete ui;
 }
+
+

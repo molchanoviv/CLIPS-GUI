@@ -20,12 +20,20 @@ public:
 	explicit ProjectStackedWidget(QWidget *parent = 0);
 	QListWidget *templatesListWidget;
 	QListWidget *factsListWidget;
+	QListWidget *deffactsListWidget;
 	QListWidget *rulesListWidget;
 	QListWidget *functionsListWidget;
 	QListWidget *classesListWidget;
 	QPushButton *addFactButton;
+	QPushButton *addDeffactButton;
 	QPushButton *addFactByTemplateButton;
 	QPushButton *addTemplateButton;
+	QPushButton *refreshTemplatesButton;
+	QPushButton *refreshFactsButton;
+	QPushButton *refreshDeffactsButton;
+	QPushButton *refreshRulesButton;
+	QPushButton *refreshFunctionsButton;
+	QPushButton *refreshClassesButton;
 
 private:
 
@@ -33,17 +41,18 @@ private:
 signals:
 	void setFactDuplicationSignal(bool, bool);
 	void removeFactSignal(int, bool);
-
 	void removeTemplateSignal(QString, bool);
+	void removeFactsListSignal(QString, bool);
 
 public slots:
-	void refreshFacts(QStringList);
-	void removeFactSlot();
-	void duplicationProxySlot(bool);
-	void clearSlot();
-
-	void removeTemplateSlot();
 	void refreshTemplates(QStringList);
+	void refreshFacts(QStringList);
+	void refreshDeffacts(QStringList);
+	void duplicationProxySlot(bool);
+	void removeTemplateSlot();
+	void removeFactSlot();
+	void removeDeffactsSlot();
+	void clearSlot();
 
 };
 

@@ -1,5 +1,6 @@
-шаблоны
-группы фактов
 правила
 функции
 классы
+неверная загрузка факта (Mytemplate (myslot first) (mymultislot second 2.5)) как (Mytemplate (myslot first) (mymultislot second 2.0))
+сделать просмотр фактов(шаблонов/правил/e.t.c.).
+управление через встроенную консоль
