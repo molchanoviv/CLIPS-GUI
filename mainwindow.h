@@ -51,22 +51,25 @@ private slots:
 	void removeProject();
 	void saveProject();
 	void saveProjectAs();
+	void addTemplateSlot();
 	void addFactSlot();
+	void addFactByTemplateSlot();
+	void addFactsListSlot();
+	void addRuleSlot();
 	void refreshTemplatesSlot();
 	void refreshFactsSlot();
 	void refreshDeffactsSlot();
 	void refreshRulesSlot();
 	void refreshFunctionsSlot();
 	void refreshClassesSlot();
-	void addFactByTemplateSlot();
-	void addFactsListSlot();
-	void addTemplateSlot();
+
 
 signals:
 	void treeWidgetItemClickedSignal(int);
 	void addFactSignal(QString, bool);
 	void addFactsListSignal(QString, QStringList);
 	void addTemplateSignal(QString, QList<slotsPair>);
+	void addRuleSignal(QString, QString, QString, QStringList, QStringList);
 };
 
 #endif // MAINWINDOW_H

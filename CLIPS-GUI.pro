@@ -18,7 +18,8 @@ SOURCES += main.cpp\
     newprojectdialog.cpp \
     addtemplatedialog.cpp \
     addfactbytemplatedialog.cpp \
-    adddeffactsdialog.cpp
+    adddeffactsdialog.cpp \
+    addruledialog.cpp
 
 HEADERS  += mainwindow.h \
     consoleclass.h \
@@ -27,13 +28,15 @@ HEADERS  += mainwindow.h \
     newprojectdialog.h \
     addtemplatedialog.h \
     addfactbytemplatedialog.h \
-    adddeffactsdialog.h
+    adddeffactsdialog.h \
+    addruledialog.h
 
 FORMS    += mainwindow.ui \
     newprojectdialog.ui \
     addtemplatedialog.ui \
     addfactbytemplatedialog.ui \
-    adddeffactsdialog.ui
+    adddeffactsdialog.ui \
+    addruledialog.ui
 
 LIBS += -lclips #-lboost_thread
 LIBS += -L/usr/lib

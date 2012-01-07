@@ -5,6 +5,7 @@
 #include "newprojectdialog.h"
 #include "addfactbytemplatedialog.h"
 #include "adddeffactsdialog.h"
+#include "addruledialog.h"
 #include <QToolBar>
 #include <QInputDialog>
 #include <QCheckBox>
@@ -63,13 +64,17 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(projectWidget, SIGNAL(removeTemplateSignal(QString,bool)), clips, SLOT(unDeftemplateSlot(QString,bool)));
 	connect(projectWidget, SIGNAL(removeFactSignal(int,bool)), clips, SLOT(retractSlot(int,bool)));
 	connect(projectWidget, SIGNAL(removeFactsListSignal(QString,bool)), clips, SLOT(unDeffactsSlot(QString,bool)));
+	connect(projectWidget, SIGNAL(removeRuleSignal(QString,bool)), clips, SLOT(unDefruleSlot(QString,bool)));
+	connect(projectWidget, SIGNAL(setBreakpointSignal(QString,bool)), clips, SLOT(SetBreakSlot(QString,bool)));
+	connect(projectWidget, SIGNAL(removeBreakpointSignal(QString,bool)), clips, SLOT(RemoveBreakSlot(QString,bool)));
+	connect(projectWidget->addTemplateButton, SIGNAL(clicked()), this, SLOT(addTemplateSlot()));
+	connect(projectWidget->refreshTemplatesButton, SIGNAL(clicked()), this, SLOT(refreshTemplatesSlot()));
 	connect(projectWidget->addFactButton, SIGNAL(clicked()), this, SLOT(addFactSlot()));
 	connect(projectWidget->addFactByTemplateButton, SIGNAL(clicked()), this, SLOT(addFactByTemplateSlot()));
-	connect(projectWidget->addTemplateButton, SIGNAL(clicked()), this, SLOT(addTemplateSlot()));
-	connect(projectWidget->addDeffactButton, SIGNAL(clicked()), this, SLOT(addFactsListSlot()));
-	connect(projectWidget->refreshTemplatesButton, SIGNAL(clicked()), this, SLOT(refreshTemplatesSlot()));
 	connect(projectWidget->refreshFactsButton, SIGNAL(clicked()), this, SLOT(refreshFactsSlot()));
+	connect(projectWidget->addDeffactButton, SIGNAL(clicked()), this, SLOT(addFactsListSlot()));
 	connect(projectWidget->refreshDeffactsButton, SIGNAL(clicked()), this, SLOT(refreshDeffactsSlot()));
+	connect(projectWidget->addRuleButton, SIGNAL(clicked()), this, SLOT(addRuleSlot()));
 	connect(projectWidget->refreshRulesButton, SIGNAL(clicked()), this, SLOT(refreshRulesSlot()));
 	connect(projectWidget->refreshFunctionsButton, SIGNAL(clicked()), this, SLOT(refreshFunctionsSlot()));
 	connect(projectWidget->refreshClassesButton, SIGNAL(clicked()), this, SLOT(refreshClassesSlot()));
@@ -77,6 +82,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(this, SIGNAL(addFactsListSignal(QString,QStringList)), clips, SLOT(deffactsSlot(QString,QStringList)));
 	connect(this,SIGNAL(addTemplateSignal(QString,QList<slotsPair>)), clips, SLOT(deftemplateSlot(QString,QList<slotsPair>)));
 	connect(this, SIGNAL(treeWidgetItemClickedSignal(int)), projectWidget, SLOT(setCurrentIndex(int)));
+	connect(this, SIGNAL(addRuleSignal(QString,QString,QString,QStringList,QStringList)), clips, SLOT(defRuleSlot(QString,QString,QString,QStringList,QStringList)));
 	connect(console, SIGNAL(assertStringSignal(QString,bool)), clips, SLOT(assertStringSlot(QString,bool)));
 	connect(console, SIGNAL(factsSignal(bool)), clips, SLOT(factsSlot(bool)));
 	connect(console, SIGNAL(retractSignal(int,bool)), clips, SLOT(retractSlot(int,bool)));
@@ -85,9 +91,10 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(console, SIGNAL(createProjectSignal()), this, SLOT(newProject()));
 	connect(console, SIGNAL(openProjectSignal()), this, SLOT(openProject()));
 	connect(console, SIGNAL(quitSignal()), qApp, SLOT(quit()));
+	connect(clips, SIGNAL(templatesChangedSignal(QStringList)), projectWidget, SLOT(refreshTemplates(QStringList)));
 	connect(clips, SIGNAL(factsChangedSignal(QStringList)), projectWidget, SLOT(refreshFacts(QStringList)));
 	connect(clips, SIGNAL(deffactsChangedSignal(QStringList)), projectWidget, SLOT(refreshDeffacts(QStringList)));
-	connect(clips, SIGNAL(templatesChangedSignal(QStringList)), projectWidget, SLOT(refreshTemplates(QStringList)));
+	connect(clips, SIGNAL(rulesChangedSignal(QStringList)), projectWidget, SLOT(refreshRules(QStringList)));
 	connect(clips, SIGNAL(clearSignal()), projectWidget, SLOT(clearSlot()));
 	connect(clips, SIGNAL(outputSignal(QString)), console, SLOT(output(QString)));
 	disableWidgets(true);
@@ -155,6 +162,7 @@ void MainWindow::newProject()
 		projectWidget->refreshTemplates(clips->templatesSlot(false));
 		projectWidget->refreshFacts(clips->factsSlot(false));
 		projectWidget->refreshDeffacts(clips->factsListSlot(false));
+		projectWidget->refreshRules(clips->rulesSlot(false));
 	}
 
 }
@@ -216,6 +224,7 @@ void MainWindow::openProject()
 		clips->loadFactsSlot(projectPair.second+"/facts.clp");
 		projectWidget->refreshFacts(clips->factsSlot(false));
 		projectWidget->refreshDeffacts(clips->factsListSlot(false));
+		projectWidget->refreshRules(clips->rulesSlot(false));
 
 	}
 }
@@ -300,6 +309,45 @@ void MainWindow::addTemplateSlot()
 				slotsList.append(pair);
 			}
 			emit addTemplateSignal(name, slotsList);
+		}
+	}
+}
+
+void MainWindow::addRuleSlot()
+{
+	bool ok;
+	int antecedents = QInputDialog::getInt(this, tr("Antecedents count"), tr("Enter antecedents count:"), 1, 1, 100, 1, &ok);
+	if(ok)
+	{
+		int consequents = QInputDialog::getInt(this, tr("Consequents count"), tr("Enter consequents count:"), 1, 1, 100, 1, &ok);
+		if(ok)
+		{
+			addRuleDialog dialog(this, antecedents, consequents);
+			if(dialog.exec() == QDialog::Accepted)
+			{
+				QString name = dialog.nameLineEdit->text();
+				if(name.isEmpty())
+					return;
+				QString comment = dialog.commentLineEdit->text();
+				QString declaration = dialog.declarationLineEdit->text();
+				QStringList antecedentsList;
+				QList<QLineEdit *> antecedentsLineEditList = dialog.antecedentsLineEditList;
+				for(int i=0; i<antecedentsLineEditList.count(); i++)
+				{
+					antecedentsList.append(antecedentsLineEditList.at(i)->text());
+				}
+				if(antecedentsList.isEmpty())
+					return;
+				QStringList consequentsList;
+				QList<QLineEdit *> consequentsLineEditList = dialog.consequentsLineEditList;
+				for(int i=0; i<consequentsLineEditList.count(); i++)
+				{
+					consequentsList.append(consequentsLineEditList.at(i)->text());
+				}
+				if(consequentsList.isEmpty())
+					return;
+				emit addRuleSignal(name, comment, declaration, antecedentsList, consequentsList);
+			}
 		}
 	}
 }
@@ -461,7 +509,7 @@ void MainWindow::refreshDeffactsSlot()
 
 void MainWindow::refreshRulesSlot()
 {
-	//
+	projectWidget->refreshRules(clips->rulesSlot(false));
 }
 
 void MainWindow::refreshFunctionsSlot()

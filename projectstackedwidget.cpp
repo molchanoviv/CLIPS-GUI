@@ -72,17 +72,23 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	QGroupBox *rulesWidget = new QGroupBox(tr("Rules"));
 	QVBoxLayout *rulesLayout = new QVBoxLayout;
 	rulesListWidget = new QListWidget;
-	QPushButton *addRuleButton = new QPushButton(tr("Add Rule"));
+	addRuleButton = new QPushButton(tr("Add Rule"));
 	addRuleButton->setIcon(QIcon::fromTheme("list-add"));
 	QPushButton *removeRuleButton = new QPushButton(tr("Remove Rule"));
 	removeRuleButton->setIcon(QIcon::fromTheme("list-remove"));
 	refreshRulesButton = new QPushButton(tr("Refresh Rules"));
 	refreshRulesButton->setIcon(QIcon::fromTheme("view-refresh"));
+	setBreakpointPushButton = new QPushButton(tr("Set Breakpoint"));
+	setBreakpointPushButton->setIcon(QIcon::fromTheme("format-add-node"));
+	removeBreakpointPushButton = new QPushButton(tr("Remove Breakpoint"));
+	removeBreakpointPushButton->setIcon(QIcon::fromTheme("format-remove-node"));
 	QHBoxLayout *rulesTopLayout = new QHBoxLayout;
 	rulesTopLayout->addWidget(addRuleButton);
 	rulesTopLayout->addWidget(removeRuleButton);
 	rulesTopLayout->addWidget(refreshRulesButton);
 	rulesTopLayout->addStretch();
+	rulesTopLayout->addWidget(setBreakpointPushButton);
+	rulesTopLayout->addWidget(removeBreakpointPushButton);
 	rulesLayout->addLayout(rulesTopLayout);
 	rulesLayout->addWidget(rulesListWidget);
 	rulesWidget->setLayout(rulesLayout);
@@ -90,7 +96,7 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	QGroupBox *functionsWidget = new QGroupBox(tr("Functions"));
 	QVBoxLayout *functionsLayout = new QVBoxLayout;
 	functionsListWidget = new QListWidget;
-	QPushButton *addFunctionButton = new QPushButton(tr("Add Function"));
+	addFunctionButton = new QPushButton(tr("Add Function"));
 	addFunctionButton->setIcon(QIcon::fromTheme("list-add"));
 	QPushButton *removeFunctionButton = new QPushButton(tr("Remove Function"));
 	removeFunctionButton->setIcon(QIcon::fromTheme("list-remove"));
@@ -108,7 +114,7 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	QGroupBox *classesWidget = new QGroupBox(tr("Classes"));
 	QVBoxLayout *classesLayout = new QVBoxLayout;
 	classesListWidget = new QListWidget;
-	QPushButton *addClassButton = new QPushButton(tr("Add Class"));
+	addClassButton = new QPushButton(tr("Add Class"));
 	addClassButton->setIcon(QIcon::fromTheme("list-add"));
 	QPushButton *removeClassButton = new QPushButton(tr("Remove Class"));
 	removeClassButton->setIcon(QIcon::fromTheme("list-remove"));
@@ -131,9 +137,12 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	this->addWidget(classesWidget);
 
 	connect(duplicationButton, SIGNAL(toggled(bool)), this, SLOT(duplicationProxySlot(bool)));
+	connect(setBreakpointPushButton, SIGNAL(clicked()), this, SLOT(setBreakpointSlot()));
+	connect(removeBreakpointPushButton, SIGNAL(clicked()), this, SLOT(removeBreakpointSlot()));
 	connect(removeTemplateButton, SIGNAL(clicked()), this, SLOT(removeTemplateSlot()));
 	connect(removeFactButton, SIGNAL(clicked()), this, SLOT(removeFactSlot()));
 	connect(removeDeffactButton, SIGNAL(clicked()), this, SLOT(removeDeffactsSlot()));
+	connect(removeRuleButton, SIGNAL(clicked()), this, SLOT(removeDefruleSlot()));
 }
 
 void ProjectStackedWidget::removeFactSlot()
@@ -181,9 +190,39 @@ void ProjectStackedWidget::refreshTemplates(QStringList templates)
 	}
 }
 
+void ProjectStackedWidget::refreshRules(QStringList rules)
+{
+	rulesListWidget->clear();
+	QString str;
+	foreach(str, rules)
+	{
+		QListWidgetItem *item = new QListWidgetItem(rulesListWidget);
+		if(str.indexOf("[bp]/")==0)
+		{
+			str.remove(0, 5);
+			item->setIcon(QIcon::fromTheme("snap-node"));
+		}
+		item->setText(str);
+	}
+}
+
 void ProjectStackedWidget::duplicationProxySlot(bool state)
 {
 	emit setFactDuplicationSignal(state, false);
+}
+
+void ProjectStackedWidget::setBreakpointSlot()
+{
+	QList<QListWidgetItem*> rules = rulesListWidget->selectedItems();
+	if(!rules.isEmpty())
+		emit setBreakpointSignal(rules.at(0)->text(), false);
+}
+
+void ProjectStackedWidget::removeBreakpointSlot()
+{
+	QList<QListWidgetItem*> rules = rulesListWidget->selectedItems();
+	if(!rules.isEmpty())
+		emit removeBreakpointSignal(rules.at(0)->text(), false);
 }
 
 void ProjectStackedWidget::removeTemplateSlot()
@@ -198,6 +237,13 @@ void ProjectStackedWidget::removeDeffactsSlot()
 	QList<QListWidgetItem*> deffacts = deffactsListWidget->selectedItems();
 	if(!deffacts.isEmpty())
 		emit removeFactsListSignal(deffacts.at(0)->text(), false);
+}
+
+void ProjectStackedWidget::removeDefruleSlot()
+{
+	QList<QListWidgetItem*> rules = rulesListWidget->selectedItems();
+	if(!rules.isEmpty())
+		emit removeRuleSignal(rules.at(0)->text(), false);
 }
 
 void ProjectStackedWidget::clearSlot()
