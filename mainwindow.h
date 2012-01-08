@@ -40,6 +40,8 @@ private:
 	ProjectStackedWidget *projectWidget;
 	int removeFolder(QDir);
 	void disableWidgets(bool);
+	void refreshAll(bool);
+	void createProjectTreeWidgetItems(QString);
 	StringPair projectPair;
 
 
@@ -60,8 +62,11 @@ private slots:
 	void refreshFactsSlot();
 	void refreshDeffactsSlot();
 	void refreshRulesSlot();
+	void refreshActivationsSlot();
 	void refreshFunctionsSlot();
 	void refreshClassesSlot();
+	void setActivationSalienceSlot();
+	void setConflictStrategySlot();
 
 
 signals:
@@ -70,6 +75,8 @@ signals:
 	void addFactsListSignal(QString, QStringList);
 	void addTemplateSignal(QString, QList<slotsPair>);
 	void addRuleSignal(QString, QString, QString, QStringList, QStringList);
+	void setActivationSalienceSignal(QString, int, bool);
+	void setStrategySignal(int);
 };
 
 #endif // MAINWINDOW_H

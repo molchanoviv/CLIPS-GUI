@@ -22,6 +22,7 @@ public:
 	QListWidget *factsListWidget;
 	QListWidget *deffactsListWidget;
 	QListWidget *rulesListWidget;
+	QListWidget *activationsListWidget;
 	QListWidget *functionsListWidget;
 	QListWidget *classesListWidget;
 	QPushButton *addFactButton;
@@ -35,10 +36,14 @@ public:
 	QPushButton *refreshFactsButton;
 	QPushButton *refreshDeffactsButton;
 	QPushButton *refreshRulesButton;
+	QPushButton *refreshActivationsButton;
 	QPushButton *refreshFunctionsButton;
 	QPushButton *refreshClassesButton;
 	QPushButton *setBreakpointPushButton;
 	QPushButton *removeBreakpointPushButton;
+	QPushButton *runButton;
+	QPushButton *setActivationSaliencePushButton;
+	QPushButton *setStrategyPushButton;
 
 private:
 
@@ -51,12 +56,14 @@ signals:
 	void removeRuleSignal(QString, bool);
 	void setBreakpointSignal(QString, bool);
 	void removeBreakpointSignal(QString, bool);
+	void removeActivationSignal(QString, bool);
 
 public slots:
 	void refreshTemplates(QStringList);
 	void refreshFacts(QStringList);
 	void refreshDeffacts(QStringList);
 	void refreshRules(QStringList);
+	void refreshActivations(QStringList);
 	void duplicationProxySlot(bool);
 	void setBreakpointSlot();
 	void removeBreakpointSlot();
@@ -64,6 +71,7 @@ public slots:
 	void removeFactSlot();
 	void removeDeffactsSlot();
 	void removeDefruleSlot();
+	void removeActivationSlot();
 	void clearSlot();
 
 };

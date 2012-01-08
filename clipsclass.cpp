@@ -124,6 +124,8 @@ void CLIPSClass::assertSlot(QString templateName, QList<slotsPair> slotsList, bo
 	emit factsChangedSignal(facts);
 	QStringList templates = templatesSlot(false);
 	emit templatesChangedSignal(templates);
+	QStringList activations = agendaSlot(false);
+	emit activationsChangedSignal(activations);
 }
 
 void CLIPSClass::retractSlot(int factNumber, bool ret)
@@ -141,6 +143,8 @@ void CLIPSClass::retractSlot(int factNumber, bool ret)
 					emit outputSignal("");
 				QStringList facts = factsSlot(false);
 				emit factsChangedSignal(facts);
+				QStringList activations = agendaSlot(false);
+				emit activationsChangedSignal(activations);
 			}
 		}
 	}
@@ -169,6 +173,8 @@ void CLIPSClass::deffactsSlot(QString name, QStringList factsList)
 	emit deffactsChangedSignal(deffacts);
 	QStringList templates = templatesSlot(false);
 	emit templatesChangedSignal(templates);
+	QStringList activations = agendaSlot(false);
+	emit activationsChangedSignal(activations);
 }
 
 void CLIPSClass::unDeffactsSlot(QString name, bool ret)
@@ -183,6 +189,8 @@ void CLIPSClass::unDeffactsSlot(QString name, bool ret)
 	emit deffactsChangedSignal(deffacts);
 	QStringList templates = templatesSlot(false);
 	emit templatesChangedSignal(templates);
+	QStringList activations = agendaSlot(false);
+	emit activationsChangedSignal(activations);
 }
 
 void CLIPSClass::deftemplateSlot(QString name, QList<slotsPair> slotsList)
@@ -249,6 +257,8 @@ void CLIPSClass::defRuleSlot(QString name, QString comment, QString declaration,
 	emit rulesChangedSignal(rules);
 	QStringList templates = templatesSlot(false);
 	emit templatesChangedSignal(templates);
+	QStringList activations = agendaSlot(false);
+	emit activationsChangedSignal(activations);
 }
 
 void CLIPSClass::unDefruleSlot(QString name, bool ret)
@@ -261,6 +271,8 @@ void CLIPSClass::unDefruleSlot(QString name, bool ret)
 		emit outputSignal("");
 	QStringList rules = rulesSlot(false);
 	emit rulesChangedSignal(rules);
+	QStringList activations = agendaSlot(false);
+	emit activationsChangedSignal(activations);
 }
 
 void CLIPSClass::SetBreakSlot(QString name, bool ret)
@@ -300,6 +312,117 @@ QList<slotsPair> CLIPSClass::getTemplateInformation(QString name)
 		}
 	}
 	return info;
+}
+
+void CLIPSClass::runSlot()
+{
+	Run(-1);
+	QStringList templates = templatesSlot(false);
+	emit templatesChangedSignal(templates);
+	QStringList facts = factsSlot(false);
+	emit factsChangedSignal(facts);
+	QStringList deffacts = factsListSlot(false);
+	emit deffactsChangedSignal(deffacts);
+	QStringList rules = rulesSlot(false);
+	emit rulesChangedSignal(rules);
+	QStringList activations = agendaSlot(false);
+	emit activationsChangedSignal(activations);
+}
+
+void CLIPSClass::removeActivationSlot(QString name, bool ret)
+{
+	void* ptr=NULL;
+	do
+	{
+		ptr = GetNextActivation(ptr);
+		char buf[16384]={0};
+		if(ptr!=NULL)
+		{
+			GetActivationPPForm(buf,sizeof(buf), ptr);
+			QString bufVal(buf);
+			if(bufVal == name)
+			{
+				DeleteActivation(ptr);
+				QStringList activations = agendaSlot(false);
+				emit activationsChangedSignal(activations);
+			}
+		}
+	}
+	while(ptr!=NULL);
+	if(ret)
+		emit outputSignal("");
+}
+
+int CLIPSClass::getActivationSalienceSlot(QString name)
+{
+	void* ptr=NULL;
+	do
+	{
+		ptr = GetNextActivation(ptr);
+		char buf[16384]={0};
+		if(ptr!=NULL)
+		{
+			GetActivationPPForm(buf,sizeof(buf), ptr);
+			QString bufVal(buf);
+			if(bufVal == name)
+			{
+				int salience = GetActivationSalience(ptr);
+				return salience;
+			}
+		}
+	}
+	while(ptr!=NULL);
+	return 0;
+}
+
+void CLIPSClass::setActivationSalienceSlot(QString name, int salience, bool ret)
+{
+	void* ptr=NULL;
+	do
+	{
+		ptr = GetNextActivation(ptr);
+		char buf[16384]={0};
+		if(ptr!=NULL)
+		{
+			GetActivationPPForm(buf,sizeof(buf), ptr);
+			QString bufVal(buf);
+			if(bufVal == name)
+			{
+				SetActivationSalience(ptr, salience);
+				ReorderAgenda(NULL);
+				QStringList activations = agendaSlot(false);
+				emit activationsChangedSignal(activations);
+			}
+		}
+	}
+	while(ptr!=NULL);
+	if(ret)
+		emit outputSignal("");
+}
+
+QHash<QString, int> CLIPSClass::getStrategyes()
+{
+	QHash<QString, int> strategyes;
+	strategyes.insert(tr("DEPTH_STRATEGY"), DEPTH_STRATEGY);
+	strategyes.insert(tr("BREADTH_STRATEGY"), BREADTH_STRATEGY);
+	strategyes.insert(tr("LEX_STRATEGY"), LEX_STRATEGY);
+	strategyes.insert(tr("MEA_STRATEGY"), MEA_STRATEGY);
+	strategyes.insert(tr("COMPLEXITY_STRATEGY"), COMPLEXITY_STRATEGY);
+	strategyes.insert(tr("SIMPLICITY_STRATEGY"), SIMPLICITY_STRATEGY);
+	strategyes.insert(tr("RANDOM_STRATEGY"), RANDOM_STRATEGY);
+	return strategyes;
+}
+
+int CLIPSClass::getStrategy()
+{
+	return GetStrategy();
+}
+
+void CLIPSClass::setStrategySlot(int strategy, bool ret)
+{
+	SetStrategy(strategy);
+	if(ret)
+		emit outputSignal("");
 }
 
 void CLIPSClass::saveFactsSlot(QString path)
@@ -447,4 +570,30 @@ QStringList CLIPSClass::rulesSlot(bool ret)
 		emit outputSignal(string);
 	}
 	return rulesList;
+}
+
+QStringList CLIPSClass::agendaSlot(bool ret)
+{
+	RefreshAgenda(NULL);
+	QStringList activationsList;
+	void* ptr=NULL;
+	do
+	{
+		ptr = GetNextActivation(ptr);
+		char buf[16384]={0};
+		if(ptr!=NULL)
+		{
+			GetActivationPPForm(buf,sizeof(buf), ptr);
+			activationsList<<QString(buf);
+		}
+	}
+	while(ptr!=NULL);
+	if(ret)
+	{
+		QString string, str;
+		foreach(str, activationsList)
+			string += " "+str;
+		emit outputSignal(string);
+	}
+	return activationsList;
 }

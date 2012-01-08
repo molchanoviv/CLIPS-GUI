@@ -19,6 +19,7 @@ public slots:
 	QStringList factsSlot(bool);
 	QStringList factsListSlot(bool);
 	QStringList rulesSlot(bool);
+	QStringList agendaSlot(bool);
 	void retractSlot(int, bool);
 	void saveFactsSlot(QString);
 	void loadFactsSlot(QString);
@@ -35,6 +36,13 @@ public slots:
 	void RemoveBreakSlot(QString, bool);
 	void defRuleSlot(QString, QString, QString, QStringList, QStringList);
 	QList<slotsPair> getTemplateInformation(QString);
+	void runSlot();
+	void removeActivationSlot(QString, bool);
+	int getActivationSalienceSlot(QString);
+	void setActivationSalienceSlot(QString, int, bool);
+	QHash<QString, int> getStrategyes();
+	int getStrategy();
+	void setStrategySlot(int, bool);
 
 signals:
 	void outputSignal(QString);
@@ -42,6 +50,7 @@ signals:
 	void deffactsChangedSignal(QStringList);
 	void templatesChangedSignal(QStringList);
 	void rulesChangedSignal(QStringList);
+	void activationsChangedSignal(QStringList);
 	void clearSignal();
 
 protected:

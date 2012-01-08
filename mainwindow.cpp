@@ -67,6 +67,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(projectWidget, SIGNAL(removeRuleSignal(QString,bool)), clips, SLOT(unDefruleSlot(QString,bool)));
 	connect(projectWidget, SIGNAL(setBreakpointSignal(QString,bool)), clips, SLOT(SetBreakSlot(QString,bool)));
 	connect(projectWidget, SIGNAL(removeBreakpointSignal(QString,bool)), clips, SLOT(RemoveBreakSlot(QString,bool)));
+	connect(projectWidget, SIGNAL(removeActivationSignal(QString,bool)), clips, SLOT(removeActivationSlot(QString,bool)));
 	connect(projectWidget->addTemplateButton, SIGNAL(clicked()), this, SLOT(addTemplateSlot()));
 	connect(projectWidget->refreshTemplatesButton, SIGNAL(clicked()), this, SLOT(refreshTemplatesSlot()));
 	connect(projectWidget->addFactButton, SIGNAL(clicked()), this, SLOT(addFactSlot()));
@@ -76,6 +77,10 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(projectWidget->refreshDeffactsButton, SIGNAL(clicked()), this, SLOT(refreshDeffactsSlot()));
 	connect(projectWidget->addRuleButton, SIGNAL(clicked()), this, SLOT(addRuleSlot()));
 	connect(projectWidget->refreshRulesButton, SIGNAL(clicked()), this, SLOT(refreshRulesSlot()));
+	connect(projectWidget->refreshActivationsButton, SIGNAL(clicked()), this, SLOT(refreshActivationsSlot()));
+	connect(projectWidget->runButton, SIGNAL(clicked()), clips, SLOT(runSlot()));
+	connect(projectWidget->setActivationSaliencePushButton, SIGNAL(clicked()), this, SLOT(setActivationSalienceSlot()));
+	connect(projectWidget->setStrategyPushButton, SIGNAL(clicked()), this, SLOT(setConflictStrategySlot()));
 	connect(projectWidget->refreshFunctionsButton, SIGNAL(clicked()), this, SLOT(refreshFunctionsSlot()));
 	connect(projectWidget->refreshClassesButton, SIGNAL(clicked()), this, SLOT(refreshClassesSlot()));
 	connect(this, SIGNAL(addFactSignal(QString,bool)), clips, SLOT(assertStringSlot(QString,bool)));
@@ -83,6 +88,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(this,SIGNAL(addTemplateSignal(QString,QList<slotsPair>)), clips, SLOT(deftemplateSlot(QString,QList<slotsPair>)));
 	connect(this, SIGNAL(treeWidgetItemClickedSignal(int)), projectWidget, SLOT(setCurrentIndex(int)));
 	connect(this, SIGNAL(addRuleSignal(QString,QString,QString,QStringList,QStringList)), clips, SLOT(defRuleSlot(QString,QString,QString,QStringList,QStringList)));
+	connect(this, SIGNAL(setActivationSalienceSignal(QString,int,bool)), clips, SLOT(setActivationSalienceSlot(QString,int,bool)));
 	connect(console, SIGNAL(assertStringSignal(QString,bool)), clips, SLOT(assertStringSlot(QString,bool)));
 	connect(console, SIGNAL(factsSignal(bool)), clips, SLOT(factsSlot(bool)));
 	connect(console, SIGNAL(retractSignal(int,bool)), clips, SLOT(retractSlot(int,bool)));
@@ -95,6 +101,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(clips, SIGNAL(factsChangedSignal(QStringList)), projectWidget, SLOT(refreshFacts(QStringList)));
 	connect(clips, SIGNAL(deffactsChangedSignal(QStringList)), projectWidget, SLOT(refreshDeffacts(QStringList)));
 	connect(clips, SIGNAL(rulesChangedSignal(QStringList)), projectWidget, SLOT(refreshRules(QStringList)));
+	connect(clips, SIGNAL(activationsChangedSignal(QStringList)), projectWidget, SLOT(refreshActivations(QStringList)));
 	connect(clips, SIGNAL(clearSignal()), projectWidget, SLOT(clearSlot()));
 	connect(clips, SIGNAL(outputSignal(QString)), console, SLOT(output(QString)));
 	disableWidgets(true);
@@ -116,38 +123,14 @@ void MainWindow::newProject()
 			msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard);
 			msgBox.setDefaultButton(QMessageBox::Save);
 			if(msgBox.exec() == QMessageBox::Save)
-				clips->saveFactsSlot(projectPair.second+"/facts.clp");
+				saveProject();
 		}
 		QString projectName = dialog.projectNameLineEdit->text();
 		QString projectPath = dialog.projectPathLineEdit->text();
 		if(projectName.isEmpty() || projectPath.isEmpty())
 			return;
 		disableWidgets(false);
-		projectsTreeWidget->clear();
-		QTreeWidgetItem *item = new QTreeWidgetItem();
-		item->setText(0, projectName);
-		item->setText(1, QString::number(projectsTreeWidget->topLevelItemCount()));
-		QTreeWidgetItem *templatesItem = new QTreeWidgetItem();
-		templatesItem->setText(0, tr("Templates"));
-		QTreeWidgetItem *factsItem = new QTreeWidgetItem();
-		factsItem->setText(0, tr("Facts"));
-		QTreeWidgetItem *deffactsItem = new QTreeWidgetItem();
-		deffactsItem->setText(0, tr("FactsList"));
-		QTreeWidgetItem *rulesItem = new QTreeWidgetItem();
-		rulesItem->setText(0, tr("Rules"));
-		QTreeWidgetItem *functionsItem = new QTreeWidgetItem();
-		functionsItem->setText(0, tr("Functions"));
-		QTreeWidgetItem *classesItem = new QTreeWidgetItem();
-		classesItem->setText(0, tr("Classes"));
-		item->addChild(templatesItem);
-		item->addChild(factsItem);
-		item->addChild(deffactsItem);
-		item->addChild(rulesItem);
-		item->addChild(functionsItem);
-		item->addChild(classesItem);
-		projectsTreeWidget->insertTopLevelItem(0, item);
-		item->setExpanded(1);
-		projectsTreeWidget->clearSelection();
+		createProjectTreeWidgetItems(projectName);
 		QDir dir(projectPath);
 		dir.mkdir(projectName);
 		QFile file(projectPath+"/"+projectName+"/"+projectName+".clp.prj");
@@ -159,12 +142,8 @@ void MainWindow::newProject()
 		file.close();
 		projectPair.first = projectName;
 		projectPair.second = projectPath+"/"+projectName+"/"+projectName;
-		projectWidget->refreshTemplates(clips->templatesSlot(false));
-		projectWidget->refreshFacts(clips->factsSlot(false));
-		projectWidget->refreshDeffacts(clips->factsListSlot(false));
-		projectWidget->refreshRules(clips->rulesSlot(false));
+		refreshAll(false);
 	}
-
 }
 
 void MainWindow::openProject()
@@ -180,7 +159,7 @@ void MainWindow::openProject()
 			msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard);
 			msgBox.setDefaultButton(QMessageBox::Save);
 			if(msgBox.exec() == QMessageBox::Save)
-				clips->saveFactsSlot(projectPair.second+"/facts.clp");
+				saveProject();
 		}
 		QSettings settings(fileName, QSettings::IniFormat);
 		settings.beginGroup("project");
@@ -189,44 +168,48 @@ void MainWindow::openProject()
 		if(projectName.isEmpty())
 			return;
 		disableWidgets(false);
-		projectsTreeWidget->clear();
-		QTreeWidgetItem *item = new QTreeWidgetItem();
-		item->setText(0, projectName);
-		item->setText(1, QString::number(projectsTreeWidget->topLevelItemCount()));
-		QTreeWidgetItem *templatesItem = new QTreeWidgetItem();
-		templatesItem->setText(0, tr("Templates"));
-		QTreeWidgetItem *factsItem = new QTreeWidgetItem();
-		factsItem->setText(0, tr("Facts"));
-		QTreeWidgetItem *deffactsItem = new QTreeWidgetItem();
-		deffactsItem->setText(0, tr("FactsList"));
-		QTreeWidgetItem *rulesItem = new QTreeWidgetItem();
-		rulesItem->setText(0, tr("Rules"));
-		QTreeWidgetItem *functionsItem = new QTreeWidgetItem();
-		functionsItem->setText(0, tr("Functions"));
-		QTreeWidgetItem *classesItem = new QTreeWidgetItem();
-		classesItem->setText(0, tr("Classes"));
-		item->addChild(templatesItem);
-		item->addChild(factsItem);
-		item->addChild(deffactsItem);
-		item->addChild(rulesItem);
-		item->addChild(functionsItem);
-		item->addChild(classesItem);
-		projectsTreeWidget->insertTopLevelItem(0, item);
-		item->setExpanded(1);
-		projectsTreeWidget->clearSelection();
+		createProjectTreeWidgetItems(projectName);
 		if(!projectPair.first.isEmpty())
 			saveProject();
 		projectPair.first = projectName;
 		projectPair.second = fileName.remove(fileName.lastIndexOf(QRegExp("(/|\\\\)")), fileName.length());
 		clips->clearSlot();
 		clips->loadSlot(projectPair.second+"/all.clp");
-		projectWidget->refreshTemplates(clips->templatesSlot(false));
 		clips->loadFactsSlot(projectPair.second+"/facts.clp");
-		projectWidget->refreshFacts(clips->factsSlot(false));
-		projectWidget->refreshDeffacts(clips->factsListSlot(false));
-		projectWidget->refreshRules(clips->rulesSlot(false));
-
+		refreshAll(false);
 	}
+}
+
+void MainWindow::createProjectTreeWidgetItems(QString projectName)
+{
+	projectsTreeWidget->clear();
+	QTreeWidgetItem *item = new QTreeWidgetItem();
+	item->setText(0, projectName);
+	item->setText(1, QString::number(projectsTreeWidget->topLevelItemCount()));
+	QTreeWidgetItem *templatesItem = new QTreeWidgetItem();
+	templatesItem->setText(0, tr("Templates"));
+	QTreeWidgetItem *factsItem = new QTreeWidgetItem();
+	factsItem->setText(0, tr("Facts"));
+	QTreeWidgetItem *deffactsItem = new QTreeWidgetItem();
+	deffactsItem->setText(0, tr("FactsList"));
+	QTreeWidgetItem *rulesItem = new QTreeWidgetItem();
+	rulesItem->setText(0, tr("Rules"));
+	QTreeWidgetItem *activationsItem = new QTreeWidgetItem();
+	activationsItem->setText(0, tr("Activations"));
+	QTreeWidgetItem *functionsItem = new QTreeWidgetItem();
+	functionsItem->setText(0, tr("Functions"));
+	QTreeWidgetItem *classesItem = new QTreeWidgetItem();
+	classesItem->setText(0, tr("Classes"));
+	item->addChild(templatesItem);
+	item->addChild(factsItem);
+	item->addChild(deffactsItem);
+	item->addChild(rulesItem);
+	item->addChild(activationsItem);
+	item->addChild(functionsItem);
+	item->addChild(classesItem);
+	projectsTreeWidget->insertTopLevelItem(0, item);
+	item->setExpanded(1);
+	projectsTreeWidget->clearSelection();
 }
 
 void MainWindow::addFactSlot()
@@ -349,6 +332,45 @@ void MainWindow::addRuleSlot()
 				emit addRuleSignal(name, comment, declaration, antecedentsList, consequentsList);
 			}
 		}
+	}
+}
+
+void MainWindow::setActivationSalienceSlot()
+{
+	QList<QListWidgetItem*> activations = projectWidget->activationsListWidget->selectedItems();
+	if(!activations.isEmpty())
+	{
+		QString name = activations.at(0)->text();
+		int cur_salience = clips->getActivationSalienceSlot(name);
+		bool ok;
+		int new_salience = QInputDialog::getInt(this, tr("Set Activation Salience"), tr("Salience:"), cur_salience, -10000, 10000, 1, &ok);
+		if (ok)
+			emit setActivationSalienceSignal(name, new_salience, false);
+	}
+}
+
+void MainWindow::setConflictStrategySlot()
+{
+	QHash<QString, int> strategyesHash = clips->getStrategyes();
+	QStringList strategyesList;
+	int cur_strategy = clips->getStrategy();
+	int val=0;
+	int iter_num=0;
+	QHashIterator<QString, int> i(strategyesHash);
+	while (i.hasNext())
+	{
+		i.next();
+		strategyesList.append(i.key());
+		if(i.value() == cur_strategy)
+			val = iter_num;
+		iter_num++;
+	}
+
+	bool ok;
+	QString strategyName = QInputDialog::getItem(this, tr("Select Strategy"), tr("Strategy:"), strategyesList, val, false, &ok);
+	if (ok && !strategyName.isEmpty())
+	{
+		clips->setStrategySlot(strategyesHash[strategyName], false);
 	}
 }
 
@@ -492,6 +514,15 @@ void MainWindow::treeWidgetItemClicked(QTreeWidgetItem* item, int column)
 		emit treeWidgetItemClickedSignal(item->parent()->indexOfChild(item));
 }
 
+void MainWindow::refreshAll(bool state)
+{
+	projectWidget->refreshTemplates(clips->templatesSlot(state));
+	projectWidget->refreshFacts(clips->factsSlot(state));
+	projectWidget->refreshDeffacts(clips->factsListSlot(state));
+	projectWidget->refreshRules(clips->rulesSlot(state));
+	projectWidget->refreshActivations(clips->agendaSlot(state));
+}
+
 void MainWindow::refreshTemplatesSlot()
 {
 	projectWidget->refreshTemplates(clips->templatesSlot(false));
@@ -510,6 +541,11 @@ void MainWindow::refreshDeffactsSlot()
 void MainWindow::refreshRulesSlot()
 {
 	projectWidget->refreshRules(clips->rulesSlot(false));
+}
+
+void MainWindow::refreshActivationsSlot()
+{
+	projectWidget->refreshActivations(clips->agendaSlot(false));
 }
 
 void MainWindow::refreshFunctionsSlot()

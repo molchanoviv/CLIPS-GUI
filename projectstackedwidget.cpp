@@ -92,6 +92,30 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	rulesLayout->addLayout(rulesTopLayout);
 	rulesLayout->addWidget(rulesListWidget);
 	rulesWidget->setLayout(rulesLayout);
+	/*****************************Activations**********************************/
+	QGroupBox *activationsWidget = new QGroupBox(tr("Activations"));
+	QVBoxLayout *activationsLayout = new QVBoxLayout;
+	activationsListWidget = new QListWidget;
+	QPushButton *removeActivationButton = new QPushButton(tr("Remove Activation"));
+	removeActivationButton->setIcon(QIcon::fromTheme("list-remove"));
+	refreshActivationsButton = new QPushButton(tr("Refresh Activations"));
+	refreshActivationsButton->setIcon(QIcon::fromTheme("view-refresh"));
+	runButton = new QPushButton(tr("Run"));
+	runButton->setIcon(QIcon::fromTheme("arrow-right"));
+	setActivationSaliencePushButton = new QPushButton(tr("Set Activation Salience"));
+	setActivationSaliencePushButton->setIcon(QIcon::fromTheme("view-statistics"));
+	setStrategyPushButton = new QPushButton(tr("Set Strategy"));
+	setStrategyPushButton->setIcon(QIcon::fromTheme("task-attention"));
+	QHBoxLayout *activationsTopLayout = new QHBoxLayout;
+	activationsTopLayout->addWidget(removeActivationButton);
+	activationsTopLayout->addWidget(refreshActivationsButton);
+	activationsTopLayout->addWidget(runButton);
+	activationsTopLayout->addStretch();
+	activationsTopLayout->addWidget(setActivationSaliencePushButton);
+	activationsTopLayout->addWidget(setStrategyPushButton);
+	activationsLayout->addLayout(activationsTopLayout);
+	activationsLayout->addWidget(activationsListWidget);
+	activationsWidget->setLayout(activationsLayout);
 	/*****************************Functions************************************/
 	QGroupBox *functionsWidget = new QGroupBox(tr("Functions"));
 	QVBoxLayout *functionsLayout = new QVBoxLayout;
@@ -133,6 +157,7 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	this->addWidget(factsWidget);
 	this->addWidget(deffactsWidget);
 	this->addWidget(rulesWidget);
+	this->addWidget(activationsWidget);
 	this->addWidget(functionsWidget);
 	this->addWidget(classesWidget);
 
@@ -143,13 +168,7 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	connect(removeFactButton, SIGNAL(clicked()), this, SLOT(removeFactSlot()));
 	connect(removeDeffactButton, SIGNAL(clicked()), this, SLOT(removeDeffactsSlot()));
 	connect(removeRuleButton, SIGNAL(clicked()), this, SLOT(removeDefruleSlot()));
-}
-
-void ProjectStackedWidget::removeFactSlot()
-{
-	QList<QListWidgetItem*> facts = factsListWidget->selectedItems();
-	if(!facts.isEmpty())
-		emit removeFactSignal(facts.at(0)->data(Qt::UserRole).toInt(), false);
+	connect(removeActivationButton, SIGNAL(clicked()), this, SLOT(removeActivationSlot()));
 }
 
 void ProjectStackedWidget::refreshFacts(QStringList list)
@@ -206,6 +225,17 @@ void ProjectStackedWidget::refreshRules(QStringList rules)
 	}
 }
 
+void ProjectStackedWidget::refreshActivations(QStringList activations)
+{
+	activationsListWidget->clear();
+	QString str;
+	foreach(str, activations)
+	{
+		QListWidgetItem *item = new QListWidgetItem(activationsListWidget);
+		item->setText(str);
+	}
+}
+
 void ProjectStackedWidget::duplicationProxySlot(bool state)
 {
 	emit setFactDuplicationSignal(state, false);
@@ -232,6 +262,13 @@ void ProjectStackedWidget::removeTemplateSlot()
 		emit removeTemplateSignal(templates.at(0)->text(), false);
 }
 
+void ProjectStackedWidget::removeFactSlot()
+{
+	QList<QListWidgetItem*> facts = factsListWidget->selectedItems();
+	if(!facts.isEmpty())
+		emit removeFactSignal(facts.at(0)->data(Qt::UserRole).toInt(), false);
+}
+
 void ProjectStackedWidget::removeDeffactsSlot()
 {
 	QList<QListWidgetItem*> deffacts = deffactsListWidget->selectedItems();
@@ -246,12 +283,20 @@ void ProjectStackedWidget::removeDefruleSlot()
 		emit removeRuleSignal(rules.at(0)->text(), false);
 }
 
+void ProjectStackedWidget::removeActivationSlot()
+{
+	QList<QListWidgetItem*> activations = activationsListWidget->selectedItems();
+	if(!activations.isEmpty())
+		emit removeActivationSignal(activations.at(0)->text(), false);
+}
+
 void ProjectStackedWidget::clearSlot()
 {
 	templatesListWidget->clear();
 	factsListWidget->clear();
 	deffactsListWidget->clear();
 	rulesListWidget->clear();
+	activationsListWidget->clear();
 	functionsListWidget->clear();
 	classesListWidget->clear();
 }
