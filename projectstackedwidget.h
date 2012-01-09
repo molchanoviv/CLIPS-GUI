@@ -23,6 +23,7 @@ public:
 	QListWidget *deffactsListWidget;
 	QListWidget *rulesListWidget;
 	QListWidget *activationsListWidget;
+	QListWidget *globalsListWidget;
 	QListWidget *functionsListWidget;
 	QListWidget *classesListWidget;
 	QPushButton *addFactButton;
@@ -30,6 +31,7 @@ public:
 	QPushButton *addFactByTemplateButton;
 	QPushButton *addTemplateButton;
 	QPushButton *addRuleButton;
+	QPushButton *addGlobalButton;
 	QPushButton *addFunctionButton;
 	QPushButton *addClassButton;
 	QPushButton *refreshTemplatesButton;
@@ -37,6 +39,7 @@ public:
 	QPushButton *refreshDeffactsButton;
 	QPushButton *refreshRulesButton;
 	QPushButton *refreshActivationsButton;
+	QPushButton *refreshGlobalsButton;
 	QPushButton *refreshFunctionsButton;
 	QPushButton *refreshClassesButton;
 	QPushButton *setBreakpointPushButton;
@@ -44,6 +47,7 @@ public:
 	QPushButton *runButton;
 	QPushButton *setActivationSaliencePushButton;
 	QPushButton *setStrategyPushButton;
+	QPushButton *watchGlobalPushButton;
 
 private:
 
@@ -57,6 +61,8 @@ signals:
 	void setBreakpointSignal(QString, bool);
 	void removeBreakpointSignal(QString, bool);
 	void removeActivationSignal(QString, bool);
+	void removeGlobalSignal(QString, bool);
+	void watchGlobalSignal(QString);
 
 public slots:
 	void refreshTemplates(QStringList);
@@ -64,7 +70,9 @@ public slots:
 	void refreshDeffacts(QStringList);
 	void refreshRules(QStringList);
 	void refreshActivations(QStringList);
+	void refreshGlobals(QStringList);
 	void duplicationProxySlot(bool);
+	void watchGlobalSlot();
 	void setBreakpointSlot();
 	void removeBreakpointSlot();
 	void removeTemplateSlot();
@@ -72,6 +80,7 @@ public slots:
 	void removeDeffactsSlot();
 	void removeDefruleSlot();
 	void removeActivationSlot();
+	void removeGlobalSlot();
 	void clearSlot();
 
 };

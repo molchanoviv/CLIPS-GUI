@@ -18,7 +18,8 @@ void CLIPSClass::assertStringSlot(QString fact, bool ret)
 	emit factsChangedSignal(facts);
 	QStringList templates = templatesSlot(false);
 	emit templatesChangedSignal(templates);
-
+	QStringList activations = agendaSlot(false);
+	emit activationsChangedSignal(activations);
 }
 
 void CLIPSClass::assertSlot(QString templateName, QList<slotsPair> slotsList, bool ret)
@@ -425,6 +426,59 @@ void CLIPSClass::setStrategySlot(int strategy, bool ret)
 		emit outputSignal("");
 }
 
+void CLIPSClass::defglobalSlot(QString moduleName, QHash<QString, QString> defglobalsHash)
+{
+	QString globalsStr;
+	QHashIterator<QString, QString> i(defglobalsHash);
+	QRegExp rx("^\\?\\*.*\\*$");
+	while (i.hasNext())
+	{
+		i.next();
+		QString str = i.key();
+		if(!str.contains(rx))
+			str = "?*"+str+"*";
+		globalsStr += str+" = "+i.value()+" ";
+	}
+	QString command = "(defglobal "+moduleName+" "+globalsStr+")";
+	QFile file(QDir::tempPath()+"/tmpfile");
+	if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+		return;
+	QTextStream out(&file);
+	out<<command;
+	QString path = file.fileName();
+	file.close();
+	Load(path.toLocal8Bit().data());
+	file.remove();
+	QStringList globals = globalsSlot(false);
+	emit globalsChangedSignal(globals);
+}
+
+void CLIPSClass::unDefglobalSlot(QString name, bool ret)
+{
+	void* globalPtr = FindDefglobal(name.simplified().toLocal8Bit().data());
+	if(!IsDefruleDeletable(globalPtr))
+		return;
+	Undefglobal(globalPtr);
+	if(ret)
+		emit outputSignal("");
+	QStringList globals = globalsSlot(false);
+	emit globalsChangedSignal(globals);
+}
+
+QStringList CLIPSClass::getModules()//Временная заглушка
+{
+	QStringList modulesList;
+	modulesList<<"MAIN";
+	return modulesList;
+}
+
+QString CLIPSClass::getGlobalInformation(QString name)
+{
+	void* globalPtr = FindDefglobal(name.simplified().toLocal8Bit().data());
+	char *globalsName = GetDefglobalPPForm(globalPtr);
+	return QString(globalsName).simplified();
+}
+
 void CLIPSClass::saveFactsSlot(QString path)
 {
 	SaveFacts(path.toLocal8Bit().data(),LOCAL_SAVE,NULL);
@@ -442,6 +496,11 @@ void CLIPSClass::saveSlot(QString path)
 	Save(path.toLocal8Bit().data());
 }
 
+void CLIPSClass::bSaveSlot(QString path)
+{
+	Bsave(path.toLocal8Bit().data());
+}
+
 void CLIPSClass::loadSlot(QString path)
 {
 	Load(path.toLocal8Bit().data());
@@ -449,6 +508,11 @@ void CLIPSClass::loadSlot(QString path)
 	emit factsChangedSignal(facts);
 	QStringList templates = templatesSlot(false);
 	emit templatesChangedSignal(templates);
+}
+
+void CLIPSClass::bLoadSlot(QString path)
+{
+	BloadData(path.toLocal8Bit().data());
 }
 
 void CLIPSClass::clearSlot()
@@ -596,4 +660,29 @@ QStringList CLIPSClass::agendaSlot(bool ret)
 		emit outputSignal(string);
 	}
 	return activationsList;
+}
+
+QStringList CLIPSClass::globalsSlot(bool ret)
+{
+	QStringList globalsList;
+	void* ptr=NULL;
+	do
+	{
+		ptr = GetNextDefglobal(ptr);
+		if(ptr!=NULL)
+		{
+			//char *globalsStr = GetDefglobalPPForm(ptr);
+			char *globalsStr = GetDefglobalName(ptr);
+			globalsList<<QString(globalsStr).simplified();
+		}
+	}
+	while(ptr!=NULL);
+	if(ret)
+	{
+		QString string, str;
+		foreach(str, globalsList)
+			string += " "+str;
+		emit outputSignal(string);
+	}
+	return globalsList;
 }

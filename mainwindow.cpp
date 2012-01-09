@@ -6,9 +6,11 @@
 #include "addfactbytemplatedialog.h"
 #include "adddeffactsdialog.h"
 #include "addruledialog.h"
+#include "addglobalsdialog.h"
 #include <QToolBar>
 #include <QInputDialog>
 #include <QCheckBox>
+#include <QComboBox>
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -68,6 +70,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(projectWidget, SIGNAL(setBreakpointSignal(QString,bool)), clips, SLOT(SetBreakSlot(QString,bool)));
 	connect(projectWidget, SIGNAL(removeBreakpointSignal(QString,bool)), clips, SLOT(RemoveBreakSlot(QString,bool)));
 	connect(projectWidget, SIGNAL(removeActivationSignal(QString,bool)), clips, SLOT(removeActivationSlot(QString,bool)));
+	connect(projectWidget, SIGNAL(removeGlobalSignal(QString,bool)), clips, SLOT(unDefglobalSlot(QString,bool)));
+	connect(projectWidget, SIGNAL(watchGlobalSignal(QString)), this, SLOT(watchGlobalSlot(QString)));
 	connect(projectWidget->addTemplateButton, SIGNAL(clicked()), this, SLOT(addTemplateSlot()));
 	connect(projectWidget->refreshTemplatesButton, SIGNAL(clicked()), this, SLOT(refreshTemplatesSlot()));
 	connect(projectWidget->addFactButton, SIGNAL(clicked()), this, SLOT(addFactSlot()));
@@ -81,6 +85,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(projectWidget->runButton, SIGNAL(clicked()), clips, SLOT(runSlot()));
 	connect(projectWidget->setActivationSaliencePushButton, SIGNAL(clicked()), this, SLOT(setActivationSalienceSlot()));
 	connect(projectWidget->setStrategyPushButton, SIGNAL(clicked()), this, SLOT(setConflictStrategySlot()));
+	connect(projectWidget->addGlobalButton, SIGNAL(clicked()), this, SLOT(addGlobalSlot()));
+	connect(projectWidget->refreshGlobalsButton, SIGNAL(clicked()), this, SLOT(refreshGlobalsSlot()));
 	connect(projectWidget->refreshFunctionsButton, SIGNAL(clicked()), this, SLOT(refreshFunctionsSlot()));
 	connect(projectWidget->refreshClassesButton, SIGNAL(clicked()), this, SLOT(refreshClassesSlot()));
 	connect(this, SIGNAL(addFactSignal(QString,bool)), clips, SLOT(assertStringSlot(QString,bool)));
@@ -89,6 +95,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(this, SIGNAL(treeWidgetItemClickedSignal(int)), projectWidget, SLOT(setCurrentIndex(int)));
 	connect(this, SIGNAL(addRuleSignal(QString,QString,QString,QStringList,QStringList)), clips, SLOT(defRuleSlot(QString,QString,QString,QStringList,QStringList)));
 	connect(this, SIGNAL(setActivationSalienceSignal(QString,int,bool)), clips, SLOT(setActivationSalienceSlot(QString,int,bool)));
+	connect(this, SIGNAL(addGlobalSignal(QString,QHash<QString,QString>)), clips, SLOT(defglobalSlot(QString,QHash<QString,QString>)));
 	connect(console, SIGNAL(assertStringSignal(QString,bool)), clips, SLOT(assertStringSlot(QString,bool)));
 	connect(console, SIGNAL(factsSignal(bool)), clips, SLOT(factsSlot(bool)));
 	connect(console, SIGNAL(retractSignal(int,bool)), clips, SLOT(retractSlot(int,bool)));
@@ -102,6 +109,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(clips, SIGNAL(deffactsChangedSignal(QStringList)), projectWidget, SLOT(refreshDeffacts(QStringList)));
 	connect(clips, SIGNAL(rulesChangedSignal(QStringList)), projectWidget, SLOT(refreshRules(QStringList)));
 	connect(clips, SIGNAL(activationsChangedSignal(QStringList)), projectWidget, SLOT(refreshActivations(QStringList)));
+	connect(clips, SIGNAL(globalsChangedSignal(QStringList)), projectWidget, SLOT(refreshGlobals(QStringList)));
 	connect(clips, SIGNAL(clearSignal()), projectWidget, SLOT(clearSlot()));
 	connect(clips, SIGNAL(outputSignal(QString)), console, SLOT(output(QString)));
 	disableWidgets(true);
@@ -176,6 +184,7 @@ void MainWindow::openProject()
 		clips->clearSlot();
 		clips->loadSlot(projectPair.second+"/all.clp");
 		clips->loadFactsSlot(projectPair.second+"/facts.clp");
+		clips->bLoadSlot(projectPair.second+"/data.bin");
 		refreshAll(false);
 	}
 }
@@ -196,6 +205,8 @@ void MainWindow::createProjectTreeWidgetItems(QString projectName)
 	rulesItem->setText(0, tr("Rules"));
 	QTreeWidgetItem *activationsItem = new QTreeWidgetItem();
 	activationsItem->setText(0, tr("Activations"));
+	QTreeWidgetItem *globalsItem = new QTreeWidgetItem();
+	globalsItem->setText(0, tr("Globals"));
 	QTreeWidgetItem *functionsItem = new QTreeWidgetItem();
 	functionsItem->setText(0, tr("Functions"));
 	QTreeWidgetItem *classesItem = new QTreeWidgetItem();
@@ -205,6 +216,7 @@ void MainWindow::createProjectTreeWidgetItems(QString projectName)
 	item->addChild(deffactsItem);
 	item->addChild(rulesItem);
 	item->addChild(activationsItem);
+	item->addChild(globalsItem);
 	item->addChild(functionsItem);
 	item->addChild(classesItem);
 	projectsTreeWidget->insertTopLevelItem(0, item);
@@ -335,6 +347,30 @@ void MainWindow::addRuleSlot()
 	}
 }
 
+void MainWindow::addGlobalSlot()
+{
+	bool ok;
+	int variablesCount = QInputDialog::getInt(this, tr("Globals count"), tr("Enter globals count:"), 1, 1, 100, 1, &ok);
+	if(ok)
+	{
+		QStringList modulesList = clips->getModules();
+		addGlobalsDialog dialog(this, variablesCount, modulesList);
+		if(dialog.exec() == QDialog::Accepted)
+		{
+			QString module = dialog.modulesComboBox->currentText();
+			if(module.isEmpty())
+				return;
+			QHash<QString, QString> hash;
+			QList<QPair<QLineEdit*, QLineEdit*> > list = dialog.assignmentsLineEditsList;
+			for(int i=0; i<list.count(); i++)
+				hash.insert(list.at(i).first->text(), list.at(i).second->text());
+			if(hash.isEmpty())
+				return;
+			emit addGlobalSignal(module, hash);
+		}
+	}
+}
+
 void MainWindow::setActivationSalienceSlot()
 {
 	QList<QListWidgetItem*> activations = projectWidget->activationsListWidget->selectedItems();
@@ -374,6 +410,12 @@ void MainWindow::setConflictStrategySlot()
 	}
 }
 
+void MainWindow::watchGlobalSlot(QString name)
+{
+	QString info = clips->getGlobalInformation(name);
+	QMessageBox::information(this, tr("Information About Global"), info);
+}
+
 void MainWindow::closeProject()
 {
 	saveProject();
@@ -407,6 +449,7 @@ void MainWindow::saveProject()
 {
 	clips->saveFactsSlot(projectPair.second+"/facts.clp");
 	clips->saveSlot(projectPair.second+"/all.clp");
+	clips->bSaveSlot(projectPair.second+"/data.bin");
 }
 
 void MainWindow::saveProjectAs()
@@ -521,6 +564,7 @@ void MainWindow::refreshAll(bool state)
 	projectWidget->refreshDeffacts(clips->factsListSlot(state));
 	projectWidget->refreshRules(clips->rulesSlot(state));
 	projectWidget->refreshActivations(clips->agendaSlot(state));
+	projectWidget->refreshGlobals(clips->globalsSlot(state));
 }
 
 void MainWindow::refreshTemplatesSlot()
@@ -548,6 +592,11 @@ void MainWindow::refreshActivationsSlot()
 	projectWidget->refreshActivations(clips->agendaSlot(false));
 }
 
+void MainWindow::refreshGlobalsSlot()
+{
+	projectWidget->refreshGlobals(clips->globalsSlot(false));
+}
+
 void MainWindow::refreshFunctionsSlot()
 {
 	//
@@ -562,5 +611,3 @@ MainWindow::~MainWindow()
 {
 	delete ui;
 }
-
-

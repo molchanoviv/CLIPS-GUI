@@ -20,11 +20,14 @@ public slots:
 	QStringList factsListSlot(bool);
 	QStringList rulesSlot(bool);
 	QStringList agendaSlot(bool);
+	QStringList globalsSlot(bool);
 	void retractSlot(int, bool);
 	void saveFactsSlot(QString);
 	void loadFactsSlot(QString);
 	void saveSlot(QString);
+	void bSaveSlot(QString);
 	void loadSlot(QString);
+	void bLoadSlot(QString);
 	void clearSlot();
 	void setFactDuplicationSlot(bool, bool);
 	void deftemplateSlot(QString, QList<slotsPair>);
@@ -43,6 +46,10 @@ public slots:
 	QHash<QString, int> getStrategyes();
 	int getStrategy();
 	void setStrategySlot(int, bool);
+	void defglobalSlot(QString, QHash<QString, QString>);
+	void unDefglobalSlot(QString, bool);
+	QStringList getModules();
+	QString getGlobalInformation(QString);
 
 signals:
 	void outputSignal(QString);
@@ -51,6 +58,7 @@ signals:
 	void templatesChangedSignal(QStringList);
 	void rulesChangedSignal(QStringList);
 	void activationsChangedSignal(QStringList);
+	void globalsChangedSignal(QStringList);
 	void clearSignal();
 
 protected:
