@@ -25,6 +25,7 @@ public:
 	QListWidget *activationsListWidget;
 	QListWidget *globalsListWidget;
 	QListWidget *functionsListWidget;
+	QListWidget *genericListWidget;
 	QListWidget *classesListWidget;
 	QPushButton *addFactButton;
 	QPushButton *addDeffactButton;
@@ -33,6 +34,7 @@ public:
 	QPushButton *addRuleButton;
 	QPushButton *addGlobalButton;
 	QPushButton *addFunctionButton;
+	QPushButton *addGenericButton;
 	QPushButton *addClassButton;
 	QPushButton *refreshTemplatesButton;
 	QPushButton *refreshFactsButton;
@@ -41,6 +43,7 @@ public:
 	QPushButton *refreshActivationsButton;
 	QPushButton *refreshGlobalsButton;
 	QPushButton *refreshFunctionsButton;
+	QPushButton *refreshGenericButton;
 	QPushButton *refreshClassesButton;
 	QPushButton *setBreakpointPushButton;
 	QPushButton *removeBreakpointPushButton;
@@ -48,6 +51,8 @@ public:
 	QPushButton *setActivationSaliencePushButton;
 	QPushButton *setStrategyPushButton;
 	QPushButton *watchGlobalPushButton;
+	QPushButton *watchFunctionPushButton;
+	QPushButton *watchGenericPushButton;
 
 private:
 
@@ -58,11 +63,15 @@ signals:
 	void removeTemplateSignal(QString, bool);
 	void removeFactsListSignal(QString, bool);
 	void removeRuleSignal(QString, bool);
-	void setBreakpointSignal(QString, bool);
-	void removeBreakpointSignal(QString, bool);
 	void removeActivationSignal(QString, bool);
 	void removeGlobalSignal(QString, bool);
+	void removeFunctionSignal(QString, bool);
+	void removeGenericSignal(QString, bool);
+	void setBreakpointSignal(QString, bool);
+	void removeBreakpointSignal(QString, bool);
 	void watchGlobalSignal(QString);
+	void watchFunctionSignal(QString);
+	void watchGenericSignal(QString);
 
 public slots:
 	void refreshTemplates(QStringList);
@@ -71,8 +80,12 @@ public slots:
 	void refreshRules(QStringList);
 	void refreshActivations(QStringList);
 	void refreshGlobals(QStringList);
+	void refreshFunctions(QStringList);
+	void refreshGeneric(QStringList);
 	void duplicationProxySlot(bool);
 	void watchGlobalSlot();
+	void watchFunctionSlot();
+	void watchGenericSlot();
 	void setBreakpointSlot();
 	void removeBreakpointSlot();
 	void removeTemplateSlot();
@@ -81,6 +94,8 @@ public slots:
 	void removeDefruleSlot();
 	void removeActivationSlot();
 	void removeGlobalSlot();
+	void removeFunctionSlot();
+	void removeGenericSlot();
 	void clearSlot();
 
 };

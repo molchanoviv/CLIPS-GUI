@@ -21,6 +21,8 @@ public slots:
 	QStringList rulesSlot(bool);
 	QStringList agendaSlot(bool);
 	QStringList globalsSlot(bool);
+	QStringList functionsSlot(bool);
+	QStringList genericSlot(bool);
 	void retractSlot(int, bool);
 	void saveFactsSlot(QString);
 	void loadFactsSlot(QString);
@@ -50,6 +52,12 @@ public slots:
 	void unDefglobalSlot(QString, bool);
 	QStringList getModules();
 	QString getGlobalInformation(QString);
+	void deffunctionSlot(QString, QString, QString, QString, QString);
+	QString getFunctionInformation(QString);
+	void unDeffunctionSlot(QString, bool);
+	void defgenericSlot(QString);
+	void unDefgenericSlot(QString, bool);
+	QString getGenericInformation(QString);
 
 signals:
 	void outputSignal(QString);
@@ -59,6 +67,8 @@ signals:
 	void rulesChangedSignal(QStringList);
 	void activationsChangedSignal(QStringList);
 	void globalsChangedSignal(QStringList);
+	void functionsChangedSignal(QStringList);
+	void genericChangedSignal(QStringList);
 	void clearSignal();
 
 protected:

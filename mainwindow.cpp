@@ -7,6 +7,7 @@
 #include "adddeffactsdialog.h"
 #include "addruledialog.h"
 #include "addglobalsdialog.h"
+#include "addfunctiondialog.h"
 #include <QToolBar>
 #include <QInputDialog>
 #include <QCheckBox>
@@ -72,6 +73,10 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(projectWidget, SIGNAL(removeActivationSignal(QString,bool)), clips, SLOT(removeActivationSlot(QString,bool)));
 	connect(projectWidget, SIGNAL(removeGlobalSignal(QString,bool)), clips, SLOT(unDefglobalSlot(QString,bool)));
 	connect(projectWidget, SIGNAL(watchGlobalSignal(QString)), this, SLOT(watchGlobalSlot(QString)));
+	connect(projectWidget, SIGNAL(removeFunctionSignal(QString,bool)), clips, SLOT(unDeffunctionSlot(QString,bool)));
+	connect(projectWidget, SIGNAL(watchFunctionSignal(QString)), this, SLOT(watchFunctionSlot(QString)));
+	connect(projectWidget, SIGNAL(removeGenericSignal(QString,bool)), clips, SLOT(unDefgenericSlot(QString,bool)));
+	connect(projectWidget, SIGNAL(watchGenericSignal(QString)), this, SLOT(watchGenericSlot(QString)));
 	connect(projectWidget->addTemplateButton, SIGNAL(clicked()), this, SLOT(addTemplateSlot()));
 	connect(projectWidget->refreshTemplatesButton, SIGNAL(clicked()), this, SLOT(refreshTemplatesSlot()));
 	connect(projectWidget->addFactButton, SIGNAL(clicked()), this, SLOT(addFactSlot()));
@@ -88,7 +93,10 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(projectWidget->addGlobalButton, SIGNAL(clicked()), this, SLOT(addGlobalSlot()));
 	connect(projectWidget->refreshGlobalsButton, SIGNAL(clicked()), this, SLOT(refreshGlobalsSlot()));
 	connect(projectWidget->refreshFunctionsButton, SIGNAL(clicked()), this, SLOT(refreshFunctionsSlot()));
+	connect(projectWidget->refreshGenericButton, SIGNAL(clicked()), this, SLOT(refreshGenericSlot()));
 	connect(projectWidget->refreshClassesButton, SIGNAL(clicked()), this, SLOT(refreshClassesSlot()));
+	connect(projectWidget->addFunctionButton, SIGNAL(clicked()), this, SLOT(addFunctionSlot()));
+	connect(projectWidget->addGenericButton, SIGNAL(clicked()), this, SLOT(addGenericSlot()));
 	connect(this, SIGNAL(addFactSignal(QString,bool)), clips, SLOT(assertStringSlot(QString,bool)));
 	connect(this, SIGNAL(addFactsListSignal(QString,QStringList)), clips, SLOT(deffactsSlot(QString,QStringList)));
 	connect(this,SIGNAL(addTemplateSignal(QString,QList<slotsPair>)), clips, SLOT(deftemplateSlot(QString,QList<slotsPair>)));
@@ -96,6 +104,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(this, SIGNAL(addRuleSignal(QString,QString,QString,QStringList,QStringList)), clips, SLOT(defRuleSlot(QString,QString,QString,QStringList,QStringList)));
 	connect(this, SIGNAL(setActivationSalienceSignal(QString,int,bool)), clips, SLOT(setActivationSalienceSlot(QString,int,bool)));
 	connect(this, SIGNAL(addGlobalSignal(QString,QHash<QString,QString>)), clips, SLOT(defglobalSlot(QString,QHash<QString,QString>)));
+	connect(this, SIGNAL(addFunctionSignal(QString,QString,QString,QString,QString)), clips, SLOT(deffunctionSlot(QString,QString,QString,QString,QString)));
+	connect(this, SIGNAL(addGenericSignal(QString)), clips, SLOT(defgenericSlot(QString)));
 	connect(console, SIGNAL(assertStringSignal(QString,bool)), clips, SLOT(assertStringSlot(QString,bool)));
 	connect(console, SIGNAL(factsSignal(bool)), clips, SLOT(factsSlot(bool)));
 	connect(console, SIGNAL(retractSignal(int,bool)), clips, SLOT(retractSlot(int,bool)));
@@ -110,6 +120,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(clips, SIGNAL(rulesChangedSignal(QStringList)), projectWidget, SLOT(refreshRules(QStringList)));
 	connect(clips, SIGNAL(activationsChangedSignal(QStringList)), projectWidget, SLOT(refreshActivations(QStringList)));
 	connect(clips, SIGNAL(globalsChangedSignal(QStringList)), projectWidget, SLOT(refreshGlobals(QStringList)));
+	connect(clips, SIGNAL(functionsChangedSignal(QStringList)), projectWidget, SLOT(refreshFunctions(QStringList)));
+	connect(clips, SIGNAL(genericChangedSignal(QStringList)), projectWidget, SLOT(refreshGeneric(QStringList)));
 	connect(clips, SIGNAL(clearSignal()), projectWidget, SLOT(clearSlot()));
 	connect(clips, SIGNAL(outputSignal(QString)), console, SLOT(output(QString)));
 	disableWidgets(true);
@@ -209,6 +221,8 @@ void MainWindow::createProjectTreeWidgetItems(QString projectName)
 	globalsItem->setText(0, tr("Globals"));
 	QTreeWidgetItem *functionsItem = new QTreeWidgetItem();
 	functionsItem->setText(0, tr("Functions"));
+	QTreeWidgetItem *genericItem = new QTreeWidgetItem();
+	genericItem->setText(0, tr("Generic Functions"));
 	QTreeWidgetItem *classesItem = new QTreeWidgetItem();
 	classesItem->setText(0, tr("Classes"));
 	item->addChild(templatesItem);
@@ -218,6 +232,7 @@ void MainWindow::createProjectTreeWidgetItems(QString projectName)
 	item->addChild(activationsItem);
 	item->addChild(globalsItem);
 	item->addChild(functionsItem);
+	item->addChild(genericItem);
 	item->addChild(classesItem);
 	projectsTreeWidget->insertTopLevelItem(0, item);
 	item->setExpanded(1);
@@ -227,7 +242,7 @@ void MainWindow::createProjectTreeWidgetItems(QString projectName)
 void MainWindow::addFactSlot()
 {
 	bool ok;
-	QString text = QInputDialog::getText(this, tr("Add Fact"), tr("Fact name:"), QLineEdit::Normal, tr("Fact"), &ok);
+	QString text = QInputDialog::getText(this, tr("Add Fact"), tr("Fact name:"), QLineEdit::Normal, "", &ok);
 	if (ok && !text.isEmpty())
 		emit addFactSignal(text, false);
 }
@@ -371,6 +386,29 @@ void MainWindow::addGlobalSlot()
 	}
 }
 
+void MainWindow::addFunctionSlot()
+{
+
+	addFunctionDialog dialog(this);
+	if(dialog.exec() == QDialog::Accepted)
+	{
+		QString name = dialog.nameLineEdit->text();
+		QString comment = dialog.commentLineEdit->text();
+		QString regular = dialog.regularLineEdit->text();
+		QString wildcard = dialog.wildcardLineEdit->text();
+		QString expression = dialog.expressionTextEdit->document()->toPlainText();
+		emit addFunctionSignal(name, comment, regular, wildcard, expression);
+	}
+}
+
+void MainWindow::addGenericSlot()
+{
+	bool ok;
+	QString text = QInputDialog::getText(this, tr("Add Generic Function"), tr("Generic function name:"), QLineEdit::Normal, "", &ok);
+	if (ok && !text.isEmpty())
+		emit addGenericSignal(text);
+}
+
 void MainWindow::setActivationSalienceSlot()
 {
 	QList<QListWidgetItem*> activations = projectWidget->activationsListWidget->selectedItems();
@@ -414,6 +452,18 @@ void MainWindow::watchGlobalSlot(QString name)
 {
 	QString info = clips->getGlobalInformation(name);
 	QMessageBox::information(this, tr("Information About Global"), info);
+}
+
+void MainWindow::watchFunctionSlot(QString name)
+{
+	QString info = clips->getFunctionInformation(name);
+	QMessageBox::information(this, tr("Information About Function"), info);
+}
+
+void MainWindow::watchGenericSlot(QString name)
+{
+	QString info = clips->getGenericInformation(name);
+	QMessageBox::information(this, tr("Information About Generic Function"), info);
 }
 
 void MainWindow::closeProject()
@@ -565,6 +615,8 @@ void MainWindow::refreshAll(bool state)
 	projectWidget->refreshRules(clips->rulesSlot(state));
 	projectWidget->refreshActivations(clips->agendaSlot(state));
 	projectWidget->refreshGlobals(clips->globalsSlot(state));
+	projectWidget->refreshFunctions(clips->functionsSlot(state));
+	projectWidget->refreshGeneric(clips->genericSlot(state));
 }
 
 void MainWindow::refreshTemplatesSlot()
@@ -599,7 +651,12 @@ void MainWindow::refreshGlobalsSlot()
 
 void MainWindow::refreshFunctionsSlot()
 {
-	//
+	projectWidget->refreshFunctions(clips->functionsSlot(false));
+}
+
+void MainWindow::refreshGenericSlot()
+{
+	projectWidget->refreshGeneric(clips->genericSlot(false));
 }
 
 void MainWindow::refreshClassesSlot()

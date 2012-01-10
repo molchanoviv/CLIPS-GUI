@@ -147,14 +147,38 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	removeFunctionButton->setIcon(QIcon::fromTheme("list-remove"));
 	refreshFunctionsButton = new QPushButton(tr("Refresh"));
 	refreshFunctionsButton->setIcon(QIcon::fromTheme("view-refresh"));
+	watchFunctionPushButton = new QPushButton(tr("Watch"));
+	watchFunctionPushButton->setIcon(QIcon::fromTheme("layer-visible-on"));
 	QHBoxLayout *functionsTopLayout = new QHBoxLayout;
 	functionsTopLayout->addWidget(addFunctionButton);
 	functionsTopLayout->addWidget(removeFunctionButton);
 	functionsTopLayout->addWidget(refreshFunctionsButton);
 	functionsTopLayout->addStretch();
+	functionsTopLayout->addWidget(watchFunctionPushButton);
 	functionsLayout->addLayout(functionsTopLayout);
 	functionsLayout->addWidget(functionsListWidget);
 	functionsWidget->setLayout(functionsLayout);
+	/*****************************Generic**************************************/
+	QGroupBox *genericWidget = new QGroupBox(tr("Generic Functions"));
+	QVBoxLayout *genericLayout = new QVBoxLayout;
+	genericListWidget = new QListWidget;
+	addGenericButton = new QPushButton(tr("Add"));
+	addGenericButton->setIcon(QIcon::fromTheme("list-add"));
+	QPushButton *removeGenericButton = new QPushButton(tr("Remove"));
+	removeGenericButton->setIcon(QIcon::fromTheme("list-remove"));
+	refreshGenericButton = new QPushButton(tr("Refresh"));
+	refreshGenericButton->setIcon(QIcon::fromTheme("view-refresh"));
+	watchGenericPushButton = new QPushButton(tr("Watch"));
+	watchGenericPushButton->setIcon(QIcon::fromTheme("layer-visible-on"));
+	QHBoxLayout *genericTopLayout = new QHBoxLayout;
+	genericTopLayout->addWidget(addGenericButton);
+	genericTopLayout->addWidget(removeGenericButton);
+	genericTopLayout->addWidget(refreshGenericButton);
+	genericTopLayout->addStretch();
+	genericTopLayout->addWidget(watchGenericPushButton);
+	genericLayout->addLayout(genericTopLayout);
+	genericLayout->addWidget(genericListWidget);
+	genericWidget->setLayout(genericLayout);
 	/*****************************Classes**************************************/
 	QGroupBox *classesWidget = new QGroupBox(tr("Classes"));
 	QVBoxLayout *classesLayout = new QVBoxLayout;
@@ -181,6 +205,7 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	this->addWidget(activationsWidget);
 	this->addWidget(globalsWidget);
 	this->addWidget(functionsWidget);
+	this->addWidget(genericWidget);
 	this->addWidget(classesWidget);
 
 	connect(duplicationButton, SIGNAL(toggled(bool)), this, SLOT(duplicationProxySlot(bool)));
@@ -193,6 +218,10 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	connect(removeActivationButton, SIGNAL(clicked()), this, SLOT(removeActivationSlot()));
 	connect(removeGlobalButton, SIGNAL(clicked()), this, SLOT(removeGlobalSlot()));
 	connect(watchGlobalPushButton, SIGNAL(clicked()), this, SLOT(watchGlobalSlot()));
+	connect(removeFunctionButton, SIGNAL(clicked()), this, SLOT(removeFunctionSlot()));
+	connect(watchFunctionPushButton, SIGNAL(clicked()), this, SLOT(watchFunctionSlot()));
+	connect(removeGenericButton, SIGNAL(clicked()), this, SLOT(removeGenericSlot()));
+	connect(watchGenericPushButton, SIGNAL(clicked()), this, SLOT(watchGenericSlot()));
 }
 
 void ProjectStackedWidget::refreshFacts(QStringList list)
@@ -271,11 +300,47 @@ void ProjectStackedWidget::refreshGlobals(QStringList globals)
 	}
 }
 
+void ProjectStackedWidget::refreshFunctions(QStringList functions)
+{
+	functionsListWidget->clear();
+	QString str;
+	foreach(str, functions)
+	{
+		QListWidgetItem *item = new QListWidgetItem(functionsListWidget);
+		item->setText(str);
+	}
+}
+
+void ProjectStackedWidget::refreshGeneric(QStringList generic)
+{
+	genericListWidget->clear();
+	QString str;
+	foreach(str, generic)
+	{
+		QListWidgetItem *item = new QListWidgetItem(genericListWidget);
+		item->setText(str);
+	}
+}
+
 void ProjectStackedWidget::watchGlobalSlot()
 {
 	QList<QListWidgetItem*> globals = globalsListWidget->selectedItems();
 	if(!globals.isEmpty())
 		emit watchGlobalSignal(globals.at(0)->text());
+}
+
+void ProjectStackedWidget::watchFunctionSlot()
+{
+	QList<QListWidgetItem*> functions = functionsListWidget->selectedItems();
+	if(!functions.isEmpty())
+		emit watchFunctionSignal(functions.at(0)->text());
+}
+
+void ProjectStackedWidget::watchGenericSlot()
+{
+	QList<QListWidgetItem*> generic = genericListWidget->selectedItems();
+	if(!generic.isEmpty())
+		emit watchGenericSignal(generic.at(0)->text());
 }
 
 void ProjectStackedWidget::duplicationProxySlot(bool state)
@@ -339,6 +404,20 @@ void ProjectStackedWidget::removeGlobalSlot()
 		emit removeGlobalSignal(globals.at(0)->text(), false);
 }
 
+void ProjectStackedWidget::removeFunctionSlot()
+{
+	QList<QListWidgetItem*> functions = functionsListWidget->selectedItems();
+	if(!functions.isEmpty())
+		emit removeFunctionSignal(functions.at(0)->text(), false);
+}
+
+void ProjectStackedWidget::removeGenericSlot()
+{
+	QList<QListWidgetItem*> generic = genericListWidget->selectedItems();
+	if(!generic.isEmpty())
+		emit removeGenericSignal(generic.at(0)->text(), false);
+}
+
 void ProjectStackedWidget::clearSlot()
 {
 	templatesListWidget->clear();
@@ -348,5 +427,6 @@ void ProjectStackedWidget::clearSlot()
 	activationsListWidget->clear();
 	globalsListWidget->clear();
 	functionsListWidget->clear();
+	genericListWidget->clear();
 	classesListWidget->clear();
 }

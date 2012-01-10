@@ -59,6 +59,8 @@ private slots:
 	void addFactsListSlot();
 	void addRuleSlot();
 	void addGlobalSlot();
+	void addFunctionSlot();
+	void addGenericSlot();
 	void refreshTemplatesSlot();
 	void refreshFactsSlot();
 	void refreshDeffactsSlot();
@@ -66,10 +68,13 @@ private slots:
 	void refreshActivationsSlot();
 	void refreshGlobalsSlot();
 	void refreshFunctionsSlot();
+	void refreshGenericSlot();
 	void refreshClassesSlot();
 	void setActivationSalienceSlot();
 	void setConflictStrategySlot();
 	void watchGlobalSlot(QString);
+	void watchFunctionSlot(QString);
+	void watchGenericSlot(QString);
 
 signals:
 	void treeWidgetItemClickedSignal(int);
@@ -80,6 +85,8 @@ signals:
 	void setActivationSalienceSignal(QString, int, bool);
 	void setStrategySignal(int);
 	void addGlobalSignal(QString, QHash<QString, QString>);
+	void addFunctionSignal(QString, QString, QString, QString, QString);
+	void addGenericSignal(QString);
 };
 
 #endif // MAINWINDOW_H

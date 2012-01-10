@@ -479,6 +479,78 @@ QString CLIPSClass::getGlobalInformation(QString name)
 	return QString(globalsName).simplified();
 }
 
+void CLIPSClass::deffunctionSlot(QString name, QString comment, QString regular, QString wildcard, QString expression)
+{
+	if(!comment.isEmpty())
+		comment = "\""+comment+"\"";
+	QString command = "(deffunction "+name+" "+comment+" ("+regular+" "+wildcard+") "+expression+")";
+	QFile file(QDir::tempPath()+"/tmpfile");
+	if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+		return;
+	QTextStream out(&file);
+	out<<command;
+	QString path = file.fileName();
+	file.close();
+	Load(path.toLocal8Bit().data());
+	file.remove();
+	QStringList functions = functionsSlot(false);
+	emit functionsChangedSignal(functions);
+}
+
+void CLIPSClass::unDeffunctionSlot(QString name, bool ret)
+{
+	void* functionPtr = FindDeffunction(name.simplified().toLocal8Bit().data());
+	if(!IsDeffunctionDeletable(functionPtr))
+		return;
+	Undeffunction(functionPtr);
+	if(ret)
+		emit outputSignal("");
+	QStringList functions = functionsSlot(false);
+	emit functionsChangedSignal(functions);
+}
+
+QString CLIPSClass::getFunctionInformation(QString name)
+{
+	void* functionPtr = FindDeffunction(name.simplified().toLocal8Bit().data());
+	char *functionName = GetDeffunctionPPForm(functionPtr);
+	return QString(functionName).simplified();
+}
+
+QString CLIPSClass::getGenericInformation(QString name)
+{
+	void* genericPtr = FindDefgeneric(name.simplified().toLocal8Bit().data());
+	char *genericName = GetDefgenericPPForm(genericPtr);
+	return QString(genericName).simplified();
+}
+
+void CLIPSClass::defgenericSlot(QString name)
+{
+	QString command = "(defgeneric "+name+")";
+	QFile file(QDir::tempPath()+"/tmpfile");
+	if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+		return;
+	QTextStream out(&file);
+	out<<command;
+	QString path = file.fileName();
+	file.close();
+	Load(path.toLocal8Bit().data());
+	file.remove();
+	QStringList generic = genericSlot(false);
+	emit genericChangedSignal(generic);
+}
+
+void CLIPSClass::unDefgenericSlot(QString name, bool ret)
+{
+	void* genericPtr = FindDefgeneric(name.simplified().toLocal8Bit().data());
+	if(!IsDefgenericDeletable(genericPtr))
+		return;
+	Undefgeneric(genericPtr);
+	if(ret)
+		emit outputSignal("");
+	QStringList generic = genericSlot(false);
+	emit genericChangedSignal(generic);
+}
+
 void CLIPSClass::saveFactsSlot(QString path)
 {
 	SaveFacts(path.toLocal8Bit().data(),LOCAL_SAVE,NULL);
@@ -685,4 +757,52 @@ QStringList CLIPSClass::globalsSlot(bool ret)
 		emit outputSignal(string);
 	}
 	return globalsList;
+}
+
+QStringList CLIPSClass::functionsSlot(bool ret)
+{
+	QStringList functionsList;
+	void* ptr=NULL;
+	do
+	{
+		ptr = GetNextDeffunction(ptr);
+		if(ptr!=NULL)
+		{
+			char *functionStr = GetDeffunctionName(ptr);
+			functionsList<<QString(functionStr).simplified();
+		}
+	}
+	while(ptr!=NULL);
+	if(ret)
+	{
+		QString string, str;
+		foreach(str, functionsList)
+			string += " "+str;
+		emit outputSignal(string);
+	}
+	return functionsList;
+}
+
+QStringList CLIPSClass::genericSlot(bool ret)
+{
+	QStringList genericList;
+	void* ptr=NULL;
+	do
+	{
+		ptr = GetNextDefgeneric(ptr);
+		if(ptr!=NULL)
+		{
+			char *genericStr = GetDefgenericName(ptr);
+			genericList<<QString(genericStr).simplified();
+		}
+	}
+	while(ptr!=NULL);
+	if(ret)
+	{
+		QString string, str;
+		foreach(str, genericList)
+			string += " "+str;
+		emit outputSignal(string);
+	}
+	return genericList;
 }
