@@ -10,39 +10,39 @@ TARGET = CLIPS-GUI
 TEMPLATE = app
 
 
-SOURCES += main.cpp\
-        mainwindow.cpp \
-    consoleclass.cpp \
-    clipsclass.cpp \
-    projectstackedwidget.cpp \
-    newprojectdialog.cpp \
-    addtemplatedialog.cpp \
-    addfactbytemplatedialog.cpp \
-    adddeffactsdialog.cpp \
-    addruledialog.cpp \
-    addglobalsdialog.cpp \
-    addfunctiondialog.cpp
+SOURCES += src/main.cpp\
+	src/mainwindow.cpp \
+    src/consoleclass.cpp \
+    src/clipsclass.cpp \
+    src/projectstackedwidget.cpp \
+    src/dialogs/newprojectdialog.cpp \
+    src/dialogs/addtemplatedialog.cpp \
+    src/dialogs/addfactbytemplatedialog.cpp \
+    src/dialogs/adddeffactsdialog.cpp \
+    src/dialogs/addruledialog.cpp \
+    src/dialogs/addglobalsdialog.cpp \
+    src/dialogs/addfunctiondialog.cpp
 
-HEADERS  += mainwindow.h \
-    consoleclass.h \
-    clipsclass.h \
-    projectstackedwidget.h \
-    newprojectdialog.h \
-    addtemplatedialog.h \
-    addfactbytemplatedialog.h \
-    adddeffactsdialog.h \
-    addruledialog.h \
-    addglobalsdialog.h \
-    addfunctiondialog.h
+HEADERS  += src/mainwindow.h \
+    src/consoleclass.h \
+    src/clipsclass.h \
+    src/projectstackedwidget.h \
+    src/dialogs/newprojectdialog.h \
+    src/dialogs/addtemplatedialog.h \
+    src/dialogs/addfactbytemplatedialog.h \
+    src/dialogs/adddeffactsdialog.h \
+    src/dialogs/addruledialog.h \
+    src/dialogs/addglobalsdialog.h \
+    src/dialogs/addfunctiondialog.h
 
-FORMS    += mainwindow.ui \
-    newprojectdialog.ui \
-    addtemplatedialog.ui \
-    addfactbytemplatedialog.ui \
-    adddeffactsdialog.ui \
-    addruledialog.ui \
-    addglobalsdialog.ui \
-    addfunctiondialog.ui
+FORMS    += src/mainwindow.ui \
+    src/dialogs/newprojectdialog.ui \
+    src/dialogs/addtemplatedialog.ui \
+    src/dialogs/addfactbytemplatedialog.ui \
+    src/dialogs/adddeffactsdialog.ui \
+    src/dialogs/addruledialog.ui \
+    src/dialogs/addglobalsdialog.ui \
+    src/dialogs/addfunctiondialog.ui
 
 LIBS += -lclips #-lboost_thread
 LIBS += -L/usr/lib
