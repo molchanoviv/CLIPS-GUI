@@ -91,6 +91,7 @@ signals:
 	void functionsChangedSignal(QStringList);
 	void genericChangedSignal(QStringList);
 	void methodsChangedSignal(QHash<QString, int>);
+	void dataChanged();
 	void clearSignal();
 
 protected:

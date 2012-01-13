@@ -43,6 +43,8 @@ private:
 	void refreshAll();
 	void createProjectTreeWidgetItems(QString);
 	StringPair projectPair;
+	bool unsaved;
+	void redrawTitle();
 
 
 private slots:
@@ -53,7 +55,7 @@ private slots:
 	void removeProject();
 	void saveProject();
 	void saveProjectAs();
-
+	void dataChangedSlot();
 	//Templates
 	void addTemplateSlot();
 	void refreshTemplatesSlot();

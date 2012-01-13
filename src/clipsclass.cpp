@@ -81,6 +81,7 @@ void CLIPSClass::deftemplateSlot(QString name, QList<slotsPair> slotsList)
 	exec(command);
 	QStringList templates = templatesSlot();
 	emit templatesChangedSignal(templates);
+	emit dataChanged();
 }
 
 void CLIPSClass::unDeftemplateSlot(QString name)
@@ -91,6 +92,7 @@ void CLIPSClass::unDeftemplateSlot(QString name)
 	Undeftemplate(tmplPtr);
 	QStringList templates = templatesSlot();
 	emit templatesChangedSignal(templates);
+	emit dataChanged();
 }
 
 QList<slotsPair> CLIPSClass::getTemplateInformation(QString name)
@@ -150,6 +152,7 @@ void CLIPSClass::assertStringSlot(QString fact)
 	emit templatesChangedSignal(templates);
 	QStringList activations = agendaSlot();
 	emit activationsChangedSignal(activations);
+	emit dataChanged();
 }
 
 void CLIPSClass::assertSlot(QString templateName, QList<slotsPair> slotsList)
@@ -255,6 +258,7 @@ void CLIPSClass::assertSlot(QString templateName, QList<slotsPair> slotsList)
 	emit templatesChangedSignal(templates);
 	QStringList activations = agendaSlot();
 	emit activationsChangedSignal(activations);
+	emit dataChanged();
 }
 
 void CLIPSClass::retractSlot(int factNumber)
@@ -272,6 +276,7 @@ void CLIPSClass::retractSlot(int factNumber)
 				emit factsChangedSignal(facts);
 				QStringList activations = agendaSlot();
 				emit activationsChangedSignal(activations);
+				emit dataChanged();
 			}
 		}
 	}
@@ -319,6 +324,7 @@ void CLIPSClass::deffactsSlot(QString name, QStringList factsList)
 	emit templatesChangedSignal(templates);
 	QStringList activations = agendaSlot();
 	emit activationsChangedSignal(activations);
+	emit dataChanged();
 }
 
 void CLIPSClass::unDeffactsSlot(QString name)
@@ -333,6 +339,7 @@ void CLIPSClass::unDeffactsSlot(QString name)
 	emit templatesChangedSignal(templates);
 	QStringList activations = agendaSlot();
 	emit activationsChangedSignal(activations);
+	emit dataChanged();
 }
 
 QString CLIPSClass::getDeffactsPPF(QString name)
@@ -381,6 +388,7 @@ void CLIPSClass::defRuleSlot(QString name, QString comment, QString declaration,
 	emit templatesChangedSignal(templates);
 	QStringList activations = agendaSlot();
 	emit activationsChangedSignal(activations);
+	emit dataChanged();
 }
 
 void CLIPSClass::unDefruleSlot(QString name)
@@ -393,6 +401,7 @@ void CLIPSClass::unDefruleSlot(QString name)
 	emit rulesChangedSignal(rules);
 	QStringList activations = agendaSlot();
 	emit activationsChangedSignal(activations);
+	emit dataChanged();
 }
 
 void CLIPSClass::SetBreakSlot(QString name)
@@ -400,6 +409,7 @@ void CLIPSClass::SetBreakSlot(QString name)
 	SetBreak(FindDefrule(name.toLocal8Bit().data()));
 	QStringList rules = rulesSlot();
 	emit rulesChangedSignal(rules);
+	emit dataChanged();
 }
 
 void CLIPSClass::RemoveBreakSlot(QString name)
@@ -407,6 +417,7 @@ void CLIPSClass::RemoveBreakSlot(QString name)
 	RemoveBreak(FindDefrule(name.toLocal8Bit().data()));
 	QStringList rules = rulesSlot();
 	emit rulesChangedSignal(rules);
+	emit dataChanged();
 }
 
 QString CLIPSClass::getRulePPF(QString name)
@@ -448,6 +459,7 @@ void CLIPSClass::runSlot()
 	emit rulesChangedSignal(rules);
 	QStringList activations = agendaSlot();
 	emit activationsChangedSignal(activations);
+	emit dataChanged();
 }
 
 void CLIPSClass::removeActivationSlot(QString name)
@@ -470,6 +482,7 @@ void CLIPSClass::removeActivationSlot(QString name)
 		}
 	}
 	while(ptr!=NULL);
+	emit dataChanged();
 }
 
 int CLIPSClass::getActivationSalienceSlot(QString name)
@@ -511,6 +524,7 @@ void CLIPSClass::setActivationSalienceSlot(QString name, int salience)
 				ReorderAgenda(NULL);
 				QStringList activations = agendaSlot();
 				emit activationsChangedSignal(activations);
+				emit dataChanged();
 			}
 		}
 	}
@@ -578,6 +592,7 @@ void CLIPSClass::defglobalSlot(QString moduleName, QHash<QString, QString> defgl
 	exec(command);
 	QStringList globals = globalsSlot();
 	emit globalsChangedSignal(globals);
+	emit dataChanged();
 }
 
 void CLIPSClass::unDefglobalSlot(QString name)
@@ -588,6 +603,7 @@ void CLIPSClass::unDefglobalSlot(QString name)
 	Undefglobal(globalPtr);
 	QStringList globals = globalsSlot();
 	emit globalsChangedSignal(globals);
+	emit dataChanged();
 }
 
 QString CLIPSClass::getGlobalPPF(QString name)
@@ -624,6 +640,7 @@ void CLIPSClass::deffunctionSlot(QString name, QString comment, QString regular,
 	exec(command);
 	QStringList functions = functionsSlot();
 	emit functionsChangedSignal(functions);
+	emit dataChanged();
 }
 
 void CLIPSClass::unDeffunctionSlot(QString name)
@@ -634,6 +651,7 @@ void CLIPSClass::unDeffunctionSlot(QString name)
 	Undeffunction(functionPtr);
 	QStringList functions = functionsSlot();
 	emit functionsChangedSignal(functions);
+	emit dataChanged();
 }
 
 QString CLIPSClass::getFunctionPPF(QString name)
@@ -670,6 +688,7 @@ void CLIPSClass::defgenericSlot(QString name)
 	emit genericChangedSignal(generic);
 	QHash<QString, int> methods = methodsSlot();
 	emit methodsChangedSignal(methods);
+	emit dataChanged();
 }
 
 void CLIPSClass::unDefgenericSlot(QString name)
@@ -682,6 +701,7 @@ void CLIPSClass::unDefgenericSlot(QString name)
 	emit genericChangedSignal(generic);
 	QHash<QString, int> methods = methodsSlot();
 	emit methodsChangedSignal(methods);
+	emit dataChanged();
 }
 
 QString CLIPSClass::getGenericPPF(QString name)
@@ -720,6 +740,7 @@ void CLIPSClass::defmethodSlot(QString name, QString index, QString comment, QSt
 	emit genericChangedSignal(generic);
 	QHash<QString, int> methods = methodsSlot();
 	emit methodsChangedSignal(methods);
+	emit dataChanged();
 }
 
 void CLIPSClass::unDefmethodSlot(QString name, int index)
@@ -731,6 +752,7 @@ void CLIPSClass::unDefmethodSlot(QString name, int index)
 	Undefmethod(genericPtr, index);
 	QHash<QString, int> methods = methodsSlot();
 	emit methodsChangedSignal(methods);
+	emit dataChanged();
 }
 
 QString CLIPSClass::getMethodPPF(QString name, int index)

@@ -124,8 +124,10 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(clips, SIGNAL(genericChangedSignal(QStringList)), projectWidget, SLOT(refreshGeneric(QStringList)));
 	connect(clips, SIGNAL(methodsChangedSignal(QHash<QString, int>)), projectWidget, SLOT(refreshMethods(QHash<QString, int>)));
 	connect(clips, SIGNAL(clearSignal()), projectWidget, SLOT(clearSlot()));
+	connect(clips, SIGNAL(dataChanged()), this, SLOT(dataChangedSlot()));
 	disableWidgets(true);
 	readSettings();
+	unsaved = false;
 
 }
 
@@ -280,6 +282,8 @@ void MainWindow::saveProject()
 	clips->saveFactsSlot(projectPair.second+"/facts.clp");
 	clips->saveSlot(projectPair.second+"/all.clp");
 	clips->bSaveSlot(projectPair.second+"/data.bin");
+	unsaved = false;
+	redrawTitle();
 }
 
 void MainWindow::saveProjectAs()
@@ -300,6 +304,8 @@ void MainWindow::saveProjectAs()
 		file.close();
 		clips->saveFactsSlot(projectPath+"/facts.clp");
 		clips->saveSlot(projectPath+"/all.clp");
+		unsaved = false;
+		redrawTitle();
 	}
 }
 
@@ -336,15 +342,24 @@ void MainWindow::disableWidgets(bool state)
 void MainWindow::closeEvent(QCloseEvent *event)
 {
 	Q_UNUSED(event);
-	if(!projectPair.first.isEmpty())
+	if(unsaved)
 	{
 		QMessageBox msgBox;
-		msgBox.setText(tr("You have opened project."));
-		msgBox.setInformativeText(tr("Do you want to save a project before quit?"));
-		msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-		msgBox.setDefaultButton(QMessageBox::Yes);
-		if(msgBox.exec() == QMessageBox::Yes)
+		msgBox.setText(tr("You have unsaved data. This data will be lost."));
+		msgBox.setInformativeText(tr("Do you really want to quit?"));
+		msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Save);
+		msgBox.setDefaultButton(QMessageBox::No);
+		int state = msgBox.exec();
+		if(state == QMessageBox::No)
+			event->ignore();
+		else if(state == QMessageBox::Save)
+		{
 			saveProject();
+			event->accept();
+		}
+		else
+			event->accept();
+
 	}
 	writeSettings();
 };
@@ -399,6 +414,22 @@ void MainWindow::refreshAll()
 	refreshGenericSlot();
 	refreshMethodsSlot();
 	refreshClassesSlot();
+}
+
+void MainWindow::redrawTitle()
+{
+	QString str = "";
+	if(unsaved)
+		str = tr("CLIPS-GUI")+"*";
+	else
+		str = tr("CLIPS-GUI");
+	setWindowTitle(str);
+}
+
+void MainWindow::dataChangedSlot()
+{
+	unsaved = true;
+	redrawTitle();
 }
 
 //Templates
