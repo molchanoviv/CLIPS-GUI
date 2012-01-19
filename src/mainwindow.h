@@ -20,6 +20,8 @@ namespace Ui {
 	class MainWindow;
 }
 
+class consoleClass;
+
 class MainWindow : public QMainWindow
 {
 	Q_OBJECT
@@ -40,14 +42,15 @@ private:
 	ProjectStackedWidget *projectWidget;
 	int removeFolder(QDir);
 	void disableWidgets(bool);
-	void refreshAll();
 	void createProjectTreeWidgetItems(QString);
 	StringPair projectPair;
 	bool unsaved;
 	void redrawTitle();
+	consoleClass *console;
 
 
 private slots:
+	void refreshAll();
 	void treeWidgetItemClicked(QTreeWidgetItem*,int);
 	void newProject();
 	void openProject();

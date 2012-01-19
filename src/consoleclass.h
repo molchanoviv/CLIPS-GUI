@@ -20,14 +20,8 @@ public:
 
 signals:
 	void enterPressed();
-	void assertStringSignal(QString, bool);
-	void factsSignal(bool);
-	void retractSignal(int, bool);
-	void saveFactsSignal(QString);
-	void setFactDuplicationSignal(bool, bool);
-	void createProjectSignal();
-	void openProjectSignal();
-	void quitSignal();
+	void execSignal(QString);
+	void refreshAllSignal();
 
 public slots:
 	void exec();

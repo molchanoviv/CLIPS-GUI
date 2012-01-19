@@ -5,56 +5,74 @@
 CLIPSClass::CLIPSClass(QObject *parent) :
 	QObject(parent)
 {
-	InitializeEnvironment();
+//	InitializeEnvironment();
+	Environment = CreateEnvironment();
+	SetEnvironmentContext(Environment, this);
+	EnvAddRouter(Environment,"IORouter",40,queryFunction,printFunction,NULL,NULL,NULL);
+	EnvActivateRouter(Environment,"IORouter");
+	SetPrintWhileLoading(Environment,false);
 }
 
-void CLIPSClass::exec(QString command)
+CLIPSClass::~CLIPSClass()
 {
-	QFile file(QDir::tempPath()+"/tmpfile");
-	if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-		return;
-	QTextStream out(&file);
-	out<<command;
-	QString path = file.fileName();
-	file.close();
-	Load(path.toLocal8Bit().data());
-	file.remove();
+	DestroyEnvironment(Environment);
 }
 
-void CLIPSClass::saveFactsSlot(QString path)
+void CLIPSClass::executeCommand(QString command)
 {
-	SaveFacts(path.toLocal8Bit().data(),LOCAL_SAVE,NULL);
+	answer.clear();
+	SetCommandString(Environment, command.toLocal8Bit().data());
+	RouteCommand(Environment,CommandLineData(Environment)->CommandString,true);
+	if(!answer.isEmpty())
+		emit outputSignal(answer);
 }
 
-void CLIPSClass::loadFactsSlot(QString path)
+
+int CLIPSClass::queryFunction(void* Environment, char* logicalName)
 {
-	LoadFacts(path.toLocal8Bit().data());
-	QStringList facts = factsSlot();
-	emit factsChangedSignal(facts);
+	Q_UNUSED(Environment);
+	if (	(qstrcmp(logicalName,"stdout") == 0)	||
+		(qstrcmp(logicalName,"stdin") == 0)	||
+		(qstrcmp(logicalName,"wprompt") == 0)	||
+		(qstrcmp(logicalName,"wdisplay") == 0)	||
+		(qstrcmp(logicalName,"wdialog") == 0)	||
+		(qstrcmp(logicalName,"werror") == 0)	||
+		(qstrcmp(logicalName,"wwarning") == 0)	||
+		(qstrcmp(logicalName,"wtrace") == 0))
+		return true;
+	return false;
+}
+
+int CLIPSClass::printFunction(void* Environment, char* name, char* str)
+{
+	Q_UNUSED(Environment);
+	if (qstrcmp(name, "stdin"))
+	{
+		CLIPS->answer.append(str);
+		return true;
+	}
+	return false;
+
 }
 
 void CLIPSClass::saveSlot(QString path)
 {
-	Save(path.toLocal8Bit().data());
-}
-
-void CLIPSClass::bSaveSlot(QString path)
-{
-	Bsave(path.toLocal8Bit().data());
+	QString factsPath = path+QString("/data.fct");
+	QString dataPath = path+QString("/data.clp");
+	QString binaryPath = path+QString("/data.bin");
+	SaveFacts(factsPath.toLocal8Bit().data(),LOCAL_SAVE,NULL);
+	Save(dataPath.toLocal8Bit().data());
+	Bsave(binaryPath.toLocal8Bit().data());
 }
 
 void CLIPSClass::loadSlot(QString path)
 {
-	Load(path.toLocal8Bit().data());
-	QStringList facts = factsSlot();
-	emit factsChangedSignal(facts);
-	QStringList templates = templatesSlot();
-	emit templatesChangedSignal(templates);
-}
-
-void CLIPSClass::bLoadSlot(QString path)
-{
-	BloadData(path.toLocal8Bit().data());
+	QString factsPath = path+QString("/data.fct");
+	QString dataPath = path+QString("/data.clp");
+	QString binaryPath = path+QString("/data.bin");
+	LoadFacts(factsPath.toLocal8Bit().data());
+	Load(dataPath.toLocal8Bit().data());
+	BloadData(binaryPath.toLocal8Bit().data());
 }
 
 void CLIPSClass::clearSlot()
@@ -78,7 +96,7 @@ void CLIPSClass::deftemplateSlot(QString name, QList<slotsPair> slotsList)
 		slotsstr += "( "+slot+" "+slotsList.at(i).second+" ) ";
 	}
 	QString command = "(deftemplate "+name+" "+slotsstr+")";
-	exec(command);
+	executeCommand(command);
 	QStringList templates = templatesSlot();
 	emit templatesChangedSignal(templates);
 	emit dataChanged();
@@ -317,7 +335,7 @@ void CLIPSClass::deffactsSlot(QString name, QStringList factsList)
 		factsstr += "( "+factsList.at(i)+" ) ";
 	}
 	QString command = "(deffacts "+name+" "+factsstr+")";
-	exec(command);
+	executeCommand(command);
 	QStringList deffacts = factsListSlot();
 	emit deffactsChangedSignal(deffacts);
 	QStringList templates = templatesSlot();
@@ -381,7 +399,7 @@ void CLIPSClass::defRuleSlot(QString name, QString comment, QString declaration,
 	if(!declaration.isEmpty())
 		declaration = "("+declaration+")";
 	QString command = "(defrule "+name+" "+comment+" "+declaration+" "+antecedentsStr+"=>"+consequentsStr+")";
-	exec(command);
+	executeCommand(command);
 	QStringList rules = rulesSlot();
 	emit rulesChangedSignal(rules);
 	QStringList templates = templatesSlot();
@@ -589,7 +607,7 @@ void CLIPSClass::defglobalSlot(QString moduleName, QHash<QString, QString> defgl
 		globalsStr += str+" = "+i.value()+" ";
 	}
 	QString command = "(defglobal "+moduleName+" "+globalsStr+")";
-	exec(command);
+	executeCommand(command);
 	QStringList globals = globalsSlot();
 	emit globalsChangedSignal(globals);
 	emit dataChanged();
@@ -637,7 +655,7 @@ void CLIPSClass::deffunctionSlot(QString name, QString comment, QString regular,
 	if(!comment.isEmpty())
 		comment = "\""+comment+"\"";
 	QString command = "(deffunction "+name+" "+comment+" ("+regular+" "+wildcard+") "+expression+")";
-	exec(command);
+	executeCommand(command);
 	QStringList functions = functionsSlot();
 	emit functionsChangedSignal(functions);
 	emit dataChanged();
@@ -683,7 +701,7 @@ QStringList CLIPSClass::functionsSlot()
 void CLIPSClass::defgenericSlot(QString name)
 {
 	QString command = "(defgeneric "+name+")";
-	exec(command);
+	executeCommand(command);
 	QStringList generic = genericSlot();
 	emit genericChangedSignal(generic);
 	QHash<QString, int> methods = methodsSlot();
@@ -735,7 +753,7 @@ void CLIPSClass::defmethodSlot(QString name, QString index, QString comment, QSt
 	if(!comment.isEmpty())
 		comment = "\""+comment+"\"";
 	QString command = "(defmethod "+name+" "+index+" "+comment+" ("+regular+" "+wildcard+") "+expression+")";
-	exec(command);
+	executeCommand(command);
 	QStringList generic = genericSlot();
 	emit genericChangedSignal(generic);
 	QHash<QString, int> methods = methodsSlot();

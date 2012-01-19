@@ -4,6 +4,8 @@
 #include <clips/clips.h>
 #include <QtCore>
 
+#define CLIPS	static_cast<CLIPSClass*>(GetEnvironmentContext(Environment))
+
 typedef QPair<bool, QString> slotsPair;
 
 class CLIPSClass : public QObject
@@ -11,16 +13,13 @@ class CLIPSClass : public QObject
 	Q_OBJECT
 public:
 	explicit CLIPSClass(QObject *parent = 0);
+	~CLIPSClass();
 
 public slots:
-	void saveFactsSlot(QString);
-	void loadFactsSlot(QString);
 	void saveSlot(QString);
-	void bSaveSlot(QString);
 	void loadSlot(QString);
-	void bLoadSlot(QString);
 	void clearSlot();
-	void exec(QString);
+	void executeCommand(QString);
 	//Templates
 	QStringList templatesSlot();
 	void deftemplateSlot(QString, QList<slotsPair>);
@@ -81,6 +80,9 @@ public slots:
 	//Modules
 	QStringList getModules();
 
+private slots:
+
+
 signals:
 	void templatesChangedSignal(QStringList);
 	void factsChangedSignal(QStringList);
@@ -93,9 +95,13 @@ signals:
 	void methodsChangedSignal(QHash<QString, int>);
 	void dataChanged();
 	void clearSignal();
+	void outputSignal(QString);
 
 protected:
-
+	void* Environment;
+	static int queryFunction(void*, char*);
+	static int printFunction(void*,char*, char*);
+	QString answer;
 };
 
 #endif // CLIPSCLASS_H

@@ -39,7 +39,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	projectToolbar->addAction(ui->actionClose);
 	projectToolbar->addAction(ui->actionRemove);
 	addToolBar(projectToolbar);
-	consoleClass *console = new consoleClass;
+	console = new consoleClass;
 	console->hide();
 	ui->actionShow_Hide_console->setCheckable(true);
 	connect(ui->actionShow_Hide_console, SIGNAL(toggled(bool)), console, SLOT(setShown(bool)));
@@ -125,6 +125,9 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(clips, SIGNAL(methodsChangedSignal(QHash<QString, int>)), projectWidget, SLOT(refreshMethods(QHash<QString, int>)));
 	connect(clips, SIGNAL(clearSignal()), projectWidget, SLOT(clearSlot()));
 	connect(clips, SIGNAL(dataChanged()), this, SLOT(dataChangedSlot()));
+	connect(clips, SIGNAL(outputSignal(QString)), console, SLOT(output(QString)));
+	connect(console, SIGNAL(execSignal(QString)), clips, SLOT(executeCommand(QString)));
+	connect(console, SIGNAL(refreshAllSignal()), this, SLOT(refreshAll()));
 	disableWidgets(true);
 	readSettings();
 	unsaved = false;
@@ -200,9 +203,7 @@ void MainWindow::openProject()
 		projectPair.first = projectName;
 		projectPair.second = fileName.remove(fileName.lastIndexOf(QRegExp("(/|\\\\)")), fileName.length());
 		clips->clearSlot();
-		clips->loadSlot(projectPair.second+"/all.clp");
-		clips->loadFactsSlot(projectPair.second+"/facts.clp");
-		clips->bLoadSlot(projectPair.second+"/data.bin");
+		clips->loadSlot(projectPair.second);
 		refreshAll();
 	}
 }
@@ -279,9 +280,7 @@ void MainWindow::removeProject()
 
 void MainWindow::saveProject()
 {
-	clips->saveFactsSlot(projectPair.second+"/facts.clp");
-	clips->saveSlot(projectPair.second+"/all.clp");
-	clips->bSaveSlot(projectPair.second+"/data.bin");
+	clips->saveSlot(projectPair.second);
 	unsaved = false;
 	redrawTitle();
 }
@@ -302,8 +301,7 @@ void MainWindow::saveProjectAs()
 		out << "[project]\n";
 		out<<"name="+projectName+"\n";
 		file.close();
-		clips->saveFactsSlot(projectPath+"/facts.clp");
-		clips->saveSlot(projectPath+"/all.clp");
+		clips->saveSlot(projectPath);
 		unsaved = false;
 		redrawTitle();
 	}
@@ -337,6 +335,7 @@ void MainWindow::disableWidgets(bool state)
 	ui->actionSave_As->setDisabled(state);
 	ui->actionClose->setDisabled(state);
 	ui->actionRemove->setDisabled(state);
+	console->setDisabled(state);
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
