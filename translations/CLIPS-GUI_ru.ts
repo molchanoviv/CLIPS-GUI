@@ -4,47 +4,101 @@
 <context>
     <name>CLIPSClass</name>
     <message>
-        <location filename="../src/clipsclass.cpp" line="537"/>
+        <location filename="../src/clipsclass.cpp" line="555"/>
         <source>DEPTH_STRATEGY</source>
         <translation>Стратегия глубины</translation>
     </message>
     <message>
-        <location filename="../src/clipsclass.cpp" line="538"/>
+        <location filename="../src/clipsclass.cpp" line="556"/>
         <source>BREADTH_STRATEGY</source>
         <translation>Стратегия ширины</translation>
     </message>
     <message>
-        <location filename="../src/clipsclass.cpp" line="539"/>
+        <location filename="../src/clipsclass.cpp" line="557"/>
         <source>LEX_STRATEGY</source>
         <translation>Стратегия LEX</translation>
     </message>
     <message>
-        <location filename="../src/clipsclass.cpp" line="540"/>
+        <location filename="../src/clipsclass.cpp" line="558"/>
         <source>MEA_STRATEGY</source>
         <translation>Стратегия МЕЛ</translation>
     </message>
     <message>
-        <location filename="../src/clipsclass.cpp" line="541"/>
+        <location filename="../src/clipsclass.cpp" line="559"/>
         <source>COMPLEXITY_STRATEGY</source>
         <translation>Стратегия усложнения</translation>
     </message>
     <message>
-        <location filename="../src/clipsclass.cpp" line="542"/>
+        <location filename="../src/clipsclass.cpp" line="560"/>
         <source>SIMPLICITY_STRATEGY</source>
         <translation>Стратегия упрощения</translation>
     </message>
     <message>
-        <location filename="../src/clipsclass.cpp" line="543"/>
+        <location filename="../src/clipsclass.cpp" line="561"/>
         <source>RANDOM_STRATEGY</source>
         <translation>Случайная стратегия</translation>
+    </message>
+    <message>
+        <location filename="../src/clipsclass.cpp" line="853"/>
+        <location filename="../src/clipsclass.cpp" line="858"/>
+        <location filename="../src/clipsclass.cpp" line="864"/>
+        <source>yes</source>
+        <translation>да</translation>
+    </message>
+    <message>
+        <location filename="../src/clipsclass.cpp" line="855"/>
+        <location filename="../src/clipsclass.cpp" line="860"/>
+        <location filename="../src/clipsclass.cpp" line="866"/>
+        <source>no</source>
+        <translation>нет</translation>
+    </message>
+    <message>
+        <location filename="../src/clipsclass.cpp" line="856"/>
+        <source>Abstract: </source>
+        <translation>Абстрактный: </translation>
+    </message>
+    <message>
+        <location filename="../src/clipsclass.cpp" line="856"/>
+        <location filename="../src/clipsclass.cpp" line="861"/>
+        <location filename="../src/clipsclass.cpp" line="867"/>
+        <location filename="../src/clipsclass.cpp" line="869"/>
+        <location filename="../src/clipsclass.cpp" line="900"/>
+        <source>
+</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/clipsclass.cpp" line="861"/>
+        <source>Reactive: </source>
+        <translation>Реактивный: </translation>
+    </message>
+    <message>
+        <location filename="../src/clipsclass.cpp" line="867"/>
+        <source>Deletable: </source>
+        <translation>Удаляемый: </translation>
+    </message>
+    <message>
+        <location filename="../src/clipsclass.cpp" line="869"/>
+        <source>Module: </source>
+        <translation>Модуль: </translation>
+    </message>
+    <message>
+        <location filename="../src/clipsclass.cpp" line="915"/>
+        <source>CONVENIENCE_MODE</source>
+        <translation>Режим удобства </translation>
+    </message>
+    <message>
+        <location filename="../src/clipsclass.cpp" line="916"/>
+        <source>CONSERVATION_MODE</source>
+        <translation>Режим сохранения</translation>
     </message>
 </context>
 <context>
     <name>MainWindow</name>
     <message>
         <location filename="../src/mainwindow.ui" line="14"/>
-        <location filename="../src/mainwindow.cpp" line="423"/>
-        <location filename="../src/mainwindow.cpp" line="425"/>
+        <location filename="../src/mainwindow.cpp" line="429"/>
+        <location filename="../src/mainwindow.cpp" line="431"/>
         <source>CLIPS-GUI</source>
         <translation></translation>
     </message>
@@ -154,88 +208,142 @@
         <translation>Панель инструментов проекта</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="147"/>
+        <location filename="../src/mainwindow.cpp" line="157"/>
         <source>You have opened Project. This project will be closed.</source>
         <translation>У вас уже есть открытый проект. Текущий проект будет закрыт.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="148"/>
-        <location filename="../src/mainwindow.cpp" line="184"/>
+        <location filename="../src/mainwindow.cpp" line="158"/>
+        <location filename="../src/mainwindow.cpp" line="194"/>
         <source>Do you want to save your changes?</source>
         <translation>Вы желаете сохранить изменения?</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="217"/>
+        <location filename="../src/mainwindow.cpp" line="225"/>
         <source>Templates</source>
         <translation>Шаблоны</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="219"/>
+        <location filename="../src/mainwindow.cpp" line="227"/>
         <source>Facts</source>
         <translation>Факты</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="221"/>
+        <location filename="../src/mainwindow.cpp" line="229"/>
         <source>FactsList</source>
         <translation>Списки фактов</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="223"/>
+        <location filename="../src/mainwindow.cpp" line="231"/>
         <source>Rules</source>
         <translation>Правила</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="229"/>
+        <location filename="../src/mainwindow.cpp" line="237"/>
         <source>Functions</source>
         <translation>Функции</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="231"/>
+        <location filename="../src/mainwindow.cpp" line="239"/>
         <source>Generic Functions</source>
         <translation>Общие функции</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="233"/>
+        <location filename="../src/mainwindow.cpp" line="241"/>
         <source>Methods</source>
         <translation>Методы</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="235"/>
+        <location filename="../src/mainwindow.cpp" line="243"/>
         <source>Classes</source>
         <translation>Классы</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="177"/>
+        <location filename="../src/mainwindow.cpp" line="791"/>
+        <source>This class haven&apos;t pretty print representation</source>
+        <translation>Этот класс не имеет печатной формы</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="792"/>
+        <source>Information About Class</source>
+        <translation>Информация о классе</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="841"/>
+        <source>Select Defaults Mode</source>
+        <translation>Выберите дефолтный режим</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="841"/>
+        <source>Defaults Mode:</source>
+        <translation>Дефолтный режим:</translation>
+    </message>
+    <message>
+        <source>&quot;Graph&quot; of inherited classes is empty.</source>
+        <translation type="obsolete">&quot;Таблица&quot; наследников пуста.</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="804"/>
+        <source>This class haven&apos;t meta information.</source>
+        <translation>Этот класс не имеет метаинформации.</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="805"/>
+        <source>Class Meta Information</source>
+        <translation>Метаинформация класса</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="812"/>
+        <source>This class haven&apos;t subclasses.</source>
+        <translation>Класс не имеет потомков.</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="813"/>
+        <source>Subclasses</source>
+        <translation>Наследники</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="820"/>
+        <source>This class haven&apos;t superclasses.</source>
+        <translation>Класс не имеет предков.</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="821"/>
+        <source>Supercalsses</source>
+        <translation>Предки</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="187"/>
         <source>Open Project</source>
         <translation>Открыть проект</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="177"/>
+        <location filename="../src/mainwindow.cpp" line="187"/>
         <source>GLIPS-GUI Projects (*.clp.prj);;All files (*.*)</source>
         <translation>Проекты GLIPS-GUI (*.clp.prj);;All files (*.*)</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="183"/>
+        <location filename="../src/mainwindow.cpp" line="193"/>
         <source>You have opened project. This project will be closed.</source>
         <translation>У вас уже есть открытый проект. Текущий проект будет закрыт.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="225"/>
+        <location filename="../src/mainwindow.cpp" line="233"/>
         <source>Activations</source>
         <translation>Активации</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="227"/>
+        <location filename="../src/mainwindow.cpp" line="235"/>
         <source>Globals</source>
         <translation>Глобальные переменные</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="484"/>
+        <location filename="../src/mainwindow.cpp" line="490"/>
         <source>Add Fact</source>
         <translation>Добавить факт</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="484"/>
+        <location filename="../src/mainwindow.cpp" line="490"/>
         <source>Fact name:</source>
         <translation>Имя факта: </translation>
     </message>
@@ -244,192 +352,192 @@
         <translation type="obsolete">Факт</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="495"/>
+        <location filename="../src/mainwindow.cpp" line="501"/>
         <source>Select Template</source>
         <translation>Выберите шаблон</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="495"/>
+        <location filename="../src/mainwindow.cpp" line="501"/>
         <source>Template:</source>
         <translation>Шаблон: </translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="523"/>
+        <location filename="../src/mainwindow.cpp" line="529"/>
         <source>Facts count</source>
         <translation>Количество фактов</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="523"/>
+        <location filename="../src/mainwindow.cpp" line="529"/>
         <source>Enter facts count:</source>
         <translation>Введите количество фактов: </translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="440"/>
+        <location filename="../src/mainwindow.cpp" line="446"/>
         <source>Slots count</source>
         <translation>Количество слотов</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="348"/>
+        <location filename="../src/mainwindow.cpp" line="354"/>
         <source>You have unsaved data. This data will be lost.</source>
         <translation>Имеются несохраненные данные. Эти данные будут утеряны. </translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="349"/>
+        <location filename="../src/mainwindow.cpp" line="355"/>
         <source>Do you really want to quit?</source>
         <translation>Вы действительно хотите выйти?</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="440"/>
+        <location filename="../src/mainwindow.cpp" line="446"/>
         <source>Enter slots count:</source>
         <translation>Введите количество слотов: </translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="561"/>
+        <location filename="../src/mainwindow.cpp" line="567"/>
         <source>Antecedents count</source>
         <translation>Количество условий</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="561"/>
+        <location filename="../src/mainwindow.cpp" line="567"/>
         <source>Enter antecedents count:</source>
         <translation>Введите количество условий: </translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="564"/>
+        <location filename="../src/mainwindow.cpp" line="570"/>
         <source>Consequents count</source>
         <translation>Количество действий</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="564"/>
+        <location filename="../src/mainwindow.cpp" line="570"/>
         <source>Enter consequents count:</source>
         <translation>Введите количество действий: </translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="661"/>
+        <location filename="../src/mainwindow.cpp" line="667"/>
         <source>Globals count</source>
         <translation>Количество глобальных переменных</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="661"/>
+        <location filename="../src/mainwindow.cpp" line="667"/>
         <source>Enter globals count:</source>
         <translation>Количество глобальных переменных: </translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="730"/>
+        <location filename="../src/mainwindow.cpp" line="736"/>
         <source>Add Generic Function</source>
         <translation>Добавить общую функцию</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="730"/>
+        <location filename="../src/mainwindow.cpp" line="736"/>
         <source>Generic function name:</source>
         <translation>Имя функции: </translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="620"/>
+        <location filename="../src/mainwindow.cpp" line="626"/>
         <source>Set Activation Salience</source>
         <translation>Задать приоритет активации</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="620"/>
+        <location filename="../src/mainwindow.cpp" line="626"/>
         <source>Salience:</source>
         <translation>Приоритет: </translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="644"/>
+        <location filename="../src/mainwindow.cpp" line="650"/>
         <source>Select Strategy</source>
         <translation>Выберите стратегию</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="644"/>
+        <location filename="../src/mainwindow.cpp" line="650"/>
         <source>Strategy:</source>
         <translation>Стратегия:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="470"/>
+        <location filename="../src/mainwindow.cpp" line="476"/>
         <source>This template haven&apos;t pretty print representation</source>
         <translation>Этот шаблон не имеет печатной формы</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="547"/>
+        <location filename="../src/mainwindow.cpp" line="553"/>
         <source>This fact list haven&apos;t pretty print representation</source>
         <translation>Этот факт не имеет печатной формы</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="601"/>
+        <location filename="../src/mainwindow.cpp" line="607"/>
         <source>This rule haven&apos;t pretty print representation</source>
         <translation>Это правило не имеет печатной формы</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="686"/>
+        <location filename="../src/mainwindow.cpp" line="692"/>
         <source>This global haven&apos;t pretty print representation</source>
         <translation>Эта глобальная переменная не имеет печатной формы</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="716"/>
+        <location filename="../src/mainwindow.cpp" line="722"/>
         <source>This function haven&apos;t pretty print representation</source>
         <translation>Эта функция не имеет печатной формы</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="739"/>
+        <location filename="../src/mainwindow.cpp" line="745"/>
         <source>This generic function haven&apos;t pretty print representation</source>
         <translation>Эта общая функция не имеет печатной формы</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="770"/>
+        <location filename="../src/mainwindow.cpp" line="776"/>
         <source>This method haven&apos;t pretty print representation</source>
         <translation>Этот метод не имеет печатной формы</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="471"/>
+        <location filename="../src/mainwindow.cpp" line="477"/>
         <source>Information About Template</source>
         <translation>Информация о шаблоне</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="548"/>
+        <location filename="../src/mainwindow.cpp" line="554"/>
         <source>Information About Facts List</source>
         <translation>Информация о списке фактов</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="602"/>
+        <location filename="../src/mainwindow.cpp" line="608"/>
         <source>Information About Rule</source>
         <translation>Информация о правиле</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="687"/>
+        <location filename="../src/mainwindow.cpp" line="693"/>
         <source>Information About Global</source>
         <translation>Информация о глобальной переменной</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="717"/>
+        <location filename="../src/mainwindow.cpp" line="723"/>
         <source>Information About Function</source>
         <translation>Информация о функции</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="740"/>
+        <location filename="../src/mainwindow.cpp" line="746"/>
         <source>Information About Generic Function</source>
         <translation>Информация об общей функции</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="771"/>
+        <location filename="../src/mainwindow.cpp" line="777"/>
         <source>Information About Method</source>
         <translation>Информация о методе</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="264"/>
+        <location filename="../src/mainwindow.cpp" line="272"/>
         <source>This action remove project from disc</source>
         <translation>Это действие проект с диска</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="265"/>
+        <location filename="../src/mainwindow.cpp" line="273"/>
         <source>Do you want to proceed?</source>
         <translation>Вы хотите продолжить?</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="291"/>
+        <location filename="../src/mainwindow.cpp" line="297"/>
         <source>Save Project</source>
         <translation>Сохранить проект</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="291"/>
+        <location filename="../src/mainwindow.cpp" line="297"/>
         <source>All files (*.*)</source>
         <translation>Все файлы (*.*)</translation>
     </message>
@@ -453,7 +561,7 @@
 <context>
     <name>ProjectStackedWidget</name>
     <message>
-        <location filename="../src/projectstackedwidget.cpp" line="11"/>
+        <location filename="../src/projectstackedwidget.cpp" line="13"/>
         <source>Templates</source>
         <translation>Шаблоны</translation>
     </message>
@@ -470,12 +578,12 @@
         <translation type="obsolete">Удалить шаблон</translation>
     </message>
     <message>
-        <location filename="../src/projectstackedwidget.cpp" line="32"/>
+        <location filename="../src/projectstackedwidget.cpp" line="34"/>
         <source>Facts</source>
         <translation>Факты</translation>
     </message>
     <message>
-        <location filename="../src/projectstackedwidget.cpp" line="34"/>
+        <location filename="../src/projectstackedwidget.cpp" line="36"/>
         <source>Enable Duplication</source>
         <translation>Вкл/Выкл дублирование</translation>
     </message>
@@ -496,7 +604,7 @@
         <translation type="obsolete">Удалить факт</translation>
     </message>
     <message>
-        <location filename="../src/projectstackedwidget.cpp" line="57"/>
+        <location filename="../src/projectstackedwidget.cpp" line="59"/>
         <source>Facts List</source>
         <translation>Списки фактов</translation>
     </message>
@@ -513,7 +621,7 @@
         <translation type="obsolete">Удалить список фактов</translation>
     </message>
     <message>
-        <location filename="../src/projectstackedwidget.cpp" line="78"/>
+        <location filename="../src/projectstackedwidget.cpp" line="80"/>
         <source>Rules</source>
         <translation>Правила</translation>
     </message>
@@ -530,22 +638,36 @@
         <translation type="obsolete">Обновить правила</translation>
     </message>
     <message>
-        <location filename="../src/projectstackedwidget.cpp" line="14"/>
-        <location filename="../src/projectstackedwidget.cpp" line="38"/>
-        <location filename="../src/projectstackedwidget.cpp" line="60"/>
-        <location filename="../src/projectstackedwidget.cpp" line="81"/>
-        <location filename="../src/projectstackedwidget.cpp" line="132"/>
-        <location filename="../src/projectstackedwidget.cpp" line="153"/>
-        <location filename="../src/projectstackedwidget.cpp" line="174"/>
-        <location filename="../src/projectstackedwidget.cpp" line="195"/>
-        <location filename="../src/projectstackedwidget.cpp" line="216"/>
+        <location filename="../src/projectstackedwidget.cpp" line="16"/>
+        <location filename="../src/projectstackedwidget.cpp" line="40"/>
+        <location filename="../src/projectstackedwidget.cpp" line="62"/>
+        <location filename="../src/projectstackedwidget.cpp" line="83"/>
+        <location filename="../src/projectstackedwidget.cpp" line="134"/>
+        <location filename="../src/projectstackedwidget.cpp" line="155"/>
+        <location filename="../src/projectstackedwidget.cpp" line="176"/>
+        <location filename="../src/projectstackedwidget.cpp" line="197"/>
+        <location filename="../src/projectstackedwidget.cpp" line="218"/>
         <source>Add</source>
         <translation>Добавить</translation>
     </message>
     <message>
-        <location filename="../src/projectstackedwidget.cpp" line="16"/>
-        <location filename="../src/projectstackedwidget.cpp" line="42"/>
-        <location filename="../src/projectstackedwidget.cpp" line="62"/>
+        <location filename="../src/projectstackedwidget.cpp" line="18"/>
+        <location filename="../src/projectstackedwidget.cpp" line="44"/>
+        <location filename="../src/projectstackedwidget.cpp" line="64"/>
+        <location filename="../src/projectstackedwidget.cpp" line="87"/>
+        <location filename="../src/projectstackedwidget.cpp" line="112"/>
+        <location filename="../src/projectstackedwidget.cpp" line="138"/>
+        <location filename="../src/projectstackedwidget.cpp" line="159"/>
+        <location filename="../src/projectstackedwidget.cpp" line="180"/>
+        <location filename="../src/projectstackedwidget.cpp" line="201"/>
+        <location filename="../src/projectstackedwidget.cpp" line="222"/>
+        <source>Refresh</source>
+        <translation>Обновить</translation>
+    </message>
+    <message>
+        <location filename="../src/projectstackedwidget.cpp" line="22"/>
+        <location filename="../src/projectstackedwidget.cpp" line="46"/>
+        <location filename="../src/projectstackedwidget.cpp" line="68"/>
         <location filename="../src/projectstackedwidget.cpp" line="85"/>
         <location filename="../src/projectstackedwidget.cpp" line="110"/>
         <location filename="../src/projectstackedwidget.cpp" line="136"/>
@@ -553,66 +675,82 @@
         <location filename="../src/projectstackedwidget.cpp" line="178"/>
         <location filename="../src/projectstackedwidget.cpp" line="199"/>
         <location filename="../src/projectstackedwidget.cpp" line="220"/>
-        <source>Refresh</source>
-        <translation>Обновить</translation>
-    </message>
-    <message>
-        <location filename="../src/projectstackedwidget.cpp" line="20"/>
-        <location filename="../src/projectstackedwidget.cpp" line="44"/>
-        <location filename="../src/projectstackedwidget.cpp" line="66"/>
-        <location filename="../src/projectstackedwidget.cpp" line="83"/>
-        <location filename="../src/projectstackedwidget.cpp" line="108"/>
-        <location filename="../src/projectstackedwidget.cpp" line="134"/>
-        <location filename="../src/projectstackedwidget.cpp" line="155"/>
-        <location filename="../src/projectstackedwidget.cpp" line="176"/>
-        <location filename="../src/projectstackedwidget.cpp" line="197"/>
-        <location filename="../src/projectstackedwidget.cpp" line="218"/>
         <source>Remove</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="../src/projectstackedwidget.cpp" line="40"/>
+        <location filename="../src/projectstackedwidget.cpp" line="42"/>
         <source>Add By Template</source>
         <translation>Добавить по шаблону</translation>
     </message>
     <message>
-        <location filename="../src/projectstackedwidget.cpp" line="89"/>
+        <location filename="../src/projectstackedwidget.cpp" line="91"/>
         <source>Set Breakpoint</source>
         <translation>Установить точку останова</translation>
     </message>
     <message>
-        <location filename="../src/projectstackedwidget.cpp" line="91"/>
+        <location filename="../src/projectstackedwidget.cpp" line="93"/>
         <source>Remove Breakpoint</source>
         <translation>Удалить точку останова</translation>
     </message>
     <message>
-        <location filename="../src/projectstackedwidget.cpp" line="105"/>
+        <location filename="../src/projectstackedwidget.cpp" line="107"/>
         <source>Activations</source>
         <translation>Активации</translation>
     </message>
     <message>
-        <location filename="../src/projectstackedwidget.cpp" line="114"/>
+        <location filename="../src/projectstackedwidget.cpp" line="116"/>
         <source>Set Salience</source>
         <translation>Задать приоритет</translation>
     </message>
     <message>
-        <location filename="../src/projectstackedwidget.cpp" line="192"/>
+        <location filename="../src/projectstackedwidget.cpp" line="194"/>
         <source>Methods</source>
         <translation>Методы</translation>
     </message>
     <message>
-        <location filename="../src/projectstackedwidget.cpp" line="18"/>
-        <location filename="../src/projectstackedwidget.cpp" line="64"/>
-        <location filename="../src/projectstackedwidget.cpp" line="87"/>
-        <location filename="../src/projectstackedwidget.cpp" line="138"/>
-        <location filename="../src/projectstackedwidget.cpp" line="159"/>
-        <location filename="../src/projectstackedwidget.cpp" line="180"/>
-        <location filename="../src/projectstackedwidget.cpp" line="201"/>
+        <location filename="../src/projectstackedwidget.cpp" line="224"/>
+        <source>Set Defaults Mode</source>
+        <translation>Выберите дефолтный режим</translation>
+    </message>
+    <message>
+        <location filename="../src/projectstackedwidget.cpp" line="228"/>
+        <source>Class Info</source>
+        <translation>Информация о классе</translation>
+    </message>
+    <message>
+        <source>Inheritors</source>
+        <translation type="obsolete">Прямые наследники</translation>
+    </message>
+    <message>
+        <location filename="../src/projectstackedwidget.cpp" line="231"/>
+        <source>Subclasses</source>
+        <translation>Потомки</translation>
+    </message>
+    <message>
+        <location filename="../src/projectstackedwidget.cpp" line="232"/>
+        <source>Superclasses</source>
+        <translation>Предки</translation>
+    </message>
+    <message>
+        <location filename="../src/projectstackedwidget.cpp" line="233"/>
+        <source>Meta Information</source>
+        <translation>Мета информация</translation>
+    </message>
+    <message>
+        <location filename="../src/projectstackedwidget.cpp" line="20"/>
+        <location filename="../src/projectstackedwidget.cpp" line="66"/>
+        <location filename="../src/projectstackedwidget.cpp" line="89"/>
+        <location filename="../src/projectstackedwidget.cpp" line="140"/>
+        <location filename="../src/projectstackedwidget.cpp" line="161"/>
+        <location filename="../src/projectstackedwidget.cpp" line="182"/>
+        <location filename="../src/projectstackedwidget.cpp" line="203"/>
+        <location filename="../src/projectstackedwidget.cpp" line="226"/>
         <source>View</source>
         <translation>Просмотр</translation>
     </message>
     <message>
-        <location filename="../src/projectstackedwidget.cpp" line="171"/>
+        <location filename="../src/projectstackedwidget.cpp" line="173"/>
         <source>Generic Functions</source>
         <translation>Общие функции</translation>
     </message>
@@ -629,7 +767,7 @@
         <translation type="obsolete">Обновить активации</translation>
     </message>
     <message>
-        <location filename="../src/projectstackedwidget.cpp" line="112"/>
+        <location filename="../src/projectstackedwidget.cpp" line="114"/>
         <source>Run</source>
         <translation>Выполнить</translation>
     </message>
@@ -638,12 +776,12 @@
         <translation type="obsolete">Приоритет активации</translation>
     </message>
     <message>
-        <location filename="../src/projectstackedwidget.cpp" line="116"/>
+        <location filename="../src/projectstackedwidget.cpp" line="118"/>
         <source>Set Strategy</source>
         <translation>Стратегия разрешения конфликтов</translation>
     </message>
     <message>
-        <location filename="../src/projectstackedwidget.cpp" line="129"/>
+        <location filename="../src/projectstackedwidget.cpp" line="131"/>
         <source>Globals</source>
         <translation>Глобальные переменные</translation>
     </message>
@@ -664,7 +802,7 @@
         <translation type="obsolete">Просмотреть глобальную переменную</translation>
     </message>
     <message>
-        <location filename="../src/projectstackedwidget.cpp" line="150"/>
+        <location filename="../src/projectstackedwidget.cpp" line="152"/>
         <source>Functions</source>
         <translation>Функции</translation>
     </message>
@@ -681,7 +819,7 @@
         <translation type="obsolete">Обновить функции</translation>
     </message>
     <message>
-        <location filename="../src/projectstackedwidget.cpp" line="213"/>
+        <location filename="../src/projectstackedwidget.cpp" line="215"/>
         <source>Classes</source>
         <translation>Классы</translation>
     </message>

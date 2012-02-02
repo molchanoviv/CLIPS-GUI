@@ -32,6 +32,7 @@ protected:
 	void mousePressEvent(QMouseEvent *);
 	void insertPrompt(bool);
 	bool isLocked;
+	bool isCommand;
 	QStringList *history;
 	int historyPos;
 	void historyAdd(QString);

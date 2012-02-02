@@ -23,17 +23,15 @@ void CLIPSClass::executeCommand(QString command)
 	answer.clear();
 	SetCommandString(Environment, command.toLocal8Bit().data());
 	RouteCommand(Environment,CommandLineData(Environment)->CommandString,true);
-	if(!answer.isEmpty())
-		emit outputSignal(answer);
+	emit outputSignal(answer);
 }
-
 
 int CLIPSClass::queryFunction(void* Environment, char* logicalName)
 {
 	Q_UNUSED(Environment);
 	if (	(qstrcmp(logicalName,"stdout") == 0)	||
 		(qstrcmp(logicalName,"stdin") == 0)	||
-		(qstrcmp(logicalName,"wprompt") == 0)	||
+		(qstrcmp(logicalName,"wclips") == 0)	||
 		(qstrcmp(logicalName,"wdisplay") == 0)	||
 		(qstrcmp(logicalName,"wdialog") == 0)	||
 		(qstrcmp(logicalName,"werror") == 0)	||
@@ -802,11 +800,179 @@ QHash<QString, int> CLIPSClass::methodsSlot()
 
 //Classes
 
-/*****/
+QStringList CLIPSClass::classesSlot()
+{
+	QStringList classesList;
+	void* ptr=NULL;
+	do
+	{
+		ptr = GetNextDefclass(ptr);
+		if(ptr!=NULL)
+		{
+			char *classStr = GetDefclassName(ptr);
+			classesList<<QString(classStr).simplified();
+		}
+	}
+	while(ptr!=NULL);
+	return classesList;
+}
+
+void CLIPSClass::unDefclassSlot(QString name)
+{
+	void* classPtr = FindDefclass(name.simplified().toLocal8Bit().data());
+	if(!IsDefclassDeletable(classPtr))
+		return;
+	Undefclass(classPtr);
+	QStringList classes = classesSlot();
+	emit classesChangedSignal(classes);
+	QStringList templates = templatesSlot();
+	emit templatesChangedSignal(templates);
+	QStringList activations = agendaSlot();
+	emit activationsChangedSignal(activations);
+	QHash<QString, uint> messageHandlers = messageHandlersSlot();
+	emit messageHandlersChangedSignal(messageHandlers);
+	emit dataChanged();
+}
+
+QString CLIPSClass::getClassPPF(QString name)
+{
+	void* classPtr = FindDefclass(name.simplified().toLocal8Bit().data());
+	char *className = GetDefclassPPForm(classPtr);
+	return QString(className).simplified();
+}
+
+QString CLIPSClass::getMetaInformation(QString name)
+{
+	QString ret = "";
+	QString val = "";
+	answer.clear();
+	if(name.isEmpty())
+		name = "OBJECT";
+	void* classPtr = FindDefclass(name.simplified().toLocal8Bit().data());
+	if(ClassAbstractP(classPtr))
+		val = tr("yes");
+	else
+		val = tr("no");
+	ret += tr("Abstract: ")+val+tr("\n");
+	if(ClassReactiveP(classPtr))
+		val = tr("yes");
+	else
+		val = tr("no");
+	ret += tr("Reactive: ")+val+tr("\n");
+
+	if(IsDefclassDeletable(classPtr))
+		val = tr("yes");
+	else
+		val = tr("no");
+	ret += tr("Deletable: ")+val+tr("\n");
+	char* moduleName = DefclassModule(classPtr);
+	ret += tr("Module: ")+QString(moduleName)+tr("\n");
+	DescribeClass("stdout", classPtr);
+	ret += answer;
+	return ret;
+}
+
+QString CLIPSClass::getSubclasses(QString name)
+{
+	if(name.isEmpty())
+		name = "OBJECT";
+	void* classPtr = FindDefclass(name.simplified().toLocal8Bit().data());
+	BrowseClasses("stdout", classPtr);
+	return answer;
+}
+
+QString CLIPSClass::getSuperclasses(QString name)
+{
+	QString ret = "";
+	if(name.isEmpty())
+		name = "OBJECT";
+	void* classPtr = FindDefclass(name.simplified().toLocal8Bit().data());
+	DATA_OBJECT result;
+	ClassSuperclasses(classPtr,&result,1);
+	void *multifieldPtr;
+	char *sltName;
+	multifieldPtr = GetValue(result);
+	for (int i = GetDOBegin(result); i <= GetDOEnd(result); i++)
+	{
+		if ((GetMFType(multifieldPtr,i) == STRING) ||(GetMFType(multifieldPtr,i) == SYMBOL))
+		{
+			sltName = ValueToString(GetMFValue(multifieldPtr,i));
+			ret += QString(sltName)+tr("\n");
+		}
+	}
+	ret = ret.trimmed();
+	return ret;
+}
+
+unsigned short CLIPSClass::getCurrentDefaultsMode()
+{
+	return GetClassDefaultsMode();
+}
+
+QHash<QString, unsigned short> CLIPSClass::getDefaultsModes()
+{
+	QHash<QString, unsigned short> modes;
+	modes.insert(tr("CONVENIENCE_MODE"), CONVENIENCE_MODE);
+	modes.insert(tr("CONSERVATION_MODE"), CONSERVATION_MODE);
+	return modes;
+}
+
+unsigned short CLIPSClass::setDefaultsMode(unsigned short mode)
+{
+	return SetClassDefaultsMode(mode);
+}
 
 //Message Handlers
 
-/*****/
+QHash<QString, unsigned int> CLIPSClass::messageHandlersSlot()
+{
+	QHash<QString, unsigned int> messageHandlersHash;
+	QStringList classes = classesSlot();
+	QString str;
+	foreach(str, classes)
+	{
+		void* classPtr = FindDefclass(str.simplified().toLocal8Bit().data());
+		unsigned int index=0;
+		do
+		{
+			index = GetNextDefmessageHandler(classPtr, index);
+			if(index!=0)
+			{
+				char* messageHandlerName = GetDefmessageHandlerName(classPtr, index);
+				char* messageHandlerType = GetDefmessageHandlerType(classPtr, index);
+				messageHandlersHash.insertMulti(str+QString("  ")+QString(messageHandlerName)+QString(" ")+QString(messageHandlerType), index);
+			}
+		}
+		while(index!=0);
+	}
+	return messageHandlersHash;
+}
+
+void CLIPSClass::unDefmessageHandlerSlot(QString name, unsigned int index)
+{
+	name = name.remove(name.lastIndexOf("  "), name.length());
+	void* classPtr = FindDefclass(name.simplified().toLocal8Bit().data());
+	if(IsDefmessageHandlerDeletable(classPtr, index))
+		UndefmessageHandler(classPtr, index);
+	QHash<QString, uint> messageHandlers = messageHandlersSlot();
+	emit messageHandlersChangedSignal(messageHandlers);
+	emit dataChanged();
+}
+
+QString CLIPSClass::getMessageHandlerPPF(QString name, unsigned int index)
+{
+	name = name.remove(name.lastIndexOf("  "), name.length());
+	void* classPtr = FindDefclass(name.simplified().toLocal8Bit().data());
+	char *messageHandlerPPForm = GetDefmessageHandlerPPForm(classPtr, index);
+	return QString(messageHandlerPPForm).simplified();
+}
+
+QStringList CLIPSClass::getHandlerTypesSlot()
+{
+	QStringList list;
+	list<<"around"<<"before"<<"primary"<<"after";
+	return list;
+}
 
 //Modules
 

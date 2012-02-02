@@ -11,6 +11,8 @@
 #include <QWidget>
 #include <QStringList>
 
+class QAction;
+
 typedef QPair<bool, QString> slotsPair;
 
 class ProjectStackedWidget : public QStackedWidget
@@ -71,8 +73,17 @@ public:
 	QListWidget *classesListWidget;
 	QPushButton *addClassButton;
 	QPushButton *refreshClassesButton;
+	QPushButton *defaultsModePushButton;
+	QPushButton *viewClassPushButton;
+	QPushButton *classInfoPushButton;
+	QAction *metaInformationAction;
+	QAction *subClassesAction;
+	QAction *superClassesAction;
 	//Message Handlers
-	/*****/
+	QListWidget *messageHandlersListWidget;
+	QPushButton *addMessageHandlerPushButton;
+	QPushButton *refreshMessageHandlersPushButton;
+	QPushButton *viewMessageHandlerPushButton;
 	//Modules
 	/*****/
 
@@ -105,9 +116,14 @@ signals:
 	void removeMethodSignal(QString, int);
 	void viewMethodSignal(QString, int);
 	//Classes
-	/*****/
+	void removeClassSignal(QString);
+	void viewClassSignal(QString);
+	void metaInformationSignal(QString);
+	void subClassesSignal(QString);
+	void superClassesSignal(QString);
 	//Message Handlers
-	/*****/
+	void removeMessageHandlerSignal(QString, unsigned int);
+	void viewMessageHandlerSignal(QString, unsigned int);
 	//Modules
 	/*****/
 
@@ -150,9 +166,16 @@ public slots:
 	void viewMethodSlot();
 	void removeMethodSlot();
 	//Classes
-	/*****/
+	void refreshClasses(QStringList);
+	void viewClassSlot();
+	void removeClassSlot();
+	void metaInformationSlot();
+	void subClassesSlot();
+	void superClassesSlot();
 	//Message Handlers
-	/*****/
+	void refreshMessageHandlers(QHash<QString, unsigned int>);
+	void removeMessageHandlerSlot();
+	void viewMessageHandlerSlot();
 	//Modules
 	/*****/
 };

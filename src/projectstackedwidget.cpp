@@ -3,6 +3,8 @@
 #include <QList>
 #include <QDebug>
 #include <QRegExp>
+#include <QAction>
+#include <QMenu>
 
 ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	QStackedWidget(parent)
@@ -219,14 +221,52 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	removeClassButton->setIcon(QIcon::fromTheme("list-remove"));
 	refreshClassesButton = new QPushButton(tr("Refresh"));
 	refreshClassesButton->setIcon(QIcon::fromTheme("view-refresh"));
+	defaultsModePushButton = new QPushButton(tr("Set Defaults Mode"));
+	defaultsModePushButton->setIcon(QIcon::fromTheme("preferences-other"));
+	viewClassPushButton = new QPushButton(tr("View"));
+	viewClassPushButton->setIcon(QIcon::fromTheme("layer-visible-on"));
+	classInfoPushButton = new QPushButton(tr("Class Info"));
+	classInfoPushButton->setIcon(QIcon::fromTheme("documentinfo"));
+	QMenu *classInfoMenu = new QMenu;
+	subClassesAction = new QAction(QIcon::fromTheme("code-class"), tr("Subclasses"), this);
+	superClassesAction = new QAction(QIcon::fromTheme("code-class"), tr("Superclasses"), this);
+	metaInformationAction = new QAction(QIcon::fromTheme("metacontact_unknown"), tr("Meta Information"), this);
+	classInfoMenu->addAction(subClassesAction);
+	classInfoMenu->addAction(superClassesAction);
+	classInfoMenu->addAction(metaInformationAction);
+	classInfoPushButton->setMenu(classInfoMenu);
 	QHBoxLayout *classesTopLayout = new QHBoxLayout;
 	classesTopLayout->addWidget(addClassButton);
 	classesTopLayout->addWidget(removeClassButton);
 	classesTopLayout->addWidget(refreshClassesButton);
 	classesTopLayout->addStretch();
+	classesTopLayout->addWidget(defaultsModePushButton);
+	classesTopLayout->addWidget(viewClassPushButton);
+	classesTopLayout->addWidget(classInfoPushButton);
 	classesLayout->addLayout(classesTopLayout);
 	classesLayout->addWidget(classesListWidget);
 	classesWidget->setLayout(classesLayout);
+	/************************Message*Handlers**********************************/
+	QGroupBox *messageHandlersWidget = new QGroupBox(tr("Message Handlers"));
+	QVBoxLayout *messageHandlersLayout = new QVBoxLayout;
+	messageHandlersListWidget = new QListWidget;
+	addMessageHandlerPushButton = new QPushButton(tr("Add"));
+	addMessageHandlerPushButton->setIcon(QIcon::fromTheme("list-add"));
+	QPushButton *removeMessageHandlerPushButton = new QPushButton(tr("Remove"));
+	removeMessageHandlerPushButton->setIcon(QIcon::fromTheme("list-remove"));
+	refreshMessageHandlersPushButton = new QPushButton(tr("Refresh"));
+	refreshMessageHandlersPushButton->setIcon(QIcon::fromTheme("view-refresh"));
+	viewMessageHandlerPushButton = new QPushButton(tr("View"));
+	viewMessageHandlerPushButton->setIcon(QIcon::fromTheme("layer-visible-on"));
+	QHBoxLayout *messageHandlersTopLayout = new QHBoxLayout;
+	messageHandlersTopLayout->addWidget(addMessageHandlerPushButton);
+	messageHandlersTopLayout->addWidget(removeMessageHandlerPushButton);
+	messageHandlersTopLayout->addWidget(refreshMessageHandlersPushButton);
+	messageHandlersTopLayout->addStretch();
+	messageHandlersTopLayout->addWidget(viewMessageHandlerPushButton);
+	messageHandlersLayout->addLayout(messageHandlersTopLayout);
+	messageHandlersLayout->addWidget(messageHandlersListWidget);
+	messageHandlersWidget->setLayout(messageHandlersLayout);
 
 	this->addWidget(templatesWidget);
 	this->addWidget(factsWidget);
@@ -238,6 +278,7 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	this->addWidget(genericWidget);
 	this->addWidget(methodsWidget);
 	this->addWidget(classesWidget);
+	this->addWidget(messageHandlersWidget);
 
 	connect(setBreakpointPushButton, SIGNAL(clicked()), this, SLOT(setBreakpointSlot()));
 	connect(removeBreakpointPushButton, SIGNAL(clicked()), this, SLOT(removeBreakpointSlot()));
@@ -257,6 +298,13 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	connect(viewGenericPushButton, SIGNAL(clicked()), this, SLOT(viewGenericSlot()));
 	connect(removeMethodButton, SIGNAL(clicked()), this, SLOT(removeMethodSlot()));
 	connect(viewMethodPushButton, SIGNAL(clicked()), this, SLOT(viewMethodSlot()));
+	connect(removeClassButton, SIGNAL(clicked()), this, SLOT(removeClassSlot()));
+	connect(viewClassPushButton, SIGNAL(clicked()), this, SLOT(viewClassSlot()));
+	connect(metaInformationAction, SIGNAL(triggered()), this, SLOT(metaInformationSlot()));
+	connect(subClassesAction, SIGNAL(triggered()), this, SLOT(subClassesSlot()));
+	connect(superClassesAction, SIGNAL(triggered()), this, SLOT(superClassesSlot()));
+	connect(removeMessageHandlerPushButton, SIGNAL(clicked()), this, SLOT(removeMessageHandlerSlot()));
+	connect(viewMessageHandlerPushButton, SIGNAL(clicked()), this, SLOT(viewMessageHandlerSlot()));
 }
 
 void ProjectStackedWidget::clearSlot()
@@ -530,11 +578,80 @@ void ProjectStackedWidget::removeMethodSlot()
 
 //Classes
 
-/*****/
+void ProjectStackedWidget::refreshClasses(QStringList classes)
+{
+	classesListWidget->clear();
+	QString str;
+	foreach(str, classes)
+	{
+		QListWidgetItem *item = new QListWidgetItem(classesListWidget);
+		item->setText(str);
+	}
+}
+
+void ProjectStackedWidget::viewClassSlot()
+{
+	QList<QListWidgetItem*> classes = classesListWidget->selectedItems();
+	if(!classes.isEmpty())
+		emit viewClassSignal(classes.at(0)->text());
+}
+
+void ProjectStackedWidget::removeClassSlot()
+{
+	QList<QListWidgetItem*> classes = classesListWidget->selectedItems();
+	if(!classes.isEmpty())
+		emit removeClassSignal(classes.at(0)->text());
+}
+
+void ProjectStackedWidget::metaInformationSlot()
+{
+	QList<QListWidgetItem*> classes = classesListWidget->selectedItems();
+	if(!classes.isEmpty())
+		emit metaInformationSignal(classes.at(0)->text());
+}
+
+void ProjectStackedWidget::subClassesSlot()
+{
+	QList<QListWidgetItem*> classes = classesListWidget->selectedItems();
+	if(!classes.isEmpty())
+		emit subClassesSignal(classes.at(0)->text());
+}
+
+void ProjectStackedWidget::superClassesSlot()
+{
+	QList<QListWidgetItem*> classes = classesListWidget->selectedItems();
+	if(!classes.isEmpty())
+		emit superClassesSignal(classes.at(0)->text());
+}
 
 //Message Handlers
 
-/*****/
+void ProjectStackedWidget::refreshMessageHandlers(QHash<QString, unsigned int> messageHandlers)
+{
+	messageHandlersListWidget->clear();
+	QHashIterator<QString, unsigned int> i(messageHandlers);
+	while(i.hasNext())
+	{
+		i.next();
+		QListWidgetItem *item = new QListWidgetItem(messageHandlersListWidget);
+		item->setText(i.key());
+		item->setData(Qt::UserRole, i.value());
+	}
+}
+
+void ProjectStackedWidget::viewMessageHandlerSlot()
+{
+	QList<QListWidgetItem*> messageHandlers = messageHandlersListWidget->selectedItems();
+	if(!messageHandlers.isEmpty())
+		emit viewMessageHandlerSignal(messageHandlers.at(0)->text(), unsigned(messageHandlers.at(0)->data(Qt::UserRole).toInt()));
+}
+
+void ProjectStackedWidget::removeMessageHandlerSlot()
+{
+	QList<QListWidgetItem*> messageHandlers = messageHandlersListWidget->selectedItems();
+	if(!messageHandlers.isEmpty())
+		emit removeMessageHandlerSignal(messageHandlers.at(0)->text(), unsigned(messageHandlers.at(0)->data(Qt::UserRole).toInt()));
+}
 
 //Modules
 

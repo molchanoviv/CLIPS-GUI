@@ -74,9 +74,20 @@ public slots:
 	void unDefmethodSlot(QString, int);
 	QString getMethodPPF(QString, int);
 	//Classes
-	/*******/
+	QStringList classesSlot();
+	void unDefclassSlot(QString);
+	QString getClassPPF(QString);
+	QString getMetaInformation(QString);
+	QString getSubclasses(QString);
+	QString getSuperclasses(QString);
+	unsigned short getCurrentDefaultsMode();
+	QHash<QString, unsigned short> getDefaultsModes();
+	unsigned short setDefaultsMode(unsigned short);
 	//Message Handlers
-	/*******/
+	QHash<QString, unsigned int> messageHandlersSlot();
+	void unDefmessageHandlerSlot(QString, unsigned int);
+	QString getMessageHandlerPPF(QString, unsigned int);
+	QStringList getHandlerTypesSlot();
 	//Modules
 	QStringList getModules();
 
@@ -93,6 +104,8 @@ signals:
 	void functionsChangedSignal(QStringList);
 	void genericChangedSignal(QStringList);
 	void methodsChangedSignal(QHash<QString, int>);
+	void classesChangedSignal(QStringList);
+	void messageHandlersChangedSignal(QHash<QString, unsigned int>);
 	void dataChanged();
 	void clearSignal();
 	void outputSignal(QString);

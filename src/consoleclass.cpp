@@ -7,6 +7,7 @@ consoleClass::consoleClass(QWidget *parent) :
 	connect(this, SIGNAL(enterPressed()), this, SLOT(exec()));
 	prompt = ">";
 	isLocked = false;
+	isCommand = false;
 	insertPrompt(false);
 	history = new QStringList;
 }
@@ -20,18 +21,15 @@ void consoleClass::exec()
 	}
 	QString cmd = textCursor().block().text().mid(prompt.length());
 	isLocked = true;
+	isCommand = true;
 	historyAdd(cmd);
 	QRegExp command_split_rx("\\. ");
 	QStringList commands = cmd.split(command_split_rx);
 	QString str;
-//	bool haveCommands = false;
 	foreach(str, commands)
 	{
 		emit execSignal(str);
-//		haveCommands = true;
 	}
-//	if(!haveCommands)
-//		output("");
 }
 
 void consoleClass::insertPrompt(bool insertNewBlock)
@@ -44,6 +42,11 @@ void consoleClass::insertPrompt(bool insertNewBlock)
 
 void consoleClass::output(QString s)
 {
+	if(s.isEmpty())
+	{
+		if(!isCommand)
+			return;
+	}
 	if(s != "")
 	{
 		textCursor().insertBlock();

@@ -8,6 +8,7 @@
 #include "dialogs/addruledialog.h"
 #include "dialogs/addglobalsdialog.h"
 #include "dialogs/addfunctiondialog.h"
+#include "dialogs/addmessagehandlerdialog.h"
 #include <QToolBar>
 #include <QInputDialog>
 #include <QCheckBox>
@@ -81,6 +82,13 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(projectWidget, SIGNAL(viewGenericSignal(QString)), this, SLOT(viewGenericSlot(QString)));
 	connect(projectWidget, SIGNAL(removeMethodSignal(QString,int)), clips, SLOT(unDefmethodSlot(QString,int)));
 	connect(projectWidget, SIGNAL(viewMethodSignal(QString, int)), this, SLOT(viewMethodSlot(QString, int)));
+	connect(projectWidget, SIGNAL(removeClassSignal(QString)), clips, SLOT(unDefclassSlot(QString)));
+	connect(projectWidget, SIGNAL(viewClassSignal(QString)), this, SLOT(viewClassSlot(QString)));
+	connect(projectWidget, SIGNAL(metaInformationSignal(QString)), this, SLOT(metaInformationSlot(QString)));
+	connect(projectWidget, SIGNAL(subClassesSignal(QString)), this, SLOT(subClassesSlot(QString)));
+	connect(projectWidget, SIGNAL(superClassesSignal(QString)), this, SLOT(superClassesSlot(QString)));
+	connect(projectWidget, SIGNAL(removeMessageHandlerSignal(QString,uint)), clips, SLOT(unDefmessageHandlerSlot(QString,uint)));
+	connect(projectWidget, SIGNAL(viewMessageHandlerSignal(QString,uint)), this, SLOT(viewMessageHandlerSlot(QString,uint)));
 	connect(projectWidget->addTemplateButton, SIGNAL(clicked()), this, SLOT(addTemplateSlot()));
 	connect(projectWidget->refreshTemplatesButton, SIGNAL(clicked()), this, SLOT(refreshTemplatesSlot()));
 	connect(projectWidget->addFactButton, SIGNAL(clicked()), this, SLOT(addFactSlot()));
@@ -104,6 +112,9 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(projectWidget->addMethodButton, SIGNAL(clicked()), this, SLOT(addMethodSlot()));
 	connect(projectWidget->refreshMethodsButton, SIGNAL(clicked()), this, SLOT(refreshMethodsSlot()));
 	connect(projectWidget->refreshClassesButton, SIGNAL(clicked()), this, SLOT(refreshClassesSlot()));
+	connect(projectWidget->defaultsModePushButton, SIGNAL(clicked()), this, SLOT(setDefaultsModeSlot()));
+	connect(projectWidget->addMessageHandlerPushButton, SIGNAL(clicked()), this, SLOT(addMessageHandlerSlot()));
+	connect(projectWidget->refreshMessageHandlersPushButton, SIGNAL(clicked()), this, SLOT(refreshMessageHandlersSlot()));
 	connect(this, SIGNAL(treeWidgetItemClickedSignal(int)), projectWidget, SLOT(setCurrentIndex(int)));
 	connect(this,SIGNAL(addTemplateSignal(QString,QList<slotsPair>)), clips, SLOT(deftemplateSlot(QString,QList<slotsPair>)));
 	connect(this, SIGNAL(addFactSignal(QString)), clips, SLOT(assertStringSlot(QString)));
@@ -123,6 +134,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(clips, SIGNAL(functionsChangedSignal(QStringList)), projectWidget, SLOT(refreshFunctions(QStringList)));
 	connect(clips, SIGNAL(genericChangedSignal(QStringList)), projectWidget, SLOT(refreshGeneric(QStringList)));
 	connect(clips, SIGNAL(methodsChangedSignal(QHash<QString, int>)), projectWidget, SLOT(refreshMethods(QHash<QString, int>)));
+	connect(clips, SIGNAL(classesChangedSignal(QStringList)), projectWidget, SLOT(refreshClasses(QStringList)));
+	connect(clips, SIGNAL(messageHandlersChangedSignal(QHash<QString, unsigned int>)), projectWidget, SLOT(refreshMessageHandlers(QHash<QString, unsigned int>)));
 	connect(clips, SIGNAL(clearSignal()), projectWidget, SLOT(clearSlot()));
 	connect(clips, SIGNAL(dataChanged()), this, SLOT(dataChangedSlot()));
 	connect(clips, SIGNAL(outputSignal(QString)), console, SLOT(output(QString)));
@@ -234,6 +247,8 @@ void MainWindow::createProjectTreeWidgetItems(QString projectName)
 	methodsItem->setText(0, tr("Methods"));
 	QTreeWidgetItem *classesItem = new QTreeWidgetItem();
 	classesItem->setText(0, tr("Classes"));
+	QTreeWidgetItem *messageHandlersItem = new QTreeWidgetItem();
+	messageHandlersItem->setText(0, tr("Message Handlers"));
 	item->addChild(templatesItem);
 	item->addChild(factsItem);
 	item->addChild(deffactsItem);
@@ -244,6 +259,7 @@ void MainWindow::createProjectTreeWidgetItems(QString projectName)
 	item->addChild(genericItem);
 	item->addChild(methodsItem);
 	item->addChild(classesItem);
+	item->addChild(messageHandlersItem);
 	projectsTreeWidget->insertTopLevelItem(0, item);
 	item->setExpanded(1);
 	projectsTreeWidget->clearSelection();
@@ -413,6 +429,7 @@ void MainWindow::refreshAll()
 	refreshGenericSlot();
 	refreshMethodsSlot();
 	refreshClassesSlot();
+	refreshMessageHandlersSlot();
 }
 
 void MainWindow::redrawTitle()
@@ -626,7 +643,7 @@ void MainWindow::setConflictStrategySlot()
 {
 	QHash<QString, int> strategyesHash = clips->getStrategyes();
 	QStringList strategyesList;
-	int cur_strategy = clips->getStrategy();
+	int currentStrategy = clips->getStrategy();
 	int val=0;
 	int iter_num=0;
 	QHashIterator<QString, int> i(strategyesHash);
@@ -634,7 +651,7 @@ void MainWindow::setConflictStrategySlot()
 	{
 		i.next();
 		strategyesList.append(i.key());
-		if(i.value() == cur_strategy)
+		if(i.value() == currentStrategy)
 			val = iter_num;
 		iter_num++;
 	}
@@ -777,14 +794,92 @@ void MainWindow::refreshMethodsSlot()
 
 //Classes
 
+void MainWindow::viewClassSlot(QString name)
+{
+	QString info = clips->getClassPPF(name);
+	if(info.isEmpty())
+		info = tr("This class haven't pretty print representation");
+	QMessageBox::information(this, tr("Information About Class"), info);
+}
+
 void MainWindow::refreshClassesSlot()
 {
-	//
+	projectWidget->refreshClasses(clips->classesSlot());
+}
+
+void MainWindow::metaInformationSlot(QString name)
+{
+	QString info = clips->getMetaInformation(name);
+	if(info.isEmpty())
+		info = tr("This class haven't meta information.");
+	QMessageBox::information(this, tr("Class Meta Information"), info);
+}
+
+void MainWindow::subClassesSlot(QString name)
+{
+	QString info = clips->getSubclasses(name);
+	if(info.isEmpty())
+		info = tr("This class haven't subclasses.");
+	QMessageBox::information(this, tr("Subclasses"), info);
+}
+
+void MainWindow::superClassesSlot(QString name)
+{
+	QString info = clips->getSuperclasses(name);
+	if(info.isEmpty())
+		info = tr("This class haven't superclasses.");
+	QMessageBox::information(this, tr("Supercalsses"), info);
+}
+
+void MainWindow::setDefaultsModeSlot()
+{
+	unsigned short currentMode = clips->getCurrentDefaultsMode();
+	QHash<QString, unsigned short> modes = clips->getDefaultsModes();
+	QHashIterator<QString, unsigned short> i(modes);
+	QStringList modesList;
+	int iterNum = 0;
+	int val = 0;
+	while (i.hasNext())
+	{
+		i.next();
+		modesList.append(i.key());
+		if(i.value() == currentMode)
+			val = iterNum;
+		iterNum++;
+	}
+	bool ok;
+	QString modeName = QInputDialog::getItem(this, tr("Select Defaults Mode"), tr("Defaults Mode:"), modesList, val, false, &ok);
+	if (ok && !modeName.isEmpty())
+	{
+		clips->setDefaultsMode(modes[modeName]);
+	}
 }
 
 //Message Handlers
 
-/*****/
+void MainWindow::addMessageHandlerSlot()
+{
+	QStringList classesList = clips->classesSlot();
+	QStringList handlerTypeList = clips->getHandlerTypesSlot();
+	addMessageHandlerDialog dialog(this, classesList, handlerTypeList);
+	if(dialog.exec() == QDialog::Accepted)
+	{
+		//
+	}
+}
+
+void MainWindow::viewMessageHandlerSlot(QString name, unsigned int index)
+{
+	QString info = clips->getMessageHandlerPPF(name, index);
+	if(info.isEmpty())
+		info = tr("This message handler haven't pretty print representation");
+	QMessageBox::information(this, tr("Information About Message Handler"), info);
+}
+
+void MainWindow::refreshMessageHandlersSlot()
+{
+	projectWidget->refreshMessageHandlers(clips->messageHandlersSlot());
+}
 
 //Modules
 

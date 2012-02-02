@@ -97,8 +97,15 @@ private slots:
 	void viewMethodSlot(QString, int);
 	//Classes
 	void refreshClassesSlot();
+	void viewClassSlot(QString);
+	void metaInformationSlot(QString);
+	void subClassesSlot(QString);
+	void superClassesSlot(QString);
+	void setDefaultsModeSlot();
 	//Message Handlers
-	/*****/
+	void addMessageHandlerSlot();
+	void refreshMessageHandlersSlot();
+	void viewMessageHandlerSlot(QString, unsigned int);
 	//Modules
 	/*****/
 
