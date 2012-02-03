@@ -864,7 +864,16 @@ void MainWindow::addMessageHandlerSlot()
 	addMessageHandlerDialog dialog(this, classesList, handlerTypeList);
 	if(dialog.exec() == QDialog::Accepted)
 	{
-		//
+		QString className = dialog.classNameComboBox->currentText();
+		QString messageName = dialog.messageNameLineEdit->text();
+		if(messageName.isEmpty())
+			return;
+		QString handlerType = dialog.handlerTypeComboBox->currentText();
+		QString comment = dialog.commentLineEdit->text();
+		QString parameter = dialog.parameterLineEdit->text();
+		QString wildcardParameter = dialog.wildcardParameterLineEdit->text();
+		QString action = dialog.actionTextEdit->toPlainText();
+		clips->defmessageHandlerSlot(className, messageName, handlerType, comment, parameter, wildcardParameter, action);
 	}
 }
 

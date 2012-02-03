@@ -84,6 +84,7 @@ public slots:
 	QHash<QString, unsigned short> getDefaultsModes();
 	unsigned short setDefaultsMode(unsigned short);
 	//Message Handlers
+	void defmessageHandlerSlot(QString, QString, QString, QString, QString, QString, QString);
 	QHash<QString, unsigned int> messageHandlersSlot();
 	void unDefmessageHandlerSlot(QString, unsigned int);
 	QString getMessageHandlerPPF(QString, unsigned int);

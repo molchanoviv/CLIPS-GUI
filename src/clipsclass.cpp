@@ -21,9 +21,10 @@ CLIPSClass::~CLIPSClass()
 void CLIPSClass::executeCommand(QString command)
 {
 	answer.clear();
-	SetCommandString(Environment, command.toLocal8Bit().data());
+	SetCommandString(Environment, command.toUtf8().data());
 	RouteCommand(Environment,CommandLineData(Environment)->CommandString,true);
 	emit outputSignal(answer);
+	emit dataChanged();
 }
 
 int CLIPSClass::queryFunction(void* Environment, char* logicalName)
@@ -58,9 +59,9 @@ void CLIPSClass::saveSlot(QString path)
 	QString factsPath = path+QString("/data.fct");
 	QString dataPath = path+QString("/data.clp");
 	QString binaryPath = path+QString("/data.bin");
-	SaveFacts(factsPath.toLocal8Bit().data(),LOCAL_SAVE,NULL);
-	Save(dataPath.toLocal8Bit().data());
-	Bsave(binaryPath.toLocal8Bit().data());
+	SaveFacts(factsPath.toUtf8().data(),LOCAL_SAVE,NULL);
+	Save(dataPath.toUtf8().data());
+	Bsave(binaryPath.toUtf8().data());
 }
 
 void CLIPSClass::loadSlot(QString path)
@@ -68,9 +69,9 @@ void CLIPSClass::loadSlot(QString path)
 	QString factsPath = path+QString("/data.fct");
 	QString dataPath = path+QString("/data.clp");
 	QString binaryPath = path+QString("/data.bin");
-	LoadFacts(factsPath.toLocal8Bit().data());
-	Load(dataPath.toLocal8Bit().data());
-	BloadData(binaryPath.toLocal8Bit().data());
+	LoadFacts(factsPath.toUtf8().data());
+	Load(dataPath.toUtf8().data());
+	BloadData(binaryPath.toUtf8().data());
 }
 
 void CLIPSClass::clearSlot()
@@ -102,7 +103,7 @@ void CLIPSClass::deftemplateSlot(QString name, QList<slotsPair> slotsList)
 
 void CLIPSClass::unDeftemplateSlot(QString name)
 {
-	void* tmplPtr = FindDeftemplate(name.simplified().toLocal8Bit().data());
+	void* tmplPtr = FindDeftemplate(name.simplified().toUtf8().data());
 	if(!IsDeftemplateDeletable(tmplPtr))
 		return;
 	Undeftemplate(tmplPtr);
@@ -115,7 +116,7 @@ QList<slotsPair> CLIPSClass::getTemplateInformation(QString name)
 {
 	QList<slotsPair> info;
 	DATA_OBJECT sltVal;
-	void* tmplPtr = FindDeftemplate(name.toLocal8Bit().data());
+	void* tmplPtr = FindDeftemplate(name.toUtf8().data());
 	DeftemplateSlotNames(tmplPtr, &sltVal);
 	void *multifieldPtr;
 	char *sltName;
@@ -134,7 +135,7 @@ QList<slotsPair> CLIPSClass::getTemplateInformation(QString name)
 
 QString CLIPSClass::getTemplatePPF(QString name)
 {
-	void* deftemplatePtr = FindDeftemplate(name.simplified().toLocal8Bit().data());
+	void* deftemplatePtr = FindDeftemplate(name.simplified().toUtf8().data());
 	char *deftemplateName = GetDeftemplatePPForm(deftemplatePtr);
 	return QString(deftemplateName).simplified();
 }
@@ -161,7 +162,7 @@ QStringList CLIPSClass::templatesSlot()
 void CLIPSClass::assertStringSlot(QString fact)
 {
 	fact.append(")").prepend("(");
-	AssertString(fact.toLocal8Bit().data());
+	AssertString(fact.toUtf8().data());
 	QStringList facts = factsSlot();
 	emit factsChangedSignal(facts);
 	QStringList templates = templatesSlot();
@@ -180,7 +181,7 @@ void CLIPSClass::assertSlot(QString templateName, QList<slotsPair> slotsList)
 	void *theMultifield;
 	DATA_OBJECT theValue;
 	IncrementGCLocks();
-	templatePtr = FindDeftemplate(templateName.toLocal8Bit().data());
+	templatePtr = FindDeftemplate(templateName.toUtf8().data());
 	newFact = CreateFact(templatePtr);
 	if (newFact == NULL)
 		return;
@@ -211,7 +212,7 @@ void CLIPSClass::assertSlot(QString templateName, QList<slotsPair> slotsList)
 				if(validator.validate(slotVal, pos) != QValidator::Acceptable)
 				{
 					theValue.type = SYMBOL;
-					theValue.value = AddSymbol(slotVal.toLocal8Bit().data());
+					theValue.value = AddSymbol(slotVal.toUtf8().data());
 				}
 				else
 				{
@@ -224,7 +225,7 @@ void CLIPSClass::assertSlot(QString templateName, QList<slotsPair> slotsList)
 				theValue.type = INTEGER;
 				theValue.value = AddLong(slotVal.toInt());
 			}
-			PutFactSlot(newFact, sltNames.at(i).toLocal8Bit().data(), &theValue);
+			PutFactSlot(newFact, sltNames.at(i).toUtf8().data(), &theValue);
 		}
 		else
 		{
@@ -244,7 +245,7 @@ void CLIPSClass::assertSlot(QString templateName, QList<slotsPair> slotsList)
 					if(validator.validate(slotVal, pos) != QValidator::Acceptable)
 					{
 						SetMFType(theMultifield,t+1,SYMBOL);
-						SetMFValue(theMultifield,t+1,AddSymbol(mltSltVal.at(t).toLocal8Bit().data()));
+						SetMFValue(theMultifield,t+1,AddSymbol(mltSltVal.at(t).toUtf8().data()));
 					}
 					else
 					{
@@ -262,7 +263,7 @@ void CLIPSClass::assertSlot(QString templateName, QList<slotsPair> slotsList)
 			SetDOEnd(theValue,mltSltVal.count()+1);
 			theValue.type = MULTIFIELD;
 			theValue.value = theMultifield;
-			PutFactSlot(newFact, sltNames.at(i).toLocal8Bit().data(), &theValue);
+			PutFactSlot(newFact, sltNames.at(i).toUtf8().data(), &theValue);
 		}
 	}
 	AssignFactSlotDefaults(newFact);
@@ -345,7 +346,7 @@ void CLIPSClass::deffactsSlot(QString name, QStringList factsList)
 
 void CLIPSClass::unDeffactsSlot(QString name)
 {
-	void* tmplPtr = FindDeffacts(name.simplified().toLocal8Bit().data());
+	void* tmplPtr = FindDeffacts(name.simplified().toUtf8().data());
 	if(!IsDeffactsDeletable(tmplPtr))
 		return;
 	Undeffacts(tmplPtr);
@@ -360,7 +361,7 @@ void CLIPSClass::unDeffactsSlot(QString name)
 
 QString CLIPSClass::getDeffactsPPF(QString name)
 {
-	void* deffactsPtr = FindDeffacts(name.simplified().toLocal8Bit().data());
+	void* deffactsPtr = FindDeffacts(name.simplified().toUtf8().data());
 	char *deffactsName = GetDeffactsPPForm(deffactsPtr);
 	return QString(deffactsName).simplified();
 }
@@ -409,7 +410,7 @@ void CLIPSClass::defRuleSlot(QString name, QString comment, QString declaration,
 
 void CLIPSClass::unDefruleSlot(QString name)
 {
-	void* tmplPtr = FindDefrule(name.simplified().toLocal8Bit().data());
+	void* tmplPtr = FindDefrule(name.simplified().toUtf8().data());
 	if(!IsDefruleDeletable(tmplPtr))
 		return;
 	Undefrule(tmplPtr);
@@ -422,7 +423,7 @@ void CLIPSClass::unDefruleSlot(QString name)
 
 void CLIPSClass::SetBreakSlot(QString name)
 {
-	SetBreak(FindDefrule(name.toLocal8Bit().data()));
+	SetBreak(FindDefrule(name.toUtf8().data()));
 	QStringList rules = rulesSlot();
 	emit rulesChangedSignal(rules);
 	emit dataChanged();
@@ -430,7 +431,7 @@ void CLIPSClass::SetBreakSlot(QString name)
 
 void CLIPSClass::RemoveBreakSlot(QString name)
 {
-	RemoveBreak(FindDefrule(name.toLocal8Bit().data()));
+	RemoveBreak(FindDefrule(name.toUtf8().data()));
 	QStringList rules = rulesSlot();
 	emit rulesChangedSignal(rules);
 	emit dataChanged();
@@ -438,7 +439,7 @@ void CLIPSClass::RemoveBreakSlot(QString name)
 
 QString CLIPSClass::getRulePPF(QString name)
 {
-	void* rulePtr = FindDefrule(name.simplified().toLocal8Bit().data());
+	void* rulePtr = FindDefrule(name.simplified().toUtf8().data());
 	char *ruleName = GetDefrulePPForm(rulePtr);
 	return QString(ruleName).simplified();
 }
@@ -613,7 +614,7 @@ void CLIPSClass::defglobalSlot(QString moduleName, QHash<QString, QString> defgl
 
 void CLIPSClass::unDefglobalSlot(QString name)
 {
-	void* globalPtr = FindDefglobal(name.simplified().toLocal8Bit().data());
+	void* globalPtr = FindDefglobal(name.simplified().toUtf8().data());
 	if(!IsDefglobalDeletable(globalPtr))
 		return;
 	Undefglobal(globalPtr);
@@ -624,7 +625,7 @@ void CLIPSClass::unDefglobalSlot(QString name)
 
 QString CLIPSClass::getGlobalPPF(QString name)
 {
-	void* globalPtr = FindDefglobal(name.simplified().toLocal8Bit().data());
+	void* globalPtr = FindDefglobal(name.simplified().toUtf8().data());
 	char *globalsName = GetDefglobalPPForm(globalPtr);
 	return QString(globalsName).simplified();
 }
@@ -661,7 +662,7 @@ void CLIPSClass::deffunctionSlot(QString name, QString comment, QString regular,
 
 void CLIPSClass::unDeffunctionSlot(QString name)
 {
-	void* functionPtr = FindDeffunction(name.simplified().toLocal8Bit().data());
+	void* functionPtr = FindDeffunction(name.simplified().toUtf8().data());
 	if(!IsDeffunctionDeletable(functionPtr))
 		return;
 	Undeffunction(functionPtr);
@@ -672,7 +673,7 @@ void CLIPSClass::unDeffunctionSlot(QString name)
 
 QString CLIPSClass::getFunctionPPF(QString name)
 {
-	void* functionPtr = FindDeffunction(name.simplified().toLocal8Bit().data());
+	void* functionPtr = FindDeffunction(name.simplified().toUtf8().data());
 	char *functionName = GetDeffunctionPPForm(functionPtr);
 	return QString(functionName).simplified();
 }
@@ -709,7 +710,7 @@ void CLIPSClass::defgenericSlot(QString name)
 
 void CLIPSClass::unDefgenericSlot(QString name)
 {
-	void* genericPtr = FindDefgeneric(name.simplified().toLocal8Bit().data());
+	void* genericPtr = FindDefgeneric(name.simplified().toUtf8().data());
 	if(!IsDefgenericDeletable(genericPtr))
 		return;
 	Undefgeneric(genericPtr);
@@ -722,7 +723,7 @@ void CLIPSClass::unDefgenericSlot(QString name)
 
 QString CLIPSClass::getGenericPPF(QString name)
 {
-	void* genericPtr = FindDefgeneric(name.simplified().toLocal8Bit().data());
+	void* genericPtr = FindDefgeneric(name.simplified().toUtf8().data());
 	char *genericName = GetDefgenericPPForm(genericPtr);
 	return QString(genericName).simplified();
 }
@@ -762,7 +763,7 @@ void CLIPSClass::defmethodSlot(QString name, QString index, QString comment, QSt
 void CLIPSClass::unDefmethodSlot(QString name, int index)
 {
 
-	void* genericPtr = FindDefgeneric(name.simplified().toLocal8Bit().data());
+	void* genericPtr = FindDefgeneric(name.simplified().toUtf8().data());
 	if(IsDefmethodDeletable(genericPtr,index))
 		return;
 	Undefmethod(genericPtr, index);
@@ -773,7 +774,7 @@ void CLIPSClass::unDefmethodSlot(QString name, int index)
 
 QString CLIPSClass::getMethodPPF(QString name, int index)
 {
-	void* genericPtr = FindDefgeneric(name.simplified().toLocal8Bit().data());
+	void* genericPtr = FindDefgeneric(name.simplified().toUtf8().data());
 	char *methodName = GetDefmethodPPForm(genericPtr,index);
 	return QString(methodName).simplified();
 }
@@ -785,7 +786,7 @@ QHash<QString, int> CLIPSClass::methodsSlot()
 	QString str;
 	foreach(str, generics)
 	{
-		void* genericPtr = FindDefgeneric(str.simplified().toLocal8Bit().data());
+		void* genericPtr = FindDefgeneric(str.simplified().toUtf8().data());
 		int index=0;
 		do
 		{
@@ -819,7 +820,7 @@ QStringList CLIPSClass::classesSlot()
 
 void CLIPSClass::unDefclassSlot(QString name)
 {
-	void* classPtr = FindDefclass(name.simplified().toLocal8Bit().data());
+	void* classPtr = FindDefclass(name.simplified().toUtf8().data());
 	if(!IsDefclassDeletable(classPtr))
 		return;
 	Undefclass(classPtr);
@@ -836,7 +837,7 @@ void CLIPSClass::unDefclassSlot(QString name)
 
 QString CLIPSClass::getClassPPF(QString name)
 {
-	void* classPtr = FindDefclass(name.simplified().toLocal8Bit().data());
+	void* classPtr = FindDefclass(name.simplified().toUtf8().data());
 	char *className = GetDefclassPPForm(classPtr);
 	return QString(className).simplified();
 }
@@ -848,7 +849,7 @@ QString CLIPSClass::getMetaInformation(QString name)
 	answer.clear();
 	if(name.isEmpty())
 		name = "OBJECT";
-	void* classPtr = FindDefclass(name.simplified().toLocal8Bit().data());
+	void* classPtr = FindDefclass(name.simplified().toUtf8().data());
 	if(ClassAbstractP(classPtr))
 		val = tr("yes");
 	else
@@ -876,7 +877,7 @@ QString CLIPSClass::getSubclasses(QString name)
 {
 	if(name.isEmpty())
 		name = "OBJECT";
-	void* classPtr = FindDefclass(name.simplified().toLocal8Bit().data());
+	void* classPtr = FindDefclass(name.simplified().toUtf8().data());
 	BrowseClasses("stdout", classPtr);
 	return answer;
 }
@@ -886,7 +887,7 @@ QString CLIPSClass::getSuperclasses(QString name)
 	QString ret = "";
 	if(name.isEmpty())
 		name = "OBJECT";
-	void* classPtr = FindDefclass(name.simplified().toLocal8Bit().data());
+	void* classPtr = FindDefclass(name.simplified().toUtf8().data());
 	DATA_OBJECT result;
 	ClassSuperclasses(classPtr,&result,1);
 	void *multifieldPtr;
@@ -924,6 +925,27 @@ unsigned short CLIPSClass::setDefaultsMode(unsigned short mode)
 
 //Message Handlers
 
+void CLIPSClass::defmessageHandlerSlot(QString className, QString messageName, QString handlerType, QString comment, QString parameter, QString wildcardParameter, QString action)
+{
+	QString command = "";
+	command += "(defmessage-handler "+className+" "+messageName+" "+handlerType+" ";
+	if(!comment.isEmpty())
+		command += comment+" ";
+	if(!parameter.isEmpty())
+	{
+		command += "("+parameter;
+		if(!wildcardParameter.isEmpty())
+			command += " "+wildcardParameter;
+		command += ") ";
+	}
+	command += "("+action+"))";
+	executeCommand(command);
+	QHash<QString, uint> messageHandlers = messageHandlersSlot();
+	emit messageHandlersChangedSignal(messageHandlers);
+	emit dataChanged();
+
+}
+
 QHash<QString, unsigned int> CLIPSClass::messageHandlersSlot()
 {
 	QHash<QString, unsigned int> messageHandlersHash;
@@ -931,7 +953,7 @@ QHash<QString, unsigned int> CLIPSClass::messageHandlersSlot()
 	QString str;
 	foreach(str, classes)
 	{
-		void* classPtr = FindDefclass(str.simplified().toLocal8Bit().data());
+		void* classPtr = FindDefclass(str.simplified().toUtf8().data());
 		unsigned int index=0;
 		do
 		{
@@ -951,7 +973,7 @@ QHash<QString, unsigned int> CLIPSClass::messageHandlersSlot()
 void CLIPSClass::unDefmessageHandlerSlot(QString name, unsigned int index)
 {
 	name = name.remove(name.lastIndexOf("  "), name.length());
-	void* classPtr = FindDefclass(name.simplified().toLocal8Bit().data());
+	void* classPtr = FindDefclass(name.simplified().toUtf8().data());
 	if(IsDefmessageHandlerDeletable(classPtr, index))
 		UndefmessageHandler(classPtr, index);
 	QHash<QString, uint> messageHandlers = messageHandlersSlot();
@@ -962,7 +984,7 @@ void CLIPSClass::unDefmessageHandlerSlot(QString name, unsigned int index)
 QString CLIPSClass::getMessageHandlerPPF(QString name, unsigned int index)
 {
 	name = name.remove(name.lastIndexOf("  "), name.length());
-	void* classPtr = FindDefclass(name.simplified().toLocal8Bit().data());
+	void* classPtr = FindDefclass(name.simplified().toUtf8().data());
 	char *messageHandlerPPForm = GetDefmessageHandlerPPForm(classPtr, index);
 	return QString(messageHandlerPPForm).simplified();
 }

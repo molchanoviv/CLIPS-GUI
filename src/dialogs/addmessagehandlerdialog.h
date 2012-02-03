@@ -3,10 +3,10 @@
 
 #include "ui_addmessagehandlerdialog.h"
 
-class QStringList;
-class QComboBox;
-class QLineEdit;
-class QTextEdit;
+#include <QComboBox>
+#include <QLineEdit>
+#include <QTextEdit>
+#include <QStringList>
 
 class addMessageHandlerDialog : public QDialog, private Ui::addMessageHandlerDialog
 {
@@ -14,14 +14,13 @@ class addMessageHandlerDialog : public QDialog, private Ui::addMessageHandlerDia
 	
 public:
 	explicit addMessageHandlerDialog(QWidget *parent = 0, QStringList classesList = QStringList(), QStringList handlerTypeList = QStringList());
-	~addMessageHandlerDialog();
 	QComboBox *classNameComboBox;
 	QLineEdit *messageNameLineEdit;
-//	QComboBox *handlerTypeComboBox;
-//	QLineEdit *commentLineEdit;
-//	QLineEdit *parameterLineEdit;
-//	QLineEdit *wildcardParameter;
-//	QTextEdit *actionTextEdit;
+	QComboBox *handlerTypeComboBox;
+	QLineEdit *commentLineEdit;
+	QLineEdit *parameterLineEdit;
+	QLineEdit *wildcardParameterLineEdit;
+	QTextEdit *actionTextEdit;
 
 };
 
