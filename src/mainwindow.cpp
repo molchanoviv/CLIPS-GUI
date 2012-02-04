@@ -9,6 +9,7 @@
 #include "dialogs/addglobalsdialog.h"
 #include "dialogs/addfunctiondialog.h"
 #include "dialogs/addmessagehandlerdialog.h"
+#include "dialogs/addinstancedialog.h"
 #include <QToolBar>
 #include <QInputDialog>
 #include <QCheckBox>
@@ -117,6 +118,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(projectWidget->defaultsModePushButton, SIGNAL(clicked()), this, SLOT(setDefaultsModeSlot()));
 	connect(projectWidget->addMessageHandlerPushButton, SIGNAL(clicked()), this, SLOT(addMessageHandlerSlot()));
 	connect(projectWidget->refreshMessageHandlersPushButton, SIGNAL(clicked()), this, SLOT(refreshMessageHandlersSlot()));
+	connect(projectWidget->addInstancePushButton, SIGNAL(clicked()), this, SLOT(addInstanceSlot()));
 	connect(projectWidget->refreshInstancesPushButton, SIGNAL(clicked()), this, SLOT(refreshInstancesSlot()));
 	connect(this, SIGNAL(treeWidgetItemClickedSignal(int)), projectWidget, SLOT(setCurrentIndex(int)));
 	connect(this,SIGNAL(addTemplateSignal(QString,QList<slotsPair>)), clips, SLOT(deftemplateSlot(QString,QList<slotsPair>)));
@@ -899,6 +901,21 @@ void MainWindow::refreshMessageHandlersSlot()
 }
 
 //Instances
+
+void MainWindow::addInstanceSlot()
+{
+	addInstanceDialog dialog(this);
+	if(dialog.exec() == QDialog::Accepted)
+	{
+		QString name = dialog.nameLineEdit->text();
+		QString comment = dialog.commentLineEdit->text();
+		QString instanceTemplate = dialog.instanceTemplateLineEdit->text();
+		QString active = "";
+		if(dialog.activeCheckBox->isChecked())
+			active = "active";
+		clips->definstanceSlot(name, active, comment, instanceTemplate);
+	}
+}
 
 void MainWindow::viewInstanceSlot(QString name)
 {

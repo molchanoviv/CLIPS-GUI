@@ -91,6 +91,7 @@ public slots:
 	QStringList getHandlerTypesSlot();
 	//Instances
 	QStringList instancesSlot();
+	void definstanceSlot(QString, QString, QString, QString);
 	void unDefinstancesSlot(QString);
 	QString getInstancePPF(QString);
 	//Modules

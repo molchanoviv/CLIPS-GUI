@@ -931,7 +931,7 @@ void CLIPSClass::defmessageHandlerSlot(QString className, QString messageName, Q
 	QString command = "";
 	command += "(defmessage-handler "+className+" "+messageName+" "+handlerType+" ";
 	if(!comment.isEmpty())
-		command += comment+" ";
+		command += "\""+comment+"\" ";
 	if(!parameter.isEmpty())
 	{
 		command += "("+parameter;
@@ -945,30 +945,6 @@ void CLIPSClass::defmessageHandlerSlot(QString className, QString messageName, Q
 	emit messageHandlersChangedSignal(messageHandlers);
 	emit dataChanged();
 
-}
-
-QHash<QString, unsigned int> CLIPSClass::messageHandlersSlot()
-{
-	QHash<QString, unsigned int> messageHandlersHash;
-	QStringList classes = classesSlot();
-	QString str;
-	foreach(str, classes)
-	{
-		void* classPtr = FindDefclass(str.simplified().toUtf8().data());
-		unsigned int index=0;
-		do
-		{
-			index = GetNextDefmessageHandler(classPtr, index);
-			if(index!=0)
-			{
-				char* messageHandlerName = GetDefmessageHandlerName(classPtr, index);
-				char* messageHandlerType = GetDefmessageHandlerType(classPtr, index);
-				messageHandlersHash.insertMulti(str+QString("  ")+QString(messageHandlerName)+QString(" ")+QString(messageHandlerType), index);
-			}
-		}
-		while(index!=0);
-	}
-	return messageHandlersHash;
 }
 
 void CLIPSClass::unDefmessageHandlerSlot(QString name, unsigned int index)
@@ -997,23 +973,41 @@ QStringList CLIPSClass::getHandlerTypesSlot()
 	return list;
 }
 
+QHash<QString, unsigned int> CLIPSClass::messageHandlersSlot()
+{
+	QHash<QString, unsigned int> messageHandlersHash;
+	QStringList classes = classesSlot();
+	QString str;
+	foreach(str, classes)
+	{
+		void* classPtr = FindDefclass(str.simplified().toUtf8().data());
+		unsigned int index=0;
+		do
+		{
+			index = GetNextDefmessageHandler(classPtr, index);
+			if(index!=0)
+			{
+				char* messageHandlerName = GetDefmessageHandlerName(classPtr, index);
+				char* messageHandlerType = GetDefmessageHandlerType(classPtr, index);
+				messageHandlersHash.insertMulti(str+QString("  ")+QString(messageHandlerName)+QString(" ")+QString(messageHandlerType), index);
+			}
+		}
+		while(index!=0);
+	}
+	return messageHandlersHash;
+}
+
 //Instances
 
-QStringList CLIPSClass::instancesSlot()
+void CLIPSClass::definstanceSlot(QString name, QString active, QString comment, QString instanceTemplate)
 {
-	QStringList instancesList;
-	void* ptr=NULL;
-	do
-	{
-		ptr = GetNextDefinstances(ptr);
-		if(ptr!=NULL)
-		{
-			char *instanceStr = GetDefinstancesName(ptr);
-			instancesList<<QString(instanceStr).simplified();
-		}
-	}
-	while(ptr!=NULL);
-	return instancesList;
+	if(!comment.isEmpty())
+		comment = "\""+comment+"\"";
+	QString command = "(definstances "+name+" "+active+" "+comment+" "+instanceTemplate+")";
+	executeCommand(command);
+	QStringList instances = instancesSlot();
+	emit instancesChangedSignal(instances);
+	emit dataChanged();
 }
 
 void CLIPSClass::unDefinstancesSlot(QString name)
@@ -1032,6 +1026,23 @@ QString CLIPSClass::getInstancePPF(QString name)
 	void* instancePtr = FindDefinstances(name.simplified().toUtf8().data());
 	char *instanceName = GetDefinstancesPPForm(instancePtr);
 	return QString(instanceName).simplified();
+}
+
+QStringList CLIPSClass::instancesSlot()
+{
+	QStringList instancesList;
+	void* ptr=NULL;
+	do
+	{
+		ptr = GetNextDefinstances(ptr);
+		if(ptr!=NULL)
+		{
+			char *instanceStr = GetDefinstancesName(ptr);
+			instancesList<<QString(instanceStr).simplified();
+		}
+	}
+	while(ptr!=NULL);
+	return instancesList;
 }
 
 //Modules
