@@ -89,6 +89,10 @@ public slots:
 	void unDefmessageHandlerSlot(QString, unsigned int);
 	QString getMessageHandlerPPF(QString, unsigned int);
 	QStringList getHandlerTypesSlot();
+	//Instances
+	QStringList instancesSlot();
+	void unDefinstancesSlot(QString);
+	QString getInstancePPF(QString);
 	//Modules
 	QStringList getModules();
 
@@ -107,6 +111,7 @@ signals:
 	void methodsChangedSignal(QHash<QString, int>);
 	void classesChangedSignal(QStringList);
 	void messageHandlersChangedSignal(QHash<QString, unsigned int>);
+	void instancesChangedSignal(QStringList);
 	void dataChanged();
 	void clearSignal();
 	void outputSignal(QString);

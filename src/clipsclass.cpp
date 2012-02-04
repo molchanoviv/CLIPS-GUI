@@ -875,6 +875,7 @@ QString CLIPSClass::getMetaInformation(QString name)
 
 QString CLIPSClass::getSubclasses(QString name)
 {
+	answer.clear();
 	if(name.isEmpty())
 		name = "OBJECT";
 	void* classPtr = FindDefclass(name.simplified().toUtf8().data());
@@ -994,6 +995,43 @@ QStringList CLIPSClass::getHandlerTypesSlot()
 	QStringList list;
 	list<<"around"<<"before"<<"primary"<<"after";
 	return list;
+}
+
+//Instances
+
+QStringList CLIPSClass::instancesSlot()
+{
+	QStringList instancesList;
+	void* ptr=NULL;
+	do
+	{
+		ptr = GetNextDefinstances(ptr);
+		if(ptr!=NULL)
+		{
+			char *instanceStr = GetDefinstancesName(ptr);
+			instancesList<<QString(instanceStr).simplified();
+		}
+	}
+	while(ptr!=NULL);
+	return instancesList;
+}
+
+void CLIPSClass::unDefinstancesSlot(QString name)
+{
+	void* instancePtr = FindDefinstances(name.simplified().toUtf8().data());
+	if(!IsDefinstancesDeletable(instancePtr))
+		return;
+	Undefinstances(instancePtr);
+	QStringList instances = instancesSlot();
+	emit instancesChangedSignal(instances);
+	emit dataChanged();
+}
+
+QString CLIPSClass::getInstancePPF(QString name)
+{
+	void* instancePtr = FindDefinstances(name.simplified().toUtf8().data());
+	char *instanceName = GetDefinstancesPPForm(instancePtr);
+	return QString(instanceName).simplified();
 }
 
 //Modules

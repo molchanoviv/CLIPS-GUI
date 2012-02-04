@@ -13,18 +13,18 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	QGroupBox *templatesWidget = new QGroupBox(tr("Templates"));
 	QVBoxLayout *templatesLayout = new QVBoxLayout;
 	templatesListWidget = new QListWidget;
-	addTemplateButton = new QPushButton(tr("Add"));
-	addTemplateButton->setIcon(QIcon::fromTheme("list-add"));
-	refreshTemplatesButton = new QPushButton(tr("Refresh"));
-	refreshTemplatesButton->setIcon(QIcon::fromTheme("view-refresh"));
+	addTemplatePushButton = new QPushButton(tr("Add"));
+	addTemplatePushButton->setIcon(QIcon::fromTheme("list-add"));
+	refreshTemplatesPushButton = new QPushButton(tr("Refresh"));
+	refreshTemplatesPushButton->setIcon(QIcon::fromTheme("view-refresh"));
 	viewTemplatePushButton = new QPushButton(tr("View"));
 	viewTemplatePushButton->setIcon(QIcon::fromTheme("layer-visible-on"));
 	QPushButton *removeTemplateButton = new QPushButton(tr("Remove"));
 	removeTemplateButton->setIcon(QIcon::fromTheme("list-remove"));
 	QHBoxLayout *templatesTopLayout = new QHBoxLayout;
-	templatesTopLayout->addWidget(addTemplateButton);
+	templatesTopLayout->addWidget(addTemplatePushButton);
 	templatesTopLayout->addWidget(removeTemplateButton);
-	templatesTopLayout->addWidget(refreshTemplatesButton);
+	templatesTopLayout->addWidget(refreshTemplatesPushButton);
 	templatesTopLayout->addStretch();
 	templatesTopLayout->addWidget(viewTemplatePushButton);
 	templatesLayout->addLayout(templatesTopLayout);
@@ -33,25 +33,25 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	/*****************************Facts****************************************/
 	QGroupBox *factsWidget = new QGroupBox(tr("Facts"));
 	QVBoxLayout *factsLayout = new QVBoxLayout;
-	duplicationButton = new QPushButton(tr("Enable Duplication"));
-	duplicationButton->setCheckable(true);
-	duplicationButton->setIcon(QIcon::fromTheme("edit-copy"));
+	duplicationPushButton = new QPushButton(tr("Enable Duplication"));
+	duplicationPushButton->setCheckable(true);
+	duplicationPushButton->setIcon(QIcon::fromTheme("edit-copy"));
 	factsListWidget = new QListWidget;
-	addFactButton = new QPushButton(tr("Add"));
-	addFactButton->setIcon(QIcon::fromTheme("list-add"));
-	addFactByTemplateButton = new QPushButton(tr("Add By Template"));
-	addFactByTemplateButton->setIcon(QIcon::fromTheme("list-add"));
-	refreshFactsButton = new QPushButton(tr("Refresh"));
-	refreshFactsButton->setIcon(QIcon::fromTheme("view-refresh"));
+	addFactPushButton = new QPushButton(tr("Add"));
+	addFactPushButton->setIcon(QIcon::fromTheme("list-add"));
+	addFactByTemplatePushButton = new QPushButton(tr("Add By Template"));
+	addFactByTemplatePushButton->setIcon(QIcon::fromTheme("list-add"));
+	refreshFactsPushButton = new QPushButton(tr("Refresh"));
+	refreshFactsPushButton->setIcon(QIcon::fromTheme("view-refresh"));
 	QPushButton *removeFactButton = new QPushButton(tr("Remove"));
 	removeFactButton->setIcon(QIcon::fromTheme("list-remove"));
 	QHBoxLayout *factsTopLayout = new QHBoxLayout;
-	factsTopLayout->addWidget(addFactByTemplateButton);
-	factsTopLayout->addWidget(addFactButton);
+	factsTopLayout->addWidget(addFactByTemplatePushButton);
+	factsTopLayout->addWidget(addFactPushButton);
 	factsTopLayout->addWidget(removeFactButton);
-	factsTopLayout->addWidget(refreshFactsButton);
+	factsTopLayout->addWidget(refreshFactsPushButton);
 	factsTopLayout->addStretch();
-	factsTopLayout->addWidget(duplicationButton);
+	factsTopLayout->addWidget(duplicationPushButton);
 	factsLayout->addLayout(factsTopLayout);
 	factsLayout->addWidget(factsListWidget);
 	factsWidget->setLayout(factsLayout);
@@ -59,18 +59,18 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	QGroupBox *deffactsWidget = new QGroupBox(tr("Facts List"));
 	QVBoxLayout *deffactsLayout = new QVBoxLayout;
 	deffactsListWidget = new QListWidget;
-	addDeffactButton = new QPushButton(tr("Add"));
-	addDeffactButton->setIcon(QIcon::fromTheme("list-add"));
-	refreshDeffactsButton = new QPushButton(tr("Refresh"));
-	refreshDeffactsButton->setIcon(QIcon::fromTheme("view-refresh"));
+	addDeffactPushButton = new QPushButton(tr("Add"));
+	addDeffactPushButton->setIcon(QIcon::fromTheme("list-add"));
+	refreshDeffactsPushButton = new QPushButton(tr("Refresh"));
+	refreshDeffactsPushButton->setIcon(QIcon::fromTheme("view-refresh"));
 	viewDeffactPushButton = new QPushButton(tr("View"));
 	viewDeffactPushButton->setIcon(QIcon::fromTheme("layer-visible-on"));
 	QPushButton *removeDeffactButton = new QPushButton(tr("Remove"));
 	removeDeffactButton->setIcon(QIcon::fromTheme("list-remove"));
 	QHBoxLayout *deffactsTopLayout = new QHBoxLayout;
-	deffactsTopLayout->addWidget(addDeffactButton);
+	deffactsTopLayout->addWidget(addDeffactPushButton);
 	deffactsTopLayout->addWidget(removeDeffactButton);
-	deffactsTopLayout->addWidget(refreshDeffactsButton);
+	deffactsTopLayout->addWidget(refreshDeffactsPushButton);
 	deffactsTopLayout->addStretch();
 	deffactsTopLayout->addWidget(viewDeffactPushButton);
 	deffactsLayout->addLayout(deffactsTopLayout);
@@ -80,12 +80,12 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	QGroupBox *rulesWidget = new QGroupBox(tr("Rules"));
 	QVBoxLayout *rulesLayout = new QVBoxLayout;
 	rulesListWidget = new QListWidget;
-	addRuleButton = new QPushButton(tr("Add"));
-	addRuleButton->setIcon(QIcon::fromTheme("list-add"));
+	addRulePushButton = new QPushButton(tr("Add"));
+	addRulePushButton->setIcon(QIcon::fromTheme("list-add"));
 	QPushButton *removeRuleButton = new QPushButton(tr("Remove"));
 	removeRuleButton->setIcon(QIcon::fromTheme("list-remove"));
-	refreshRulesButton = new QPushButton(tr("Refresh"));
-	refreshRulesButton->setIcon(QIcon::fromTheme("view-refresh"));
+	refreshRulesPushButton = new QPushButton(tr("Refresh"));
+	refreshRulesPushButton->setIcon(QIcon::fromTheme("view-refresh"));
 	viewRulePushButton = new QPushButton(tr("View"));
 	viewRulePushButton->setIcon(QIcon::fromTheme("layer-visible-on"));
 	setBreakpointPushButton = new QPushButton(tr("Set Breakpoint"));
@@ -93,9 +93,9 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	removeBreakpointPushButton = new QPushButton(tr("Remove Breakpoint"));
 	removeBreakpointPushButton->setIcon(QIcon::fromTheme("format-remove-node"));
 	QHBoxLayout *rulesTopLayout = new QHBoxLayout;
-	rulesTopLayout->addWidget(addRuleButton);
+	rulesTopLayout->addWidget(addRulePushButton);
 	rulesTopLayout->addWidget(removeRuleButton);
-	rulesTopLayout->addWidget(refreshRulesButton);
+	rulesTopLayout->addWidget(refreshRulesPushButton);
 	rulesTopLayout->addStretch();
 	rulesTopLayout->addWidget(setBreakpointPushButton);
 	rulesTopLayout->addWidget(removeBreakpointPushButton);
@@ -109,18 +109,18 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	activationsListWidget = new QListWidget;
 	QPushButton *removeActivationButton = new QPushButton(tr("Remove"));
 	removeActivationButton->setIcon(QIcon::fromTheme("list-remove"));
-	refreshActivationsButton = new QPushButton(tr("Refresh"));
-	refreshActivationsButton->setIcon(QIcon::fromTheme("view-refresh"));
-	runButton = new QPushButton(tr("Run"));
-	runButton->setIcon(QIcon::fromTheme("arrow-right"));
+	refreshActivationsPushButton = new QPushButton(tr("Refresh"));
+	refreshActivationsPushButton->setIcon(QIcon::fromTheme("view-refresh"));
+	runPushButton = new QPushButton(tr("Run"));
+	runPushButton->setIcon(QIcon::fromTheme("arrow-right"));
 	setActivationSaliencePushButton = new QPushButton(tr("Set Salience"));
 	setActivationSaliencePushButton->setIcon(QIcon::fromTheme("view-statistics"));
 	setStrategyPushButton = new QPushButton(tr("Set Strategy"));
 	setStrategyPushButton->setIcon(QIcon::fromTheme("task-attention"));
 	QHBoxLayout *activationsTopLayout = new QHBoxLayout;
 	activationsTopLayout->addWidget(removeActivationButton);
-	activationsTopLayout->addWidget(refreshActivationsButton);
-	activationsTopLayout->addWidget(runButton);
+	activationsTopLayout->addWidget(refreshActivationsPushButton);
+	activationsTopLayout->addWidget(runPushButton);
 	activationsTopLayout->addStretch();
 	activationsTopLayout->addWidget(setActivationSaliencePushButton);
 	activationsTopLayout->addWidget(setStrategyPushButton);
@@ -131,18 +131,18 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	QGroupBox *globalsWidget = new QGroupBox(tr("Globals"));
 	QVBoxLayout *globalsLayout = new QVBoxLayout;
 	globalsListWidget = new QListWidget;
-	addGlobalButton = new QPushButton(tr("Add"));
-	addGlobalButton->setIcon(QIcon::fromTheme("list-add"));
+	addGlobalPushButton = new QPushButton(tr("Add"));
+	addGlobalPushButton->setIcon(QIcon::fromTheme("list-add"));
 	QPushButton *removeGlobalButton = new QPushButton(tr("Remove"));
 	removeGlobalButton->setIcon(QIcon::fromTheme("list-remove"));
-	refreshGlobalsButton = new QPushButton(tr("Refresh"));
-	refreshGlobalsButton->setIcon(QIcon::fromTheme("view-refresh"));
+	refreshGlobalsPushButton = new QPushButton(tr("Refresh"));
+	refreshGlobalsPushButton->setIcon(QIcon::fromTheme("view-refresh"));
 	viewGlobalPushButton = new QPushButton(tr("View"));
 	viewGlobalPushButton->setIcon(QIcon::fromTheme("layer-visible-on"));
 	QHBoxLayout *globalsTopLayout = new QHBoxLayout;
-	globalsTopLayout->addWidget(addGlobalButton);
+	globalsTopLayout->addWidget(addGlobalPushButton);
 	globalsTopLayout->addWidget(removeGlobalButton);
-	globalsTopLayout->addWidget(refreshGlobalsButton);
+	globalsTopLayout->addWidget(refreshGlobalsPushButton);
 	globalsTopLayout->addStretch();
 	globalsTopLayout->addWidget(viewGlobalPushButton);
 	globalsLayout->addLayout(globalsTopLayout);
@@ -152,18 +152,18 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	QGroupBox *functionsWidget = new QGroupBox(tr("Functions"));
 	QVBoxLayout *functionsLayout = new QVBoxLayout;
 	functionsListWidget = new QListWidget;
-	addFunctionButton = new QPushButton(tr("Add"));
-	addFunctionButton->setIcon(QIcon::fromTheme("list-add"));
+	addFunctionPushButton = new QPushButton(tr("Add"));
+	addFunctionPushButton->setIcon(QIcon::fromTheme("list-add"));
 	QPushButton *removeFunctionButton = new QPushButton(tr("Remove"));
 	removeFunctionButton->setIcon(QIcon::fromTheme("list-remove"));
-	refreshFunctionsButton = new QPushButton(tr("Refresh"));
-	refreshFunctionsButton->setIcon(QIcon::fromTheme("view-refresh"));
+	refreshFunctionsPushButton = new QPushButton(tr("Refresh"));
+	refreshFunctionsPushButton->setIcon(QIcon::fromTheme("view-refresh"));
 	viewFunctionPushButton = new QPushButton(tr("View"));
 	viewFunctionPushButton->setIcon(QIcon::fromTheme("layer-visible-on"));
 	QHBoxLayout *functionsTopLayout = new QHBoxLayout;
-	functionsTopLayout->addWidget(addFunctionButton);
+	functionsTopLayout->addWidget(addFunctionPushButton);
 	functionsTopLayout->addWidget(removeFunctionButton);
-	functionsTopLayout->addWidget(refreshFunctionsButton);
+	functionsTopLayout->addWidget(refreshFunctionsPushButton);
 	functionsTopLayout->addStretch();
 	functionsTopLayout->addWidget(viewFunctionPushButton);
 	functionsLayout->addLayout(functionsTopLayout);
@@ -173,18 +173,18 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	QGroupBox *genericWidget = new QGroupBox(tr("Generic Functions"));
 	QVBoxLayout *genericLayout = new QVBoxLayout;
 	genericListWidget = new QListWidget;
-	addGenericButton = new QPushButton(tr("Add"));
-	addGenericButton->setIcon(QIcon::fromTheme("list-add"));
+	addGenericPushButton = new QPushButton(tr("Add"));
+	addGenericPushButton->setIcon(QIcon::fromTheme("list-add"));
 	QPushButton *removeGenericButton = new QPushButton(tr("Remove"));
 	removeGenericButton->setIcon(QIcon::fromTheme("list-remove"));
-	refreshGenericButton = new QPushButton(tr("Refresh"));
-	refreshGenericButton->setIcon(QIcon::fromTheme("view-refresh"));
+	refreshGenericPushButton = new QPushButton(tr("Refresh"));
+	refreshGenericPushButton->setIcon(QIcon::fromTheme("view-refresh"));
 	viewGenericPushButton = new QPushButton(tr("View"));
 	viewGenericPushButton->setIcon(QIcon::fromTheme("layer-visible-on"));
 	QHBoxLayout *genericTopLayout = new QHBoxLayout;
-	genericTopLayout->addWidget(addGenericButton);
+	genericTopLayout->addWidget(addGenericPushButton);
 	genericTopLayout->addWidget(removeGenericButton);
-	genericTopLayout->addWidget(refreshGenericButton);
+	genericTopLayout->addWidget(refreshGenericPushButton);
 	genericTopLayout->addStretch();
 	genericTopLayout->addWidget(viewGenericPushButton);
 	genericLayout->addLayout(genericTopLayout);
@@ -194,18 +194,18 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	QGroupBox *methodsWidget = new QGroupBox(tr("Methods"));
 	QVBoxLayout *methodsLayout = new QVBoxLayout;
 	methodsListWidget = new QListWidget;
-	addMethodButton = new QPushButton(tr("Add"));
-	addMethodButton->setIcon(QIcon::fromTheme("list-add"));
+	addMethodPushButton = new QPushButton(tr("Add"));
+	addMethodPushButton->setIcon(QIcon::fromTheme("list-add"));
 	QPushButton *removeMethodButton = new QPushButton(tr("Remove"));
 	removeMethodButton->setIcon(QIcon::fromTheme("list-remove"));
-	refreshMethodsButton = new QPushButton(tr("Refresh"));
-	refreshMethodsButton->setIcon(QIcon::fromTheme("view-refresh"));
+	refreshMethodsPushButton = new QPushButton(tr("Refresh"));
+	refreshMethodsPushButton->setIcon(QIcon::fromTheme("view-refresh"));
 	viewMethodPushButton = new QPushButton(tr("View"));
 	viewMethodPushButton->setIcon(QIcon::fromTheme("layer-visible-on"));
 	QHBoxLayout *methodsTopLayout = new QHBoxLayout;
-	methodsTopLayout->addWidget(addMethodButton);
+	methodsTopLayout->addWidget(addMethodPushButton);
 	methodsTopLayout->addWidget(removeMethodButton);
-	methodsTopLayout->addWidget(refreshMethodsButton);
+	methodsTopLayout->addWidget(refreshMethodsPushButton);
 	methodsTopLayout->addStretch();
 	methodsTopLayout->addWidget(viewMethodPushButton);
 	methodsLayout->addLayout(methodsTopLayout);
@@ -215,12 +215,12 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	QGroupBox *classesWidget = new QGroupBox(tr("Classes"));
 	QVBoxLayout *classesLayout = new QVBoxLayout;
 	classesListWidget = new QListWidget;
-	addClassButton = new QPushButton(tr("Add"));
-	addClassButton->setIcon(QIcon::fromTheme("list-add"));
+	addClassPushButton = new QPushButton(tr("Add"));
+	addClassPushButton->setIcon(QIcon::fromTheme("list-add"));
 	QPushButton *removeClassButton = new QPushButton(tr("Remove"));
 	removeClassButton->setIcon(QIcon::fromTheme("list-remove"));
-	refreshClassesButton = new QPushButton(tr("Refresh"));
-	refreshClassesButton->setIcon(QIcon::fromTheme("view-refresh"));
+	refreshClassesPushButton = new QPushButton(tr("Refresh"));
+	refreshClassesPushButton->setIcon(QIcon::fromTheme("view-refresh"));
 	defaultsModePushButton = new QPushButton(tr("Set Defaults Mode"));
 	defaultsModePushButton->setIcon(QIcon::fromTheme("preferences-other"));
 	viewClassPushButton = new QPushButton(tr("View"));
@@ -236,9 +236,9 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	classInfoMenu->addAction(metaInformationAction);
 	classInfoPushButton->setMenu(classInfoMenu);
 	QHBoxLayout *classesTopLayout = new QHBoxLayout;
-	classesTopLayout->addWidget(addClassButton);
+	classesTopLayout->addWidget(addClassPushButton);
 	classesTopLayout->addWidget(removeClassButton);
-	classesTopLayout->addWidget(refreshClassesButton);
+	classesTopLayout->addWidget(refreshClassesPushButton);
 	classesTopLayout->addStretch();
 	classesTopLayout->addWidget(defaultsModePushButton);
 	classesTopLayout->addWidget(viewClassPushButton);
@@ -267,6 +267,28 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	messageHandlersLayout->addLayout(messageHandlersTopLayout);
 	messageHandlersLayout->addWidget(messageHandlersListWidget);
 	messageHandlersWidget->setLayout(messageHandlersLayout);
+	/*****************************Instances************************************/
+	QGroupBox *instancesWidget = new QGroupBox(tr("Instances"));
+	QVBoxLayout *instancesLayout = new QVBoxLayout;
+	instancesListWidget = new QListWidget;
+	addInstancePushButton = new QPushButton(tr("Add"));
+	addInstancePushButton->setIcon(QIcon::fromTheme("list-add"));
+	QPushButton *removeInstanceButton = new QPushButton(tr("Remove"));
+	removeInstanceButton->setIcon(QIcon::fromTheme("list-remove"));
+	refreshInstancesPushButton = new QPushButton(tr("Refresh"));
+	refreshInstancesPushButton->setIcon(QIcon::fromTheme("view-refresh"));
+	viewInstancePushButton = new QPushButton(tr("View"));
+	viewInstancePushButton->setIcon(QIcon::fromTheme("layer-visible-on"));
+	QHBoxLayout *instancesTopLayout = new QHBoxLayout;
+	instancesTopLayout->addWidget(addInstancePushButton);
+	instancesTopLayout->addWidget(removeInstanceButton);
+	instancesTopLayout->addWidget(refreshInstancesPushButton);
+	instancesTopLayout->addStretch();
+	instancesTopLayout->addWidget(viewInstancePushButton);
+	instancesLayout->addLayout(instancesTopLayout);
+	instancesLayout->addWidget(instancesListWidget);
+	instancesWidget->setLayout(instancesLayout);
+
 
 	this->addWidget(templatesWidget);
 	this->addWidget(factsWidget);
@@ -279,6 +301,7 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	this->addWidget(methodsWidget);
 	this->addWidget(classesWidget);
 	this->addWidget(messageHandlersWidget);
+	this->addWidget(instancesWidget);
 
 	connect(setBreakpointPushButton, SIGNAL(clicked()), this, SLOT(setBreakpointSlot()));
 	connect(removeBreakpointPushButton, SIGNAL(clicked()), this, SLOT(removeBreakpointSlot()));
@@ -305,6 +328,8 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	connect(superClassesAction, SIGNAL(triggered()), this, SLOT(superClassesSlot()));
 	connect(removeMessageHandlerPushButton, SIGNAL(clicked()), this, SLOT(removeMessageHandlerSlot()));
 	connect(viewMessageHandlerPushButton, SIGNAL(clicked()), this, SLOT(viewMessageHandlerSlot()));
+	connect(removeInstanceButton, SIGNAL(clicked()), this, SLOT(removeInstanceSlot()));
+	connect(viewInstancePushButton, SIGNAL(clicked()), this, SLOT(viewInstanceSlot()));
 }
 
 void ProjectStackedWidget::clearSlot()
@@ -651,6 +676,33 @@ void ProjectStackedWidget::removeMessageHandlerSlot()
 	QList<QListWidgetItem*> messageHandlers = messageHandlersListWidget->selectedItems();
 	if(!messageHandlers.isEmpty())
 		emit removeMessageHandlerSignal(messageHandlers.at(0)->text(), unsigned(messageHandlers.at(0)->data(Qt::UserRole).toInt()));
+}
+
+//Instances
+
+void ProjectStackedWidget::refreshInstancesSlot(QStringList instances)
+{
+	instancesListWidget->clear();
+	QString str;
+	foreach(str, instances)
+	{
+		QListWidgetItem *item = new QListWidgetItem(instancesListWidget);
+		item->setText(str);
+	}
+}
+
+void ProjectStackedWidget::viewInstanceSlot()
+{
+	QList<QListWidgetItem*> instances = instancesListWidget->selectedItems();
+	if(!instances.isEmpty())
+		emit viewInstanceSignal(instances.at(0)->text());
+}
+
+void ProjectStackedWidget::removeInstanceSlot()
+{
+	QList<QListWidgetItem*> instances = instancesListWidget->selectedItems();
+	if(!instances.isEmpty())
+		emit removeInstanceSignal(instances.at(0)->text());
 }
 
 //Modules

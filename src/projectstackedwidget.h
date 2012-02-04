@@ -22,57 +22,57 @@ public:
 	explicit ProjectStackedWidget(QWidget *parent = 0);
 	//Templates
 	QListWidget *templatesListWidget;
-	QPushButton *addTemplateButton;
-	QPushButton *refreshTemplatesButton;
+	QPushButton *addTemplatePushButton;
+	QPushButton *refreshTemplatesPushButton;
 	QPushButton *viewTemplatePushButton;
 	//Facts
 	QListWidget *factsListWidget;
-	QPushButton *addFactByTemplateButton;
-	QPushButton *addFactButton;
-	QPushButton *refreshFactsButton;
-	QPushButton *duplicationButton;
+	QPushButton *addFactByTemplatePushButton;
+	QPushButton *addFactPushButton;
+	QPushButton *refreshFactsPushButton;
+	QPushButton *duplicationPushButton;
 	//Facts List
 	QListWidget *deffactsListWidget;
-	QPushButton *addDeffactButton;
-	QPushButton *refreshDeffactsButton;
+	QPushButton *addDeffactPushButton;
+	QPushButton *refreshDeffactsPushButton;
 	QPushButton *viewDeffactPushButton;
 	//Rules
 	QListWidget *rulesListWidget;
-	QPushButton *addRuleButton;
-	QPushButton *refreshRulesButton;
+	QPushButton *addRulePushButton;
+	QPushButton *refreshRulesPushButton;
 	QPushButton *viewRulePushButton;
 	QPushButton *setBreakpointPushButton;
 	QPushButton *removeBreakpointPushButton;
 	//Agenda
 	QListWidget *activationsListWidget;
-	QPushButton *refreshActivationsButton;
-	QPushButton *runButton;
+	QPushButton *refreshActivationsPushButton;
+	QPushButton *runPushButton;
 	QPushButton *setActivationSaliencePushButton;
 	QPushButton *setStrategyPushButton;
 	//Globals
 	QListWidget *globalsListWidget;
-	QPushButton *addGlobalButton;
-	QPushButton *refreshGlobalsButton;
+	QPushButton *addGlobalPushButton;
+	QPushButton *refreshGlobalsPushButton;
 	QPushButton *viewGlobalPushButton;
 	//Functions
 	QListWidget *functionsListWidget;
-	QPushButton *addFunctionButton;
-	QPushButton *refreshFunctionsButton;
+	QPushButton *addFunctionPushButton;
+	QPushButton *refreshFunctionsPushButton;
 	QPushButton *viewFunctionPushButton;
 	//Generics
 	QListWidget *genericListWidget;
-	QPushButton *addGenericButton;
-	QPushButton *refreshGenericButton;
+	QPushButton *addGenericPushButton;
+	QPushButton *refreshGenericPushButton;
 	QPushButton *viewGenericPushButton;
 	//Methods
 	QListWidget *methodsListWidget;
-	QPushButton *addMethodButton;
-	QPushButton *refreshMethodsButton;
+	QPushButton *addMethodPushButton;
+	QPushButton *refreshMethodsPushButton;
 	QPushButton *viewMethodPushButton;
 	//Classes
 	QListWidget *classesListWidget;
-	QPushButton *addClassButton;
-	QPushButton *refreshClassesButton;
+	QPushButton *addClassPushButton;
+	QPushButton *refreshClassesPushButton;
 	QPushButton *defaultsModePushButton;
 	QPushButton *viewClassPushButton;
 	QPushButton *classInfoPushButton;
@@ -84,6 +84,11 @@ public:
 	QPushButton *addMessageHandlerPushButton;
 	QPushButton *refreshMessageHandlersPushButton;
 	QPushButton *viewMessageHandlerPushButton;
+	//Instances
+	QListWidget *instancesListWidget;
+	QPushButton *addInstancePushButton;
+	QPushButton *refreshInstancesPushButton;
+	QPushButton *viewInstancePushButton;
 	//Modules
 	/*****/
 
@@ -124,6 +129,9 @@ signals:
 	//Message Handlers
 	void removeMessageHandlerSignal(QString, unsigned int);
 	void viewMessageHandlerSignal(QString, unsigned int);
+	//Instances
+	void removeInstanceSignal(QString);
+	void viewInstanceSignal(QString);
 	//Modules
 	/*****/
 
@@ -176,6 +184,10 @@ public slots:
 	void refreshMessageHandlers(QHash<QString, unsigned int>);
 	void removeMessageHandlerSlot();
 	void viewMessageHandlerSlot();
+	//Instances
+	void refreshInstancesSlot(QStringList);
+	void removeInstanceSlot();
+	void viewInstanceSlot();
 	//Modules
 	/*****/
 };

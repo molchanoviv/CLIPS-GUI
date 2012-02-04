@@ -89,32 +89,35 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(projectWidget, SIGNAL(superClassesSignal(QString)), this, SLOT(superClassesSlot(QString)));
 	connect(projectWidget, SIGNAL(removeMessageHandlerSignal(QString,uint)), clips, SLOT(unDefmessageHandlerSlot(QString,uint)));
 	connect(projectWidget, SIGNAL(viewMessageHandlerSignal(QString,uint)), this, SLOT(viewMessageHandlerSlot(QString,uint)));
-	connect(projectWidget->addTemplateButton, SIGNAL(clicked()), this, SLOT(addTemplateSlot()));
-	connect(projectWidget->refreshTemplatesButton, SIGNAL(clicked()), this, SLOT(refreshTemplatesSlot()));
-	connect(projectWidget->addFactButton, SIGNAL(clicked()), this, SLOT(addFactSlot()));
-	connect(projectWidget->addFactByTemplateButton, SIGNAL(clicked()), this, SLOT(addFactByTemplateSlot()));
-	connect(projectWidget->duplicationButton, SIGNAL(toggled(bool)), clips, SLOT(setFactDuplicationSlot(bool)));
-	connect(projectWidget->refreshFactsButton, SIGNAL(clicked()), this, SLOT(refreshFactsSlot()));
-	connect(projectWidget->addDeffactButton, SIGNAL(clicked()), this, SLOT(addFactsListSlot()));
-	connect(projectWidget->refreshDeffactsButton, SIGNAL(clicked()), this, SLOT(refreshDeffactsSlot()));
-	connect(projectWidget->addRuleButton, SIGNAL(clicked()), this, SLOT(addRuleSlot()));
-	connect(projectWidget->refreshRulesButton, SIGNAL(clicked()), this, SLOT(refreshRulesSlot()));
-	connect(projectWidget->refreshActivationsButton, SIGNAL(clicked()), this, SLOT(refreshActivationsSlot()));
-	connect(projectWidget->runButton, SIGNAL(clicked()), clips, SLOT(runSlot()));
+	connect(projectWidget, SIGNAL(removeInstanceSignal(QString)), clips, SLOT(unDefinstancesSlot(QString)));
+	connect(projectWidget, SIGNAL(viewInstanceSignal(QString)), this, SLOT(viewInstanceSlot(QString)));
+	connect(projectWidget->addTemplatePushButton, SIGNAL(clicked()), this, SLOT(addTemplateSlot()));
+	connect(projectWidget->refreshTemplatesPushButton, SIGNAL(clicked()), this, SLOT(refreshTemplatesSlot()));
+	connect(projectWidget->addFactPushButton, SIGNAL(clicked()), this, SLOT(addFactSlot()));
+	connect(projectWidget->addFactByTemplatePushButton, SIGNAL(clicked()), this, SLOT(addFactByTemplateSlot()));
+	connect(projectWidget->duplicationPushButton, SIGNAL(toggled(bool)), clips, SLOT(setFactDuplicationSlot(bool)));
+	connect(projectWidget->refreshFactsPushButton, SIGNAL(clicked()), this, SLOT(refreshFactsSlot()));
+	connect(projectWidget->addDeffactPushButton, SIGNAL(clicked()), this, SLOT(addFactsListSlot()));
+	connect(projectWidget->refreshDeffactsPushButton, SIGNAL(clicked()), this, SLOT(refreshDeffactsSlot()));
+	connect(projectWidget->addRulePushButton, SIGNAL(clicked()), this, SLOT(addRuleSlot()));
+	connect(projectWidget->refreshRulesPushButton, SIGNAL(clicked()), this, SLOT(refreshRulesSlot()));
+	connect(projectWidget->refreshActivationsPushButton, SIGNAL(clicked()), this, SLOT(refreshActivationsSlot()));
+	connect(projectWidget->runPushButton, SIGNAL(clicked()), clips, SLOT(runSlot()));
 	connect(projectWidget->setActivationSaliencePushButton, SIGNAL(clicked()), this, SLOT(setActivationSalienceSlot()));
 	connect(projectWidget->setStrategyPushButton, SIGNAL(clicked()), this, SLOT(setConflictStrategySlot()));
-	connect(projectWidget->addGlobalButton, SIGNAL(clicked()), this, SLOT(addGlobalSlot()));
-	connect(projectWidget->refreshGlobalsButton, SIGNAL(clicked()), this, SLOT(refreshGlobalsSlot()));
-	connect(projectWidget->addFunctionButton, SIGNAL(clicked()), this, SLOT(addFunctionSlot()));
-	connect(projectWidget->refreshFunctionsButton, SIGNAL(clicked()), this, SLOT(refreshFunctionsSlot()));
-	connect(projectWidget->addGenericButton, SIGNAL(clicked()), this, SLOT(addGenericSlot()));
-	connect(projectWidget->refreshGenericButton, SIGNAL(clicked()), this, SLOT(refreshGenericSlot()));
-	connect(projectWidget->addMethodButton, SIGNAL(clicked()), this, SLOT(addMethodSlot()));
-	connect(projectWidget->refreshMethodsButton, SIGNAL(clicked()), this, SLOT(refreshMethodsSlot()));
-	connect(projectWidget->refreshClassesButton, SIGNAL(clicked()), this, SLOT(refreshClassesSlot()));
+	connect(projectWidget->addGlobalPushButton, SIGNAL(clicked()), this, SLOT(addGlobalSlot()));
+	connect(projectWidget->refreshGlobalsPushButton, SIGNAL(clicked()), this, SLOT(refreshGlobalsSlot()));
+	connect(projectWidget->addFunctionPushButton, SIGNAL(clicked()), this, SLOT(addFunctionSlot()));
+	connect(projectWidget->refreshFunctionsPushButton, SIGNAL(clicked()), this, SLOT(refreshFunctionsSlot()));
+	connect(projectWidget->addGenericPushButton, SIGNAL(clicked()), this, SLOT(addGenericSlot()));
+	connect(projectWidget->refreshGenericPushButton, SIGNAL(clicked()), this, SLOT(refreshGenericSlot()));
+	connect(projectWidget->addMethodPushButton, SIGNAL(clicked()), this, SLOT(addMethodSlot()));
+	connect(projectWidget->refreshMethodsPushButton, SIGNAL(clicked()), this, SLOT(refreshMethodsSlot()));
+	connect(projectWidget->refreshClassesPushButton, SIGNAL(clicked()), this, SLOT(refreshClassesSlot()));
 	connect(projectWidget->defaultsModePushButton, SIGNAL(clicked()), this, SLOT(setDefaultsModeSlot()));
 	connect(projectWidget->addMessageHandlerPushButton, SIGNAL(clicked()), this, SLOT(addMessageHandlerSlot()));
 	connect(projectWidget->refreshMessageHandlersPushButton, SIGNAL(clicked()), this, SLOT(refreshMessageHandlersSlot()));
+	connect(projectWidget->refreshInstancesPushButton, SIGNAL(clicked()), this, SLOT(refreshInstancesSlot()));
 	connect(this, SIGNAL(treeWidgetItemClickedSignal(int)), projectWidget, SLOT(setCurrentIndex(int)));
 	connect(this,SIGNAL(addTemplateSignal(QString,QList<slotsPair>)), clips, SLOT(deftemplateSlot(QString,QList<slotsPair>)));
 	connect(this, SIGNAL(addFactSignal(QString)), clips, SLOT(assertStringSlot(QString)));
@@ -136,6 +139,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(clips, SIGNAL(methodsChangedSignal(QHash<QString, int>)), projectWidget, SLOT(refreshMethods(QHash<QString, int>)));
 	connect(clips, SIGNAL(classesChangedSignal(QStringList)), projectWidget, SLOT(refreshClasses(QStringList)));
 	connect(clips, SIGNAL(messageHandlersChangedSignal(QHash<QString, unsigned int>)), projectWidget, SLOT(refreshMessageHandlers(QHash<QString, unsigned int>)));
+	connect(clips, SIGNAL(instancesChangedSignal(QStringList)), projectWidget, SLOT(refreshInstancesSlot(QStringList)));
 	connect(clips, SIGNAL(clearSignal()), projectWidget, SLOT(clearSlot()));
 	connect(clips, SIGNAL(dataChanged()), this, SLOT(dataChangedSlot()));
 	connect(clips, SIGNAL(outputSignal(QString)), console, SLOT(output(QString)));
@@ -249,6 +253,8 @@ void MainWindow::createProjectTreeWidgetItems(QString projectName)
 	classesItem->setText(0, tr("Classes"));
 	QTreeWidgetItem *messageHandlersItem = new QTreeWidgetItem();
 	messageHandlersItem->setText(0, tr("Message Handlers"));
+	QTreeWidgetItem *instancesItem = new QTreeWidgetItem();
+	instancesItem->setText(0, tr("Instances"));
 	item->addChild(templatesItem);
 	item->addChild(factsItem);
 	item->addChild(deffactsItem);
@@ -260,6 +266,7 @@ void MainWindow::createProjectTreeWidgetItems(QString projectName)
 	item->addChild(methodsItem);
 	item->addChild(classesItem);
 	item->addChild(messageHandlersItem);
+	item->addChild(instancesItem);
 	projectsTreeWidget->insertTopLevelItem(0, item);
 	item->setExpanded(1);
 	projectsTreeWidget->clearSelection();
@@ -430,6 +437,7 @@ void MainWindow::refreshAll()
 	refreshMethodsSlot();
 	refreshClassesSlot();
 	refreshMessageHandlersSlot();
+	refreshInstancesSlot();
 }
 
 void MainWindow::redrawTitle()
@@ -888,6 +896,21 @@ void MainWindow::viewMessageHandlerSlot(QString name, unsigned int index)
 void MainWindow::refreshMessageHandlersSlot()
 {
 	projectWidget->refreshMessageHandlers(clips->messageHandlersSlot());
+}
+
+//Instances
+
+void MainWindow::viewInstanceSlot(QString name)
+{
+	QString info = clips->getInstancePPF(name);
+	if(info.isEmpty())
+		info = tr("This instance haven't pretty print representation");
+	QMessageBox::information(this, tr("Information About Instance"), info);
+}
+
+void MainWindow::refreshInstancesSlot()
+{
+	projectWidget->refreshInstancesSlot(clips->instancesSlot());
 }
 
 //Modules

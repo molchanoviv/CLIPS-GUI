@@ -106,6 +106,9 @@ private slots:
 	void addMessageHandlerSlot();
 	void refreshMessageHandlersSlot();
 	void viewMessageHandlerSlot(QString, unsigned int);
+	//Instances
+	void refreshInstancesSlot();
+	void viewInstanceSlot(QString);
 	//Modules
 	/*****/
 
