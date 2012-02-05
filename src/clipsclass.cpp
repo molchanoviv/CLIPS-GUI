@@ -1047,9 +1047,53 @@ QStringList CLIPSClass::instancesSlot()
 
 //Modules
 
-QStringList CLIPSClass::getModules()//Временная заглушка
+void CLIPSClass::defmoduleSlot(QString name, QString comment, QString specification)
+{
+	if(!comment.isEmpty())
+		comment = "\""+comment+"\"";
+	QString command = "(defmodule "+name+" "+comment+" "+specification+")";
+	executeCommand(command);
+	QStringList modules = modulesSlot();
+	emit modulesChangedSignal(modules);
+	emit refreshAll();
+	emit dataChanged();
+}
+
+QString CLIPSClass::getModulePPF(QString name)
+{
+	void* modulePtr = FindDefmodule(name.simplified().toUtf8().data());
+	char *moduleName = GetDefmodulePPForm(modulePtr);
+	return QString(moduleName).simplified();
+}
+
+QString CLIPSClass::getCurrentModule()
+{
+	void* modulePtr = GetCurrentModule();
+	char* moduleName = GetDefmoduleName(modulePtr);
+	return QString(moduleName).simplified();
+}
+
+void CLIPSClass::setCurrentModule(QString name)
+{
+	void* modulePtr = FindDefmodule(name.simplified().toUtf8().data());
+	SetCurrentModule(modulePtr);
+	emit refreshAll();
+	emit dataChanged();
+}
+
+QStringList CLIPSClass::modulesSlot()
 {
 	QStringList modulesList;
-	modulesList<<"MAIN";
+	void* ptr=NULL;
+	do
+	{
+		ptr = GetNextDefmodule(ptr);
+		if(ptr!=NULL)
+		{
+			char *moduleStr = GetDefmoduleName(ptr);
+			modulesList<<QString(moduleStr).simplified();
+		}
+	}
+	while(ptr!=NULL);
 	return modulesList;
 }

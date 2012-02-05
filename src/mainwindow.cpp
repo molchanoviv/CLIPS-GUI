@@ -10,6 +10,7 @@
 #include "dialogs/addfunctiondialog.h"
 #include "dialogs/addmessagehandlerdialog.h"
 #include "dialogs/addinstancedialog.h"
+#include "dialogs/addmoduledialog.h"
 #include <QToolBar>
 #include <QInputDialog>
 #include <QCheckBox>
@@ -92,6 +93,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(projectWidget, SIGNAL(viewMessageHandlerSignal(QString,uint)), this, SLOT(viewMessageHandlerSlot(QString,uint)));
 	connect(projectWidget, SIGNAL(removeInstanceSignal(QString)), clips, SLOT(unDefinstancesSlot(QString)));
 	connect(projectWidget, SIGNAL(viewInstanceSignal(QString)), this, SLOT(viewInstanceSlot(QString)));
+	connect(projectWidget, SIGNAL(viewModuleSignal(QString)), this, SLOT(viewModuleSlot(QString)));
 	connect(projectWidget->addTemplatePushButton, SIGNAL(clicked()), this, SLOT(addTemplateSlot()));
 	connect(projectWidget->refreshTemplatesPushButton, SIGNAL(clicked()), this, SLOT(refreshTemplatesSlot()));
 	connect(projectWidget->addFactPushButton, SIGNAL(clicked()), this, SLOT(addFactSlot()));
@@ -120,6 +122,9 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(projectWidget->refreshMessageHandlersPushButton, SIGNAL(clicked()), this, SLOT(refreshMessageHandlersSlot()));
 	connect(projectWidget->addInstancePushButton, SIGNAL(clicked()), this, SLOT(addInstanceSlot()));
 	connect(projectWidget->refreshInstancesPushButton, SIGNAL(clicked()), this, SLOT(refreshInstancesSlot()));
+	connect(projectWidget->addModulePushButton, SIGNAL(clicked()), this, SLOT(addModuleSlot()));
+	connect(projectWidget->refreshModulesPushButton, SIGNAL(clicked()), this, SLOT(refreshModulesSlot()));
+	connect(projectWidget->currentModulePushButton, SIGNAL(clicked()), this, SLOT(setCurrentModuleSlot()));
 	connect(this, SIGNAL(treeWidgetItemClickedSignal(int)), projectWidget, SLOT(setCurrentIndex(int)));
 	connect(this,SIGNAL(addTemplateSignal(QString,QList<slotsPair>)), clips, SLOT(deftemplateSlot(QString,QList<slotsPair>)));
 	connect(this, SIGNAL(addFactSignal(QString)), clips, SLOT(assertStringSlot(QString)));
@@ -142,8 +147,10 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(clips, SIGNAL(classesChangedSignal(QStringList)), projectWidget, SLOT(refreshClasses(QStringList)));
 	connect(clips, SIGNAL(messageHandlersChangedSignal(QHash<QString, unsigned int>)), projectWidget, SLOT(refreshMessageHandlers(QHash<QString, unsigned int>)));
 	connect(clips, SIGNAL(instancesChangedSignal(QStringList)), projectWidget, SLOT(refreshInstancesSlot(QStringList)));
+	connect(clips, SIGNAL(modulesChangedSignal(QStringList)), this, SLOT(refreshModulesSlot()));
 	connect(clips, SIGNAL(clearSignal()), projectWidget, SLOT(clearSlot()));
 	connect(clips, SIGNAL(dataChanged()), this, SLOT(dataChangedSlot()));
+	connect(clips, SIGNAL(refreshAll()), this, SLOT(refreshAll()));
 	connect(clips, SIGNAL(outputSignal(QString)), console, SLOT(output(QString)));
 	connect(console, SIGNAL(execSignal(QString)), clips, SLOT(executeCommand(QString)));
 	connect(console, SIGNAL(refreshAllSignal()), this, SLOT(refreshAll()));
@@ -257,6 +264,8 @@ void MainWindow::createProjectTreeWidgetItems(QString projectName)
 	messageHandlersItem->setText(0, tr("Message Handlers"));
 	QTreeWidgetItem *instancesItem = new QTreeWidgetItem();
 	instancesItem->setText(0, tr("Instances"));
+	QTreeWidgetItem *modulesItem = new QTreeWidgetItem();
+	modulesItem->setText(0, tr("Modules"));
 	item->addChild(templatesItem);
 	item->addChild(factsItem);
 	item->addChild(deffactsItem);
@@ -269,6 +278,7 @@ void MainWindow::createProjectTreeWidgetItems(QString projectName)
 	item->addChild(classesItem);
 	item->addChild(messageHandlersItem);
 	item->addChild(instancesItem);
+	item->addChild(modulesItem);
 	projectsTreeWidget->insertTopLevelItem(0, item);
 	item->setExpanded(1);
 	projectsTreeWidget->clearSelection();
@@ -440,6 +450,7 @@ void MainWindow::refreshAll()
 	refreshClassesSlot();
 	refreshMessageHandlersSlot();
 	refreshInstancesSlot();
+	refreshModulesSlot();
 }
 
 void MainWindow::redrawTitle()
@@ -687,7 +698,7 @@ void MainWindow::addGlobalSlot()
 	int variablesCount = QInputDialog::getInt(this, tr("Globals count"), tr("Enter globals count:"), 1, 1, 100, 1, &ok);
 	if(ok)
 	{
-		QStringList modulesList = clips->getModules();
+		QStringList modulesList = clips->modulesSlot();
 		addGlobalsDialog dialog(this, variablesCount, modulesList);
 		if(dialog.exec() == QDialog::Accepted)
 		{
@@ -932,4 +943,41 @@ void MainWindow::refreshInstancesSlot()
 
 //Modules
 
-/*****/
+void MainWindow::addModuleSlot()
+{
+	addModuleDialog dialog(this);
+	if(dialog.exec() == QDialog::Accepted)
+	{
+		QString name = dialog.nameLineEdit->text();
+		QString comment = dialog.commentLineEdit->text();
+		QString specification = dialog.specificationLineEdit->text();
+		clips->defmoduleSlot(name, comment, specification);
+	}
+}
+
+void MainWindow::viewModuleSlot(QString name)
+{
+	QString info = clips->getModulePPF(name);
+	if(info.isEmpty())
+		info = tr("This module haven't pretty print representation");
+	QMessageBox::information(this, tr("Information About Module"), info);
+}
+
+void MainWindow::refreshModulesSlot()
+{
+	projectWidget->refreshModulesSlot(clips->modulesSlot());
+}
+
+void MainWindow::setCurrentModuleSlot()
+{
+	QString currentModule = clips->getCurrentModule();
+	QStringList modulesList = clips->modulesSlot();
+	int index=0;
+	for(int i=0; i<modulesList.count();i++)
+	{
+		if(modulesList.at(i) == currentModule)
+			index = i;
+	}
+	QString module = QInputDialog::getItem(this, "Set Current Module", "Module", modulesList, index, false);
+	clips->setCurrentModule(module);
+}

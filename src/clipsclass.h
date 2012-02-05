@@ -95,7 +95,11 @@ public slots:
 	void unDefinstancesSlot(QString);
 	QString getInstancePPF(QString);
 	//Modules
-	QStringList getModules();
+	QStringList modulesSlot();
+	void defmoduleSlot(QString, QString, QString);
+	QString getModulePPF(QString);
+	QString getCurrentModule();
+	void setCurrentModule(QString);
 
 private slots:
 
@@ -113,8 +117,10 @@ signals:
 	void classesChangedSignal(QStringList);
 	void messageHandlersChangedSignal(QHash<QString, unsigned int>);
 	void instancesChangedSignal(QStringList);
+	void modulesChangedSignal(QStringList);
 	void dataChanged();
 	void clearSignal();
+	void refreshAll();
 	void outputSignal(QString);
 
 protected:

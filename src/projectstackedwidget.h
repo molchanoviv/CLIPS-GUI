@@ -90,7 +90,11 @@ public:
 	QPushButton *refreshInstancesPushButton;
 	QPushButton *viewInstancePushButton;
 	//Modules
-	/*****/
+	QListWidget *modulesListWidget;
+	QPushButton *addModulePushButton;
+	QPushButton *refreshModulesPushButton;
+	QPushButton *viewModulePushButton;
+	QPushButton *currentModulePushButton;
 
 signals:
 	//Templates
@@ -133,7 +137,7 @@ signals:
 	void removeInstanceSignal(QString);
 	void viewInstanceSignal(QString);
 	//Modules
-	/*****/
+	void viewModuleSignal(QString);
 
 public slots:
 	void clearSlot();
@@ -189,7 +193,8 @@ public slots:
 	void removeInstanceSlot();
 	void viewInstanceSlot();
 	//Modules
-	/*****/
+	void refreshModulesSlot(QStringList);
+	void viewModuleSlot();
 };
 
 #endif // PROJECTSTACKEDWIDGET_H

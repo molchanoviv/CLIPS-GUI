@@ -111,7 +111,10 @@ private slots:
 	void refreshInstancesSlot();
 	void viewInstanceSlot(QString);
 	//Modules
-	/*****/
+	void addModuleSlot();
+	void refreshModulesSlot();
+	void viewModuleSlot(QString);
+	void setCurrentModuleSlot();
 
 signals:
 	void treeWidgetItemClickedSignal(int);

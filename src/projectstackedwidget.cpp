@@ -288,7 +288,27 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	instancesLayout->addLayout(instancesTopLayout);
 	instancesLayout->addWidget(instancesListWidget);
 	instancesWidget->setLayout(instancesLayout);
-
+	/*****************************Modules**************************************/
+	QGroupBox *modulesWidget = new QGroupBox(tr("Modules"));
+	QVBoxLayout *modulesLayout = new QVBoxLayout;
+	modulesListWidget = new QListWidget;
+	addModulePushButton = new QPushButton(tr("Add"));
+	addModulePushButton->setIcon(QIcon::fromTheme("list-add"));
+	refreshModulesPushButton = new QPushButton(tr("Refresh"));
+	refreshModulesPushButton->setIcon(QIcon::fromTheme("view-refresh"));
+	viewModulePushButton = new QPushButton(tr("View"));
+	viewModulePushButton->setIcon(QIcon::fromTheme("layer-visible-on"));
+	currentModulePushButton = new QPushButton(tr("Set Current Module"));
+	currentModulePushButton->setIcon(QIcon::fromTheme("pattern-basis"));
+	QHBoxLayout *modulesTopLayout = new QHBoxLayout;
+	modulesTopLayout->addWidget(addModulePushButton);
+	modulesTopLayout->addWidget(refreshModulesPushButton);
+	modulesTopLayout->addStretch();
+	modulesTopLayout->addWidget(currentModulePushButton);
+	modulesTopLayout->addWidget(viewModulePushButton);
+	modulesLayout->addLayout(modulesTopLayout);
+	modulesLayout->addWidget(modulesListWidget);
+	modulesWidget->setLayout(modulesLayout);
 
 	this->addWidget(templatesWidget);
 	this->addWidget(factsWidget);
@@ -302,6 +322,7 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	this->addWidget(classesWidget);
 	this->addWidget(messageHandlersWidget);
 	this->addWidget(instancesWidget);
+	this->addWidget(modulesWidget);
 
 	connect(setBreakpointPushButton, SIGNAL(clicked()), this, SLOT(setBreakpointSlot()));
 	connect(removeBreakpointPushButton, SIGNAL(clicked()), this, SLOT(removeBreakpointSlot()));
@@ -330,6 +351,7 @@ ProjectStackedWidget::ProjectStackedWidget(QWidget *parent) :
 	connect(viewMessageHandlerPushButton, SIGNAL(clicked()), this, SLOT(viewMessageHandlerSlot()));
 	connect(removeInstanceButton, SIGNAL(clicked()), this, SLOT(removeInstanceSlot()));
 	connect(viewInstancePushButton, SIGNAL(clicked()), this, SLOT(viewInstanceSlot()));
+	connect(viewModulePushButton, SIGNAL(clicked()), this, SLOT(viewModuleSlot()));
 }
 
 void ProjectStackedWidget::clearSlot()
@@ -707,4 +729,20 @@ void ProjectStackedWidget::removeInstanceSlot()
 
 //Modules
 
-/*****/
+void ProjectStackedWidget::refreshModulesSlot(QStringList modules)
+{
+	modulesListWidget->clear();
+	QString str;
+	foreach(str, modules)
+	{
+		QListWidgetItem *item = new QListWidgetItem(modulesListWidget);
+		item->setText(str);
+	}
+}
+
+void ProjectStackedWidget::viewModuleSlot()
+{
+	QList<QListWidgetItem*> modules = modulesListWidget->selectedItems();
+	if(!modules.isEmpty())
+		emit viewModuleSignal(modules.at(0)->text());
+}
