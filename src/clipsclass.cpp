@@ -162,7 +162,7 @@ QStringList CLIPSClass::templatesSlot()
 void CLIPSClass::assertStringSlot(QString fact)
 {
 	fact.append(")").prepend("(");
-	AssertString(fact.toUtf8().data());
+	void* factPtr = AssertString(fact.toUtf8().data());
 	QStringList facts = factsSlot();
 	emit factsChangedSignal(facts);
 	QStringList templates = templatesSlot();

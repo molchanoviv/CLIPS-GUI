@@ -1,12 +1,12 @@
-#include "addfunctiondialog.h"
+#include "aboutdialog.h"
 
-addFunctionDialog::addFunctionDialog(QWidget *parent) :
+aboutDialog::aboutDialog(QWidget *parent) :
 	QDialog(parent)
 {
 	setupUi(this);
 }
 
-void addFunctionDialog::changeEvent(QEvent *e)
+void aboutDialog::changeEvent(QEvent *e)
 {
 	QDialog::changeEvent(e);
 	switch (e->type()) {
@@ -17,4 +17,3 @@ void addFunctionDialog::changeEvent(QEvent *e)
 			break;
 	}
 }
-

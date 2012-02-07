@@ -11,6 +11,7 @@
 #include "dialogs/addmessagehandlerdialog.h"
 #include "dialogs/addinstancedialog.h"
 #include "dialogs/addmoduledialog.h"
+#include "dialogs/aboutdialog.h"
 #include <QToolBar>
 #include <QInputDialog>
 #include <QCheckBox>
@@ -65,6 +66,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(ui->actionSave_As, SIGNAL(triggered()), this, SLOT(saveProjectAs()));
 	connect(ui->actionClose, SIGNAL(triggered()), this, SLOT(closeProject()));
 	connect(ui->actionRemove, SIGNAL(triggered()), this, SLOT(removeProject()));
+	connect(ui->actionAbout_Programm, SIGNAL(triggered()), this, SLOT(aboutDialogSlot()));
 	connect(projectsTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(treeWidgetItemClicked(QTreeWidgetItem*,int)));
 	connect(projectWidget, SIGNAL(removeTemplateSignal(QString)), clips, SLOT(unDeftemplateSlot(QString)));
 	connect(projectWidget, SIGNAL(viewTemplateSignal(QString)), this, SLOT(viewTemplateSlot(QString)));
@@ -154,6 +156,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(clips, SIGNAL(outputSignal(QString)), console, SLOT(output(QString)));
 	connect(console, SIGNAL(execSignal(QString)), clips, SLOT(executeCommand(QString)));
 	connect(console, SIGNAL(refreshAllSignal()), this, SLOT(refreshAll()));
+	connect(console, SIGNAL(outputSignal(QString)), this, SLOT(outputSlot(QString)));
 	disableWidgets(true);
 	readSettings();
 	unsaved = false;
@@ -467,6 +470,17 @@ void MainWindow::dataChangedSlot()
 {
 	unsaved = true;
 	redrawTitle();
+}
+
+void MainWindow::aboutDialogSlot()
+{
+	aboutDialog dialog(this);
+	dialog.exec();
+}
+
+void MainWindow::outputSlot(QString str)
+{
+	QMessageBox::information(this, tr(""), str);
 }
 
 //Templates

@@ -22,14 +22,17 @@ signals:
 	void enterPressed();
 	void execSignal(QString);
 	void refreshAllSignal();
+	void outputSignal(QString);
 
 public slots:
 	void exec();
 	void output(QString);
 
+
 protected:
 	void keyPressEvent(QKeyEvent *);
 	void mousePressEvent(QMouseEvent *);
+	void mouseDoubleClickEvent(QMouseEvent *){};
 	void insertPrompt(bool);
 	bool isLocked;
 	bool isCommand;
@@ -39,6 +42,7 @@ protected:
 	void historyBack();
 	void historyForward();
 	void scrollDown();
+	virtual void insertFromMimeData (const QMimeData*);
 
 private:
 	QString prompt;

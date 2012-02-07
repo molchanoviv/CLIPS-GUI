@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/images">
         <file>images/clips.png</file>
+        <file>images/logo.png</file>
     </qresource>
     <qresource prefix="/">
         <file>translations/CLIPS-GUI_ru.qm</file>

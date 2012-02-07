@@ -59,6 +59,8 @@ private slots:
 	void saveProject();
 	void saveProjectAs();
 	void dataChangedSlot();
+	void aboutDialogSlot();
+	void outputSlot(QString);
 	//Templates
 	void addTemplateSlot();
 	void refreshTemplatesSlot();

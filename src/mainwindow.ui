@@ -6,15 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>947</width>
-    <height>786</height>
+    <width>945</width>
+    <height>784</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>CLIPS-GUI</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="resources.qrc">
+   <iconset resource="../resources.qrc">
     <normaloff>:/images/images/clips.png</normaloff>:/images/images/clips.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget"/>
@@ -23,7 +23,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>947</width>
+     <width>945</width>
      <height>21</height>
     </rect>
    </property>
@@ -38,6 +38,7 @@
     <property name="title">
      <string>About</string>
     </property>
+    <addaction name="actionAbout_Programm"/>
     <addaction name="actionAbout_Qt"/>
    </widget>
    <widget class="QMenu" name="menuProjectProject">
@@ -74,7 +75,9 @@
   </action>
   <action name="actionAbout_Qt">
    <property name="icon">
-    <iconset theme="qtcreator"/>
+    <iconset theme="qtcreator">
+     <normaloff/>
+    </iconset>
    </property>
    <property name="text">
     <string>About Qt</string>
@@ -133,10 +136,19 @@
     <string>Shift+S</string>
    </property>
   </action>
+  <action name="actionAbout_Programm">
+   <property name="icon">
+    <iconset resource="../resources.qrc">
+     <normaloff>:/images/images/clips.png</normaloff>:/images/images/clips.png</iconset>
+   </property>
+   <property name="text">
+    <string>About Programm</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="resources.qrc"/>
+  <include location="../resources.qrc"/>
  </resources>
  <connections>
   <connection>

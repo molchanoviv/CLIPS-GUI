@@ -1,5 +1,7 @@
 #include "consoleclass.h"
 
+#include <QMimeData>
+
 consoleClass::consoleClass(QWidget *parent) :
 	QPlainTextEdit(parent)
 {
@@ -19,17 +21,14 @@ void consoleClass::exec()
 		insertPrompt(true);
 		return;
 	}
-	QString cmd = textCursor().block().text().mid(prompt.length());
+	QTextCursor cursor = textCursor();
+	cursor.movePosition(QTextCursor::End);
+	setTextCursor(cursor);
+	QString cmd = textCursor().block().text().mid(prompt.length()).simplified();
 	isLocked = true;
 	isCommand = true;
 	historyAdd(cmd);
-	QRegExp command_split_rx("\\. ");
-	QStringList commands = cmd.split(command_split_rx);
-	QString str;
-	foreach(str, commands)
-	{
-		emit execSignal(str);
-	}
+	emit execSignal(cmd);
 }
 
 void consoleClass::insertPrompt(bool insertNewBlock)
@@ -42,10 +41,15 @@ void consoleClass::insertPrompt(bool insertNewBlock)
 
 void consoleClass::output(QString s)
 {
-	if(s.isEmpty())
+	if(!isCommand)
 	{
-		if(!isCommand)
+		if(s.isEmpty())
 			return;
+		else
+		{
+			emit outputSignal(s);
+			return;
+		}
 	}
 	if(s != "")
 	{
@@ -54,6 +58,7 @@ void consoleClass::output(QString s)
 	}
 	insertPrompt(true);
 	isLocked = false;
+	isCommand = false;
 	emit refreshAllSignal();
 }
 
@@ -102,6 +107,12 @@ void consoleClass::scrollDown()
 	vbar->setValue(vbar->maximum());
 }
 
+void consoleClass::insertFromMimeData(const QMimeData* mimeData)
+{
+	if(mimeData->hasText())
+		textCursor().insertText(mimeData->text().simplified());
+}
+
 void consoleClass::keyPressEvent( QKeyEvent * event )
 {
 	if(isLocked)
@@ -121,9 +132,15 @@ void consoleClass::keyPressEvent( QKeyEvent * event )
 			event->ignore();
 	}
 	else if(event->key() == Qt::Key_Return && event->modifiers() == Qt::NoModifier)
+	{
 		emit enterPressed();
+		event->ignore();
+	}
 	else if(event->key() == Qt::Key_Enter && event->modifiers() == Qt::NoModifier)
+	{
 		emit enterPressed();
+		event->ignore();
+	}
 	else if(event->key() == Qt::Key_Up)
 		historyBack();
 	else if(event->key() == Qt::Key_Down)
@@ -147,7 +164,8 @@ void consoleClass::keyPressEvent( QKeyEvent * event )
 	}
 }
 
-void consoleClass::mousePressEvent(QMouseEvent *)
+void consoleClass::mousePressEvent(QMouseEvent *event)
 {
 	setFocus();
+	QPlainTextEdit::mousePressEvent(event);
 }
