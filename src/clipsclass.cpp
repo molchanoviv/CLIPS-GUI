@@ -59,9 +59,45 @@ void CLIPSClass::saveSlot(QString path)
 	QString factsPath = path+QString("/data.fct");
 	QString dataPath = path+QString("/data.clp");
 	QString binaryPath = path+QString("/data.bin");
+	QString configPath = path+QString("/data.cnf");
 	SaveFacts(factsPath.toUtf8().data(),LOCAL_SAVE,NULL);
 	Save(dataPath.toUtf8().data());
 	Bsave(binaryPath.toUtf8().data());
+	QFile file(configPath);
+	file.remove();
+	QSettings settings(configPath, QSettings::IniFormat);
+	settings.beginGroup("Breakpoints");
+	int i=0;
+	void* ptr=NULL;
+	do
+	{
+		ptr = GetNextDefrule(ptr);
+		if(ptr!=NULL)
+		{
+			char* buf = GetDefruleName(ptr);
+			QString name = QString(buf);
+			if(DefruleHasBreakpoint(ptr))
+			{
+				settings.setValue("bp_"+QString::number(i), name);
+				i++;
+			}
+		}
+	}
+	while(ptr!=NULL);
+	settings.setValue("bp_count", i);
+	settings.endGroup();
+	settings.beginGroup("Rules");
+	settings.setValue("strategy", getStrategy());
+	settings.endGroup();
+	settings.beginGroup("Facts");
+	settings.setValue("duplication", GetFactDuplication());
+	settings.endGroup();
+	settings.beginGroup("Classes");
+	settings.setValue("defaultMode", getCurrentDefaultsMode());
+	settings.endGroup();
+	settings.beginGroup("Modules");
+	settings.setValue("module", getCurrentModule());
+	settings.endGroup();
 }
 
 void CLIPSClass::loadSlot(QString path)
@@ -69,9 +105,35 @@ void CLIPSClass::loadSlot(QString path)
 	QString factsPath = path+QString("/data.fct");
 	QString dataPath = path+QString("/data.clp");
 	QString binaryPath = path+QString("/data.bin");
+	QString configPath = path+QString("/data.cnf");
 	LoadFacts(factsPath.toUtf8().data());
 	Load(dataPath.toUtf8().data());
 	BloadData(binaryPath.toUtf8().data());
+	QSettings settings(configPath, QSettings::IniFormat);
+	settings.beginGroup("Breakpoints");
+	int bp_count = settings.value("bp_count").toInt();
+	for(int i=0; i<bp_count; i++)
+	{
+		QString name = settings.value("bp_"+QString::number(i)).toString();
+		SetBreak(FindDefrule(name.toUtf8().data()));
+	}
+	settings.endGroup();
+	settings.beginGroup("Rules");
+	if(!settings.value("strategy").isNull())
+		setStrategySlot(settings.value("strategy").toInt());
+	settings.endGroup();
+	settings.beginGroup("Facts");
+	if(!settings.value("duplication").isNull())
+		emit restoreFactDuplicationSignal(settings.value("duplication").toBool());
+	settings.endGroup();
+	settings.beginGroup("Classes");
+	if(!settings.value("defaultMode").isNull())
+		setDefaultsMode(settings.value("defaultMode").toUInt());
+	settings.endGroup();
+	settings.beginGroup("Modules");
+	if(!settings.value("module").isNull())
+		setCurrentModule(settings.value("module").toString());
+	settings.endGroup();
 }
 
 void CLIPSClass::clearSlot()
@@ -229,7 +291,17 @@ void CLIPSClass::assertSlot(QString templateName, QList<slotsPair> slotsList)
 		}
 		else
 		{
-			QStringList mltSltVal = slotsList.at(i).second.split(" ");
+			QRegExp rx("(([\\(][\\w\\s]+[\\)]))+");
+			QStringList mltSltVal;
+			int pos = 0;
+			while ((pos = rx.indexIn(slotsList.at(i).second, pos)) != -1)
+			{
+				QString fact = rx.cap(1);
+				fact.remove(0, 1);
+				fact.remove(fact.length()-1, 1);
+				mltSltVal << fact;
+				pos += rx.matchedLength();
+			}
 			if(mltSltVal.isEmpty())
 				return;
 			theMultifield = CreateMultifield(mltSltVal.count());
@@ -238,7 +310,7 @@ void CLIPSClass::assertSlot(QString templateName, QList<slotsPair> slotsList)
 			{
 				QRegExpValidator validator(floatRx, 0);
 				int pos = 0;
-				QString slotVal = slotsList.at(t).second;
+				QString slotVal = mltSltVal.at(t);
 				if(validator.validate(slotVal, pos) != QValidator::Acceptable)
 				{
 					QRegExpValidator validator(intRx, 0);
@@ -454,7 +526,10 @@ QStringList CLIPSClass::rulesSlot()
 		if(ptr!=NULL)
 		{
 			char* buf = GetDefruleName(ptr);
-			rulesList<<QString(buf);
+			QString name = QString(buf);
+			if(DefruleHasBreakpoint(ptr))
+				name = "[bp]/"+name;
+			rulesList<<name;
 		}
 	}
 	while(ptr!=NULL);

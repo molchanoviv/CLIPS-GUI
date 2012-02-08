@@ -36,6 +36,7 @@ void consoleClass::insertPrompt(bool insertNewBlock)
 	if(insertNewBlock)
 		textCursor().insertBlock();
 	textCursor().insertText(prompt);
+	position = textCursor().position();
 	scrollDown();
 }
 
@@ -109,6 +110,12 @@ void consoleClass::scrollDown()
 
 void consoleClass::insertFromMimeData(const QMimeData* mimeData)
 {
+	if(textCursor().position() < position)
+	{
+		QTextCursor cursor = textCursor();
+		cursor.movePosition(QTextCursor::End);
+		setTextCursor(cursor);
+	}
 	if(mimeData->hasText())
 		textCursor().insertText(mimeData->text().simplified());
 }
@@ -148,14 +155,20 @@ void consoleClass::keyPressEvent( QKeyEvent * event )
 	else if(event->key() == Qt::Key_Home)
 	{
 		QTextCursor cursor = textCursor();
-		cursor.setPosition(prompt.length());
+		cursor.setPosition(position);
 		setTextCursor(cursor);
 	}
 	else if(event->key() == Qt::Key_Left&& textCursor().positionInBlock() > prompt.length())
 		QPlainTextEdit::keyPressEvent(event);
 	else if(event->key() == Qt::Key_Right  && textCursor().positionInBlock() > prompt.length()-1)
 		QPlainTextEdit::keyPressEvent(event);
-	else if(event->key() == Qt::Key_Backspace || event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter || event->key() == Qt::Key_Left || event->key() == Qt::Key_Right)
+	else if(	event->key() == Qt::Key_Backspace	||
+			event->key() == Qt::Key_Return		||
+			event->key() == Qt::Key_Enter		||
+			event->key() == Qt::Key_Left		||
+			event->key() == Qt::Key_Right		||
+			event->key() == Qt::Key_PageDown	||
+			event->key() == Qt::Key_PageUp)
 		event->ignore();
 	else
 	{
@@ -167,5 +180,6 @@ void consoleClass::keyPressEvent( QKeyEvent * event )
 void consoleClass::mousePressEvent(QMouseEvent *event)
 {
 	setFocus();
-	QPlainTextEdit::mousePressEvent(event);
+//	QPlainTextEdit::mousePressEvent(event);
 }
+

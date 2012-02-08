@@ -107,6 +107,7 @@ private slots:
 signals:
 	void templatesChangedSignal(QStringList);
 	void factsChangedSignal(QStringList);
+	void restoreFactDuplicationSignal(bool);
 	void deffactsChangedSignal(QStringList);
 	void rulesChangedSignal(QStringList);
 	void activationsChangedSignal(QStringList);

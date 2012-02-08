@@ -36,6 +36,7 @@ protected:
 	void insertPrompt(bool);
 	bool isLocked;
 	bool isCommand;
+	int position;
 	QStringList *history;
 	int historyPos;
 	void historyAdd(QString);

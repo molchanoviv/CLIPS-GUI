@@ -148,6 +148,7 @@ public slots:
 	//Facts
 	void refreshFacts(QStringList);
 	void removeFactSlot();
+	void restoreDuplicationState(bool);
 	//Facts Lists
 	void refreshDeffacts(QStringList);
 	void viewFactsListSlot();

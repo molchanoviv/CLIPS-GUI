@@ -1,9 +1,6 @@
 классы
 неверная загрузка факта (Mytemplate (myslot first) (mymultislot second 2.5)) как (Mytemplate (myslot first) (mymultislot second 2.0))
 предупреждение о заполнении в диалогах
-сохранение точек останова, стратегий, приоритетов
 горячие клавиши
 в deftemplate указывать тип например: (type INTEGER),  диапазон например (range 0 ?VARIABLE), cardinality и default
-точки останова
-assertSlot креш
-консоль выделение
+дублирование факта (initial-fact)

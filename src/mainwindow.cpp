@@ -139,6 +139,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(this, SIGNAL(addMethodSignal(QString,QString,QString,QString,QString,QString)), clips, SLOT(defmethodSlot(QString,QString,QString,QString,QString,QString)));
 	connect(clips, SIGNAL(templatesChangedSignal(QStringList)), projectWidget, SLOT(refreshTemplates(QStringList)));
 	connect(clips, SIGNAL(factsChangedSignal(QStringList)), projectWidget, SLOT(refreshFacts(QStringList)));
+	connect(clips, SIGNAL(restoreFactDuplicationSignal(bool)), projectWidget, SLOT(restoreDuplicationState(bool)));
 	connect(clips, SIGNAL(deffactsChangedSignal(QStringList)), projectWidget, SLOT(refreshDeffacts(QStringList)));
 	connect(clips, SIGNAL(rulesChangedSignal(QStringList)), projectWidget, SLOT(refreshRules(QStringList)));
 	connect(clips, SIGNAL(activationsChangedSignal(QStringList)), projectWidget, SLOT(refreshActivations(QStringList)));
@@ -233,6 +234,8 @@ void MainWindow::openProject()
 		projectPair.second = fileName.remove(fileName.lastIndexOf(QRegExp("(/|\\\\)")), fileName.length());
 		clips->clearSlot();
 		clips->loadSlot(projectPair.second);
+		unsaved=false;
+		redrawTitle();
 		refreshAll();
 	}
 }
@@ -289,7 +292,19 @@ void MainWindow::createProjectTreeWidgetItems(QString projectName)
 
 void MainWindow::closeProject()
 {
-	saveProject();
+	if(unsaved)
+	{
+		QMessageBox msgBox;
+		msgBox.setText(tr("You have unsaved data. This data will be lost."));
+		msgBox.setInformativeText(tr("Do you really want to close project?"));
+		msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Save);
+		msgBox.setDefaultButton(QMessageBox::No);
+		int state = msgBox.exec();
+		if(state == QMessageBox::No)
+			return;
+		else if(state == QMessageBox::Save)
+			saveProject();
+	}
 	clips->clearSlot();
 	projectsTreeWidget->clear();
 	projectPair.first.clear();

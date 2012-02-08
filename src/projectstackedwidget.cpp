@@ -366,6 +366,7 @@ void ProjectStackedWidget::clearSlot()
 	genericListWidget->clear();
 	methodsListWidget->clear();
 	classesListWidget->clear();
+	duplicationPushButton->setChecked(false);
 }
 
 //Templates
@@ -418,6 +419,11 @@ void ProjectStackedWidget::removeFactSlot()
 	QList<QListWidgetItem*> facts = factsListWidget->selectedItems();
 	if(!facts.isEmpty())
 		emit removeFactSignal(facts.at(0)->data(Qt::UserRole).toInt());
+}
+
+void ProjectStackedWidget::restoreDuplicationState(bool state)
+{
+	duplicationPushButton->setChecked(state);
 }
 
 //Facts Lists
