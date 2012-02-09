@@ -8,6 +8,7 @@
 #include "dialogs/addruledialog.h"
 #include "dialogs/addglobalsdialog.h"
 #include "dialogs/addfunctiondialog.h"
+#include "dialogs/addclassdialog.h"
 #include "dialogs/addmessagehandlerdialog.h"
 #include "dialogs/addinstancedialog.h"
 #include "dialogs/addmoduledialog.h"
@@ -118,6 +119,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(projectWidget->refreshGenericPushButton, SIGNAL(clicked()), this, SLOT(refreshGenericSlot()));
 	connect(projectWidget->addMethodPushButton, SIGNAL(clicked()), this, SLOT(addMethodSlot()));
 	connect(projectWidget->refreshMethodsPushButton, SIGNAL(clicked()), this, SLOT(refreshMethodsSlot()));
+	connect(projectWidget->addClassPushButton, SIGNAL(clicked()), this, SLOT(addClassSlot()));
 	connect(projectWidget->refreshClassesPushButton, SIGNAL(clicked()), this, SLOT(refreshClassesSlot()));
 	connect(projectWidget->defaultsModePushButton, SIGNAL(clicked()), this, SLOT(setDefaultsModeSlot()));
 	connect(projectWidget->addMessageHandlerPushButton, SIGNAL(clicked()), this, SLOT(addMessageHandlerSlot()));
@@ -843,6 +845,25 @@ void MainWindow::refreshMethodsSlot()
 }
 
 //Classes
+
+void MainWindow::addClassSlot()
+{
+	bool ok;
+	int parentsCount = QInputDialog::getInt(this, tr("Parents count"), tr("Enter parents count:"), 1, 0, 100, 1, &ok);
+	if(ok)
+	{
+		int slotsCount = QInputDialog::getInt(this, tr("Slots count"), tr("Enter slots count:"), 1, 0, 100, 1, &ok);
+		if(ok)
+		{
+			QStringList classesList = clips->classesSlot();
+			addClassDialog dialog(this, parentsCount, slotsCount, classesList);
+			if(dialog.exec() == QDialog::Accepted)
+			{
+				QString name = dialog.nameLineEdit->text();
+			}
+		}
+	}
+}
 
 void MainWindow::viewClassSlot(QString name)
 {

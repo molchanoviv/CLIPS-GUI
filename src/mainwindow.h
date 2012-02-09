@@ -98,6 +98,7 @@ private slots:
 	void refreshMethodsSlot();
 	void viewMethodSlot(QString, int);
 	//Classes
+	void addClassSlot();
 	void refreshClassesSlot();
 	void viewClassSlot(QString);
 	void metaInformationSlot(QString);

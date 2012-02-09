@@ -25,7 +25,8 @@ SOURCES += src/main.cpp\
     src/dialogs/addmessagehandlerdialog.cpp \
     src/dialogs/addinstancedialog.cpp \
     src/dialogs/addmoduledialog.cpp \
-    src/dialogs/aboutdialog.cpp
+    src/dialogs/aboutdialog.cpp \
+    src/dialogs/addclassdialog.cpp
 
 HEADERS  += src/mainwindow.h \
     src/consoleclass.h \
@@ -41,7 +42,8 @@ HEADERS  += src/mainwindow.h \
     src/dialogs/addmessagehandlerdialog.h \
     src/dialogs/addinstancedialog.h \
     src/dialogs/addmoduledialog.h \
-    src/dialogs/aboutdialog.h
+    src/dialogs/aboutdialog.h \
+    src/dialogs/addclassdialog.h
 
 FORMS    += src/mainwindow.ui \
     src/dialogs/newprojectdialog.ui \
@@ -54,7 +56,8 @@ FORMS    += src/mainwindow.ui \
     src/dialogs/addmessagehandlerdialog.ui \
     src/dialogs/addinstancedialog.ui \
     src/dialogs/addmoduledialog.ui \
-    src/dialogs/aboutdialog.ui
+    src/dialogs/aboutdialog.ui \
+    src/dialogs/addclassdialog.ui
 
 LIBS += -lclips #-lboost_thread
 LIBS += -L/usr/lib
