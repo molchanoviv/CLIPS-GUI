@@ -160,7 +160,6 @@ void CLIPSClass::deftemplateSlot(QString name, QList<slotsPair> slotsList)
 	executeCommand(command);
 	QStringList templates = templatesSlot();
 	emit templatesChangedSignal(templates);
-	emit dataChanged();
 }
 
 void CLIPSClass::unDeftemplateSlot(QString name)
@@ -413,7 +412,6 @@ void CLIPSClass::deffactsSlot(QString name, QStringList factsList)
 	emit templatesChangedSignal(templates);
 	QStringList activations = agendaSlot();
 	emit activationsChangedSignal(activations);
-	emit dataChanged();
 }
 
 void CLIPSClass::unDeffactsSlot(QString name)
@@ -477,7 +475,6 @@ void CLIPSClass::defRuleSlot(QString name, QString comment, QString declaration,
 	emit templatesChangedSignal(templates);
 	QStringList activations = agendaSlot();
 	emit activationsChangedSignal(activations);
-	emit dataChanged();
 }
 
 void CLIPSClass::unDefruleSlot(QString name)
@@ -684,7 +681,6 @@ void CLIPSClass::defglobalSlot(QString moduleName, QHash<QString, QString> defgl
 	executeCommand(command);
 	QStringList globals = globalsSlot();
 	emit globalsChangedSignal(globals);
-	emit dataChanged();
 }
 
 void CLIPSClass::unDefglobalSlot(QString name)
@@ -732,7 +728,6 @@ void CLIPSClass::deffunctionSlot(QString name, QString comment, QString regular,
 	executeCommand(command);
 	QStringList functions = functionsSlot();
 	emit functionsChangedSignal(functions);
-	emit dataChanged();
 }
 
 void CLIPSClass::unDeffunctionSlot(QString name)
@@ -780,7 +775,6 @@ void CLIPSClass::defgenericSlot(QString name)
 	emit genericChangedSignal(generic);
 	QHash<QString, int> methods = methodsSlot();
 	emit methodsChangedSignal(methods);
-	emit dataChanged();
 }
 
 void CLIPSClass::unDefgenericSlot(QString name)
@@ -832,7 +826,6 @@ void CLIPSClass::defmethodSlot(QString name, QString index, QString comment, QSt
 	emit genericChangedSignal(generic);
 	QHash<QString, int> methods = methodsSlot();
 	emit methodsChangedSignal(methods);
-	emit dataChanged();
 }
 
 void CLIPSClass::unDefmethodSlot(QString name, int index)
@@ -876,21 +869,34 @@ QHash<QString, int> CLIPSClass::methodsSlot()
 
 //Classes
 
-QStringList CLIPSClass::classesSlot()
+void CLIPSClass::defclassSlot(QString name, QString comment, QString role, QString patternMatchRole, QStringList slotsList, QStringList parentsList, QStringList handlersList)
 {
-	QStringList classesList;
-	void* ptr=NULL;
-	do
+	if(!comment.isEmpty())
+		comment = "\""+comment+"\"";
+	QString command = "(defclass "+name+" "+comment+"( is-a ";
+	for(int i=0; i<parentsList.count(); i++)
 	{
-		ptr = GetNextDefclass(ptr);
-		if(ptr!=NULL)
-		{
-			char *classStr = GetDefclassName(ptr);
-			classesList<<QString(classStr).simplified();
-		}
+		command += parentsList.at(i)+" ";
 	}
-	while(ptr!=NULL);
-	return classesList;
+	command +=") (role "+role+") (pattern-match "+patternMatchRole+") ";
+	for(int i=0; i<slotsList.count(); i++)
+	{
+		command += "("+slotsList.at(i)+")";
+	}
+	for(int i=0; i<handlersList.count(); i++)
+	{
+		command += "("+handlersList.at(i)+")";
+	}
+	command += ")";
+	executeCommand(command);
+	QStringList classes = classesSlot();
+	emit classesChangedSignal(classes);
+	QStringList templates = templatesSlot();
+	emit templatesChangedSignal(templates);
+	QStringList activations = agendaSlot();
+	emit activationsChangedSignal(activations);
+	QHash<QString, uint> messageHandlers = messageHandlersSlot();
+	emit messageHandlersChangedSignal(messageHandlers);
 }
 
 void CLIPSClass::unDefclassSlot(QString name)
@@ -915,6 +921,23 @@ QString CLIPSClass::getClassPPF(QString name)
 	void* classPtr = FindDefclass(name.simplified().toUtf8().data());
 	char *className = GetDefclassPPForm(classPtr);
 	return QString(className).simplified();
+}
+
+QStringList CLIPSClass::classesSlot()
+{
+	QStringList classesList;
+	void* ptr=NULL;
+	do
+	{
+		ptr = GetNextDefclass(ptr);
+		if(ptr!=NULL)
+		{
+			char *classStr = GetDefclassName(ptr);
+			classesList<<QString(classStr).simplified();
+		}
+	}
+	while(ptr!=NULL);
+	return classesList;
 }
 
 QString CLIPSClass::getMetaInformation(QString name)
@@ -1018,8 +1041,6 @@ void CLIPSClass::defmessageHandlerSlot(QString className, QString messageName, Q
 	executeCommand(command);
 	QHash<QString, uint> messageHandlers = messageHandlersSlot();
 	emit messageHandlersChangedSignal(messageHandlers);
-	emit dataChanged();
-
 }
 
 void CLIPSClass::unDefmessageHandlerSlot(QString name, unsigned int index)
@@ -1082,7 +1103,6 @@ void CLIPSClass::definstanceSlot(QString name, QString active, QString comment, 
 	executeCommand(command);
 	QStringList instances = instancesSlot();
 	emit instancesChangedSignal(instances);
-	emit dataChanged();
 }
 
 void CLIPSClass::unDefinstancesSlot(QString name)
@@ -1131,7 +1151,6 @@ void CLIPSClass::defmoduleSlot(QString name, QString comment, QString specificat
 	QStringList modules = modulesSlot();
 	emit modulesChangedSignal(modules);
 	emit refreshAll();
-	emit dataChanged();
 }
 
 QString CLIPSClass::getModulePPF(QString name)

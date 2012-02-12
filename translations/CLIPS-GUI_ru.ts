@@ -4,91 +4,91 @@
 <context>
     <name>CLIPSClass</name>
     <message>
-        <location filename="../src/clipsclass.cpp" line="629"/>
+        <location filename="../src/clipsclass.cpp" line="626"/>
         <source>DEPTH_STRATEGY</source>
         <translation>Стратегия глубины</translation>
     </message>
     <message>
-        <location filename="../src/clipsclass.cpp" line="630"/>
+        <location filename="../src/clipsclass.cpp" line="627"/>
         <source>BREADTH_STRATEGY</source>
         <translation>Стратегия ширины</translation>
     </message>
     <message>
-        <location filename="../src/clipsclass.cpp" line="631"/>
+        <location filename="../src/clipsclass.cpp" line="628"/>
         <source>LEX_STRATEGY</source>
         <translation>Стратегия LEX</translation>
     </message>
     <message>
-        <location filename="../src/clipsclass.cpp" line="632"/>
+        <location filename="../src/clipsclass.cpp" line="629"/>
         <source>MEA_STRATEGY</source>
         <translation>Стратегия МЕЛ</translation>
     </message>
     <message>
-        <location filename="../src/clipsclass.cpp" line="633"/>
+        <location filename="../src/clipsclass.cpp" line="630"/>
         <source>COMPLEXITY_STRATEGY</source>
         <translation>Стратегия усложнения</translation>
     </message>
     <message>
-        <location filename="../src/clipsclass.cpp" line="634"/>
+        <location filename="../src/clipsclass.cpp" line="631"/>
         <source>SIMPLICITY_STRATEGY</source>
         <translation>Стратегия упрощения</translation>
     </message>
     <message>
-        <location filename="../src/clipsclass.cpp" line="635"/>
+        <location filename="../src/clipsclass.cpp" line="632"/>
         <source>RANDOM_STRATEGY</source>
         <translation>Случайная стратегия</translation>
     </message>
     <message>
-        <location filename="../src/clipsclass.cpp" line="929"/>
-        <location filename="../src/clipsclass.cpp" line="934"/>
-        <location filename="../src/clipsclass.cpp" line="940"/>
+        <location filename="../src/clipsclass.cpp" line="952"/>
+        <location filename="../src/clipsclass.cpp" line="957"/>
+        <location filename="../src/clipsclass.cpp" line="963"/>
         <source>yes</source>
         <translation>да</translation>
     </message>
     <message>
-        <location filename="../src/clipsclass.cpp" line="931"/>
-        <location filename="../src/clipsclass.cpp" line="936"/>
-        <location filename="../src/clipsclass.cpp" line="942"/>
+        <location filename="../src/clipsclass.cpp" line="954"/>
+        <location filename="../src/clipsclass.cpp" line="959"/>
+        <location filename="../src/clipsclass.cpp" line="965"/>
         <source>no</source>
         <translation>нет</translation>
     </message>
     <message>
-        <location filename="../src/clipsclass.cpp" line="932"/>
+        <location filename="../src/clipsclass.cpp" line="955"/>
         <source>Abstract: </source>
         <translation>Абстрактный: </translation>
     </message>
     <message>
-        <location filename="../src/clipsclass.cpp" line="932"/>
-        <location filename="../src/clipsclass.cpp" line="937"/>
-        <location filename="../src/clipsclass.cpp" line="943"/>
-        <location filename="../src/clipsclass.cpp" line="945"/>
-        <location filename="../src/clipsclass.cpp" line="977"/>
+        <location filename="../src/clipsclass.cpp" line="955"/>
+        <location filename="../src/clipsclass.cpp" line="960"/>
+        <location filename="../src/clipsclass.cpp" line="966"/>
+        <location filename="../src/clipsclass.cpp" line="968"/>
+        <location filename="../src/clipsclass.cpp" line="1000"/>
         <source>
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/clipsclass.cpp" line="937"/>
+        <location filename="../src/clipsclass.cpp" line="960"/>
         <source>Reactive: </source>
         <translation>Реактивный: </translation>
     </message>
     <message>
-        <location filename="../src/clipsclass.cpp" line="943"/>
+        <location filename="../src/clipsclass.cpp" line="966"/>
         <source>Deletable: </source>
         <translation>Удаляемый: </translation>
     </message>
     <message>
-        <location filename="../src/clipsclass.cpp" line="945"/>
+        <location filename="../src/clipsclass.cpp" line="968"/>
         <source>Module: </source>
         <translation>Модуль: </translation>
     </message>
     <message>
-        <location filename="../src/clipsclass.cpp" line="992"/>
+        <location filename="../src/clipsclass.cpp" line="1015"/>
         <source>CONVENIENCE_MODE</source>
         <translation>Режим удобства </translation>
     </message>
     <message>
-        <location filename="../src/clipsclass.cpp" line="993"/>
+        <location filename="../src/clipsclass.cpp" line="1016"/>
         <source>CONSERVATION_MODE</source>
         <translation>Режим сохранения</translation>
     </message>
@@ -294,52 +294,62 @@
         <translation>Введите количество родителей:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="872"/>
+        <location filename="../src/mainwindow.cpp" line="858"/>
+        <source>Handlers count</source>
+        <translation>Количество обработчиков</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="858"/>
+        <source>Enter handlers count:</source>
+        <translation>Введите количество обработчиков документации:</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="898"/>
         <source>This class haven&apos;t pretty print representation</source>
         <translation>Этот класс не имеет печатной формы</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="873"/>
+        <location filename="../src/mainwindow.cpp" line="899"/>
         <source>Information About Class</source>
         <translation>Информация о классе</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="922"/>
+        <location filename="../src/mainwindow.cpp" line="948"/>
         <source>Select Defaults Mode</source>
         <translation>Выберите дефолтный режим</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="922"/>
+        <location filename="../src/mainwindow.cpp" line="948"/>
         <source>Defaults Mode:</source>
         <translation>Дефолтный режим:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="955"/>
+        <location filename="../src/mainwindow.cpp" line="981"/>
         <source>This message handler haven&apos;t pretty print representation</source>
         <translation>Этот обработчик сообщений не имеет печатной формы</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="956"/>
+        <location filename="../src/mainwindow.cpp" line="982"/>
         <source>Information About Message Handler</source>
         <translation>Информация об обработчике сообщений</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="985"/>
+        <location filename="../src/mainwindow.cpp" line="1011"/>
         <source>This instance haven&apos;t pretty print representation</source>
         <translation>Этот экземпляр объекта не имеет печатной формы</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="986"/>
+        <location filename="../src/mainwindow.cpp" line="1012"/>
         <source>Information About Instance</source>
         <translation>Информация об экземпляре объекта</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1012"/>
+        <location filename="../src/mainwindow.cpp" line="1038"/>
         <source>This module haven&apos;t pretty print representation</source>
         <translation>Этот модуль не имеет печатной формы</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="1013"/>
+        <location filename="../src/mainwindow.cpp" line="1039"/>
         <source>Information About Module</source>
         <translation>Информация о модуле</translation>
     </message>
@@ -348,32 +358,32 @@
         <translation type="obsolete">&quot;Таблица&quot; наследников пуста.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="885"/>
+        <location filename="../src/mainwindow.cpp" line="911"/>
         <source>This class haven&apos;t meta information.</source>
         <translation>Этот класс не имеет метаинформации.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="886"/>
+        <location filename="../src/mainwindow.cpp" line="912"/>
         <source>Class Meta Information</source>
         <translation>Метаинформация класса</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="893"/>
+        <location filename="../src/mainwindow.cpp" line="919"/>
         <source>This class haven&apos;t subclasses.</source>
         <translation>Класс не имеет потомков.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="894"/>
+        <location filename="../src/mainwindow.cpp" line="920"/>
         <source>Subclasses</source>
         <translation>Наследники</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="901"/>
+        <location filename="../src/mainwindow.cpp" line="927"/>
         <source>This class haven&apos;t superclasses.</source>
         <translation>Класс не имеет предков.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="902"/>
+        <location filename="../src/mainwindow.cpp" line="928"/>
         <source>Supercalsses</source>
         <translation>Предки</translation>
     </message>
@@ -967,7 +977,6 @@
     </message>
     <message>
         <location filename="../src/dialogs/addclassdialog.ui" line="65"/>
-        <location filename="../src/dialogs/addclassdialog.cpp" line="43"/>
         <source>Name:</source>
         <translation>Имя:</translation>
     </message>
@@ -987,19 +996,18 @@
         <translation>Родитель %1:</translation>
     </message>
     <message>
-        <location filename="../src/dialogs/addclassdialog.cpp" line="41"/>
+        <location filename="../src/dialogs/addclassdialog.cpp" line="48"/>
         <source>Slot %1:</source>
         <translation>Слот %1:</translation>
     </message>
     <message>
-        <location filename="../src/dialogs/addclassdialog.cpp" line="45"/>
-        <source>Facet:</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/dialogs/addclassdialog.cpp" line="58"/>
+        <source>Handler documentation %1:</source>
+        <translation>Обработчик документации %1:</translation>
     </message>
     <message>
-        <location filename="../src/dialogs/addclassdialog.cpp" line="47"/>
         <source>Handler Documentation:</source>
-        <translation>Обработчик документации:</translation>
+        <translation type="obsolete">Обработчик документации:</translation>
     </message>
 </context>
 <context>

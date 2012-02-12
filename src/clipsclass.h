@@ -3,6 +3,7 @@
 
 #include <clips/clips.h>
 #include <QtCore>
+#include <QLineEdit>
 
 #define CLIPS	static_cast<CLIPSClass*>(GetEnvironmentContext(Environment))
 
@@ -75,6 +76,7 @@ public slots:
 	QString getMethodPPF(QString, int);
 	//Classes
 	QStringList classesSlot();
+	void defclassSlot(QString, QString, QString, QString, QStringList, QStringList, QStringList);
 	void unDefclassSlot(QString);
 	QString getClassPPF(QString);
 	QString getMetaInformation(QString);
