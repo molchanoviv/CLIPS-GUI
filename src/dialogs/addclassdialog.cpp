@@ -5,7 +5,7 @@
 #include <QVBoxLayout>
 #include <QGroupBox>
 
-addClassDialog::addClassDialog(QWidget *parent, int parentsCount, int slotsCount, QStringList classesList) :
+addClassDialog::addClassDialog(QWidget *parent, int parentsCount, int slotsCount, int handlersCount, QStringList classesList) :
 	QDialog(parent)
 {
 	setupUi(this);
@@ -44,25 +44,23 @@ addClassDialog::addClassDialog(QWidget *parent, int parentsCount, int slotsCount
 	mainLayout->addLayout(bottomLayout);
 	for(int i=0; i<slotsCount; i++)
 	{
-		QGroupBox *groupBox = new QGroupBox;
-		groupBox->setTitle(tr("Slot %1:").arg(i+1));
 		QGridLayout *layout = new QGridLayout;
-		QLabel *slotNameLabel = new QLabel(tr("Name:"));
-		QLineEdit *slotNameLineEdit = new QLineEdit;
-		QLabel *slotFacetLabel = new QLabel(tr("Facet:"));
-		QLineEdit *slotFacetLineEdit = new QLineEdit;
-		QLabel *handlerDocumentationLabel = new QLabel(tr("Handler Documentation:"));
+		QLabel *slotLabel = new QLabel(tr("Slot %1:").arg(i+1));
+		QLineEdit *slotLineEdit = new QLineEdit;
+		slotsList.append(slotLineEdit);
+		layout->addWidget(slotLabel, 1, 1);
+		layout->addWidget(slotLineEdit, 1, 2);
+		mainLayout->addLayout(layout);
+	}
+	for(int i=0; i<handlersCount; i++)
+	{
+		QGridLayout *layout = new QGridLayout;
+		QLabel *handlerDocumentationLabel = new QLabel(tr("Handler documentation %1:").arg(i+1));
 		QLineEdit *handlerDocumentationLineEdit = new QLineEdit;
-//		slot slt{slotNameLineEdit, slotFacetLineEdit, handlerDocumentationLineEdit};
-//		slotsList.append(&slt);
-		layout->addWidget(slotNameLabel, 1, 1);
-		layout->addWidget(slotNameLineEdit, 1, 2);
-		layout->addWidget(slotFacetLabel, 2, 1);
-		layout->addWidget(slotFacetLineEdit, 2, 2);
-		layout->addWidget(handlerDocumentationLabel, 3, 1);
-		layout->addWidget(handlerDocumentationLineEdit, 3, 2);
-		groupBox->setLayout(layout);
-		mainLayout->addWidget(groupBox);
+		handlerDocumentationList.append(handlerDocumentationLineEdit);
+		layout->addWidget(handlerDocumentationLabel, 1, 1);
+		layout->addWidget(handlerDocumentationLineEdit, 1, 2);
+		mainLayout->addLayout(layout);
 	}
 	mainLayout->addWidget(buttonBox);
 	setLayout(mainLayout);

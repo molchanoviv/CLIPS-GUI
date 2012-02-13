@@ -860,17 +860,43 @@ void MainWindow::refreshMethodsSlot()
 void MainWindow::addClassSlot()
 {
 	bool ok;
-	int parentsCount = QInputDialog::getInt(this, tr("Parents count"), tr("Enter parents count:"), 1, 0, 100, 1, &ok);
+	int parentsCount = QInputDialog::getInt(this, tr("Parents count"), tr("Enter parents count:"), 0, 0, 100, 1, &ok);
 	if(ok)
 	{
-		int slotsCount = QInputDialog::getInt(this, tr("Slots count"), tr("Enter slots count:"), 1, 0, 100, 1, &ok);
+		int slotsCount = QInputDialog::getInt(this, tr("Slots count"), tr("Enter slots count:"), 0, 0, 100, 1, &ok);
 		if(ok)
 		{
-			QStringList classesList = clips->classesSlot();
-			addClassDialog dialog(this, parentsCount, slotsCount, classesList);
-			if(dialog.exec() == QDialog::Accepted)
+			int handlersCount = QInputDialog::getInt(this, tr("Handlers count"), tr("Enter handlers count:"), 0, 0, 100, 1, &ok);
+			if(ok)
 			{
-				QString name = dialog.nameLineEdit->text();
+				QStringList classesList = clips->classesSlot();
+				addClassDialog dialog(this, parentsCount, slotsCount, handlersCount, classesList);
+				if(dialog.exec() == QDialog::Accepted)
+				{
+					QString name = dialog.nameLineEdit->text();
+					QString comment = dialog.commentLineEdit->text();
+					QString role = dialog.roleComboBox->currentText();
+					QString patternMatchRole = dialog.patternMatchRoleComboBox->currentText();
+					QList<QLineEdit*> list = dialog.slotsList;
+					QStringList slotsList;
+					for(int i=0; i<list.count(); i++)
+					{
+						slotsList.append(list.at(i)->text());
+					}
+					QList<QLineEdit*> handlers = dialog.handlerDocumentationList;
+					QStringList handlersList;
+					for(int i=0; i<handlers.count(); i++)
+					{
+						handlersList.append(handlers.at(i)->text());
+					}
+					QList<QComboBox*> isAlist = dialog.isAList;
+					QStringList parentsList;
+					for(int i=0; i<isAlist.count(); i++)
+					{
+						parentsList.append(isAlist.at(i)->currentText());
+					}
+					clips->defclassSlot(name, comment, role, patternMatchRole, slotsList, parentsList, handlersList);
+				}
 			}
 		}
 	}

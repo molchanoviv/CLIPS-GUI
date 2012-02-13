@@ -7,20 +7,14 @@
 #include <QList>
 #include <QComboBox>
 
-typedef struct
-{
-	QLineEdit *nameLineEdit;
-	QLineEdit *facetLineEdit;
-	QLineEdit *messageHandlerLineEdit;
-} slot;
-
 class addClassDialog : public QDialog, public Ui::addClassDialog
 {
 	Q_OBJECT
 	
 public:
-	explicit addClassDialog(QWidget *parent = 0, int parentsCount=0, int slotsCount=0, QStringList classesList = QStringList());
-//	QList <slot*> slotsList;
+	explicit addClassDialog(QWidget *parent = 0, int parentsCount=0, int slotsCount=0, int handlersCount=0, QStringList classesList = QStringList());
+	QList<QLineEdit*> slotsList;
+	QList<QLineEdit*> handlerDocumentationList;
 	QList<QComboBox*> isAList;
 
 };
