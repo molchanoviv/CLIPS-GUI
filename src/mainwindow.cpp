@@ -26,9 +26,11 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->setupUi(this);
 	connect(ui->actionAbout_Qt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
 	ui->actionShow_Hide_console->setIcon(QIcon::fromTheme("utilities-terminal"));
+	ui->actionShow_Hide_project_tree->setIcon(QIcon::fromTheme("view-list-tree"));
 	ui->actionQuit->setIcon(QIcon::fromTheme("dialog-close"));
 	ui->mainToolBar->setWindowTitle(tr("Main Toolbar"));
 	ui->mainToolBar->addAction(ui->actionShow_Hide_console);
+	ui->mainToolBar->addAction(ui->actionShow_Hide_project_tree);
 	ui->mainToolBar->addAction(ui->actionQuit);
 	ui->actionNew->setIcon(QIcon::fromTheme("document-new"));
 	ui->actionOpen->setIcon(QIcon::fromTheme("document-open"));
@@ -47,7 +49,9 @@ MainWindow::MainWindow(QWidget *parent) :
 	console = new consoleClass;
 	console->hide();
 	ui->actionShow_Hide_console->setCheckable(true);
+	ui->actionShow_Hide_project_tree->setCheckable(true);
 	connect(ui->actionShow_Hide_console, SIGNAL(toggled(bool)), console, SLOT(setShown(bool)));
+	connect(ui->actionShow_Hide_project_tree, SIGNAL(toggled(bool)), this, SLOT(setShownProjectTree(bool)));
 	projectsTreeWidget = new QTreeWidget;
 	projectsTreeWidget->setHeaderLabel("CLIPS-GUI");
 	projectWidget = new ProjectStackedWidget;
@@ -427,6 +431,7 @@ void MainWindow::writeSettings()
 	settings.setValue("/splitterSizes", splitter->saveState());
 	settings.setValue("/centerSplitterSizes", centerSplitter->saveState());
 	settings.setValue("/consoleState", ui->actionShow_Hide_console->isChecked());
+	settings.setValue("/projectTreeState", ui->actionShow_Hide_project_tree->isChecked());
 	settings.endGroup();
 	settings.deleteLater();
 };
@@ -440,6 +445,7 @@ void MainWindow::readSettings()
 	splitter->restoreState(settings.value("/splitterSizes").toByteArray());
 	centerSplitter->restoreState(settings.value("/centerSplitterSizes").toByteArray());
 	ui->actionShow_Hide_console->setChecked(settings.value("/consoleState").toBool());
+	ui->actionShow_Hide_project_tree->setChecked(settings.value("/projectTreeState").toBool());
 	settings.endGroup();
 	settings.deleteLater();
 
@@ -498,6 +504,11 @@ void MainWindow::aboutDialogSlot()
 void MainWindow::outputSlot(QString str)
 {
 	QMessageBox::information(this, tr(""), str);
+}
+
+void MainWindow::setShownProjectTree(bool state)
+{
+	projectsTreeWidget->setHidden(state);
 }
 
 //Templates

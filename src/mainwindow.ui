@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>945</width>
-    <height>784</height>
+    <width>943</width>
+    <height>782</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,7 +23,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>945</width>
+     <width>943</width>
      <height>21</height>
     </rect>
    </property>
@@ -32,6 +32,7 @@
      <string>Application</string>
     </property>
     <addaction name="actionShow_Hide_console"/>
+    <addaction name="actionShow_Hide_project_tree"/>
     <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuAbout">
@@ -143,6 +144,11 @@
    </property>
    <property name="text">
     <string>About Programm</string>
+   </property>
+  </action>
+  <action name="actionShow_Hide_project_tree">
+   <property name="text">
+    <string>Show/Hide project tree</string>
    </property>
   </action>
  </widget>
