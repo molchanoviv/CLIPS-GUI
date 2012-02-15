@@ -51,7 +51,6 @@ int CLIPSClass::printFunction(void* Environment, char* name, char* str)
 		return true;
 	}
 	return false;
-
 }
 
 void CLIPSClass::saveSlot(QString path)
