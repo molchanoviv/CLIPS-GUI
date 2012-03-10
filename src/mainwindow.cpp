@@ -73,32 +73,22 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(ui->actionRemove, SIGNAL(triggered()), this, SLOT(removeProject()));
 	connect(ui->actionAbout_Programm, SIGNAL(triggered()), this, SLOT(aboutDialogSlot()));
 	connect(projectsTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(treeWidgetItemClicked(QTreeWidgetItem*,int)));
-	connect(projectWidget, SIGNAL(removeTemplateSignal(QString)), clips, SLOT(unDeftemplateSlot(QString)));
 	connect(projectWidget, SIGNAL(viewTemplateSignal(QString)), this, SLOT(viewTemplateSlot(QString)));
 	connect(projectWidget, SIGNAL(removeFactSignal(int)), clips, SLOT(retractSlot(int)));
-	connect(projectWidget, SIGNAL(removeFactsListSignal(QString)), clips, SLOT(unDeffactsSlot(QString)));
 	connect(projectWidget, SIGNAL(viewFactsListSignal(QString)), this, SLOT(viewDeffactsSlot(QString)));
-	connect(projectWidget, SIGNAL(removeRuleSignal(QString)), clips, SLOT(unDefruleSlot(QString)));
 	connect(projectWidget, SIGNAL(viewRuleSignal(QString)), this, SLOT(viewRuleSlot(QString)));
 	connect(projectWidget, SIGNAL(setBreakpointSignal(QString)), clips, SLOT(SetBreakSlot(QString)));
 	connect(projectWidget, SIGNAL(removeBreakpointSignal(QString)), clips, SLOT(RemoveBreakSlot(QString)));
 	connect(projectWidget, SIGNAL(removeActivationSignal(QString)), clips, SLOT(removeActivationSlot(QString)));
-	connect(projectWidget, SIGNAL(removeGlobalSignal(QString)), clips, SLOT(unDefglobalSlot(QString)));
 	connect(projectWidget, SIGNAL(viewGlobalSignal(QString)), this, SLOT(viewGlobalSlot(QString)));
-	connect(projectWidget, SIGNAL(removeFunctionSignal(QString)), clips, SLOT(unDeffunctionSlot(QString)));
 	connect(projectWidget, SIGNAL(viewFunctionSignal(QString)), this, SLOT(viewFunctionSlot(QString)));
-	connect(projectWidget, SIGNAL(removeGenericSignal(QString)), clips, SLOT(unDefgenericSlot(QString)));
 	connect(projectWidget, SIGNAL(viewGenericSignal(QString)), this, SLOT(viewGenericSlot(QString)));
-	connect(projectWidget, SIGNAL(removeMethodSignal(QString,int)), clips, SLOT(unDefmethodSlot(QString,int)));
 	connect(projectWidget, SIGNAL(viewMethodSignal(QString, int)), this, SLOT(viewMethodSlot(QString, int)));
-	connect(projectWidget, SIGNAL(removeClassSignal(QString)), clips, SLOT(unDefclassSlot(QString)));
 	connect(projectWidget, SIGNAL(viewClassSignal(QString)), this, SLOT(viewClassSlot(QString)));
 	connect(projectWidget, SIGNAL(metaInformationSignal(QString)), this, SLOT(metaInformationSlot(QString)));
 	connect(projectWidget, SIGNAL(subClassesSignal(QString)), this, SLOT(subClassesSlot(QString)));
 	connect(projectWidget, SIGNAL(superClassesSignal(QString)), this, SLOT(superClassesSlot(QString)));
-	connect(projectWidget, SIGNAL(removeMessageHandlerSignal(QString,uint)), clips, SLOT(unDefmessageHandlerSlot(QString,uint)));
 	connect(projectWidget, SIGNAL(viewMessageHandlerSignal(QString,uint)), this, SLOT(viewMessageHandlerSlot(QString,uint)));
-	connect(projectWidget, SIGNAL(removeInstanceSignal(QString)), clips, SLOT(unDefinstancesSlot(QString)));
 	connect(projectWidget, SIGNAL(viewInstanceSignal(QString)), this, SLOT(viewInstanceSlot(QString)));
 	connect(projectWidget, SIGNAL(viewModuleSignal(QString)), this, SLOT(viewModuleSlot(QString)));
 	connect(projectWidget->addTemplatePushButton, SIGNAL(clicked()), this, SLOT(addTemplateSlot()));
@@ -133,6 +123,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(projectWidget->addModulePushButton, SIGNAL(clicked()), this, SLOT(addModuleSlot()));
 	connect(projectWidget->refreshModulesPushButton, SIGNAL(clicked()), this, SLOT(refreshModulesSlot()));
 	connect(projectWidget->currentModulePushButton, SIGNAL(clicked()), this, SLOT(setCurrentModuleSlot()));
+	connect(projectWidget, SIGNAL(removeSignal(QString,QString, int)), clips, SLOT(removeSlot(QString,QString, int)));
 	connect(this, SIGNAL(treeWidgetItemClickedSignal(int)), projectWidget, SLOT(setCurrentIndex(int)));
 	connect(this,SIGNAL(addTemplateSignal(QString,QList<slotsPair>)), clips, SLOT(deftemplateSlot(QString,QList<slotsPair>)));
 	connect(this, SIGNAL(addFactSignal(QString)), clips, SLOT(assertStringSlot(QString)));
@@ -143,20 +134,9 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(this, SIGNAL(addFunctionSignal(QString,QString,QString,QString,QString)), clips, SLOT(deffunctionSlot(QString,QString,QString,QString,QString)));
 	connect(this, SIGNAL(addGenericSignal(QString)), clips, SLOT(defgenericSlot(QString)));
 	connect(this, SIGNAL(addMethodSignal(QString,QString,QString,QString,QString,QString)), clips, SLOT(defmethodSlot(QString,QString,QString,QString,QString,QString)));
-	connect(clips, SIGNAL(templatesChangedSignal(QStringList)), projectWidget, SLOT(refreshTemplates(QStringList)));
-	connect(clips, SIGNAL(factsChangedSignal(QStringList)), projectWidget, SLOT(refreshFacts(QStringList)));
 	connect(clips, SIGNAL(restoreFactDuplicationSignal(bool)), projectWidget, SLOT(restoreDuplicationState(bool)));
-	connect(clips, SIGNAL(deffactsChangedSignal(QStringList)), projectWidget, SLOT(refreshDeffacts(QStringList)));
-	connect(clips, SIGNAL(rulesChangedSignal(QStringList)), projectWidget, SLOT(refreshRules(QStringList)));
-	connect(clips, SIGNAL(activationsChangedSignal(QStringList)), projectWidget, SLOT(refreshActivations(QStringList)));
-	connect(clips, SIGNAL(globalsChangedSignal(QStringList)), projectWidget, SLOT(refreshGlobals(QStringList)));
-	connect(clips, SIGNAL(functionsChangedSignal(QStringList)), projectWidget, SLOT(refreshFunctions(QStringList)));
-	connect(clips, SIGNAL(genericChangedSignal(QStringList)), projectWidget, SLOT(refreshGeneric(QStringList)));
 	connect(clips, SIGNAL(methodsChangedSignal(QHash<QString, int>)), projectWidget, SLOT(refreshMethods(QHash<QString, int>)));
-	connect(clips, SIGNAL(classesChangedSignal(QStringList)), projectWidget, SLOT(refreshClasses(QStringList)));
 	connect(clips, SIGNAL(messageHandlersChangedSignal(QHash<QString, unsigned int>)), projectWidget, SLOT(refreshMessageHandlers(QHash<QString, unsigned int>)));
-	connect(clips, SIGNAL(instancesChangedSignal(QStringList)), projectWidget, SLOT(refreshInstancesSlot(QStringList)));
-	connect(clips, SIGNAL(modulesChangedSignal(QStringList)), this, SLOT(refreshModulesSlot()));
 	connect(clips, SIGNAL(clearSignal()), projectWidget, SLOT(clearSlot()));
 	connect(clips, SIGNAL(dataChanged()), this, SLOT(dataChangedSlot()));
 	connect(clips, SIGNAL(refreshAll()), this, SLOT(refreshAll()));
@@ -453,8 +433,6 @@ void MainWindow::readSettings()
 
 void MainWindow::treeWidgetItemClicked(QTreeWidgetItem* item, int column)
 {
-	//bool ok;
-
 	Q_UNUSED(column);
 	if(!item->parent())
 		emit treeWidgetItemClickedSignal(0);
@@ -544,7 +522,7 @@ void MainWindow::addTemplateSlot()
 
 void MainWindow::viewTemplateSlot(QString name)
 {
-	QString info = clips->getTemplatePPF(name);
+	QString info = clips->getPPF(name, "template");
 	if(info.isEmpty())
 		info = tr("This template haven't pretty print representation");
 	QMessageBox::information(this, tr("Information About Template"), info);
@@ -552,7 +530,7 @@ void MainWindow::viewTemplateSlot(QString name)
 
 void MainWindow::refreshTemplatesSlot()
 {
-	projectWidget->refreshTemplates(clips->templatesSlot());
+	projectWidget->refreshTemplates(clips->itemsSlot("template"));
 }
 
 //Facts
@@ -569,7 +547,7 @@ void MainWindow::addFactByTemplateSlot()
 {
 	QStringList templatesList;
 	QList<slotsPair> slotsValuesList;
-	templatesList = clips->templatesSlot();
+	templatesList = clips->itemsSlot("template");
 	bool ok;
 	QString templateName = QInputDialog::getItem(this, tr("Select Template"), tr("Template:"), templatesList, 0, false, &ok);
 	if (ok && !templateName.isEmpty())
@@ -591,7 +569,7 @@ void MainWindow::addFactByTemplateSlot()
 
 void MainWindow::refreshFactsSlot()
 {
-	projectWidget->refreshFacts(clips->factsSlot());
+	projectWidget->refreshFacts(clips->itemsSlot("fact"));
 }
 
 //Facts Lists
@@ -621,7 +599,7 @@ void MainWindow::addFactsListSlot()
 
 void MainWindow::viewDeffactsSlot(QString name)
 {
-	QString info = clips->getDeffactsPPF(name);
+	QString info = clips->getPPF(name, "factsList");
 	if(info.isEmpty())
 		info = tr("This fact list haven't pretty print representation");
 	QMessageBox::information(this, tr("Information About Facts List"), info);
@@ -629,7 +607,7 @@ void MainWindow::viewDeffactsSlot(QString name)
 
 void MainWindow::refreshDeffactsSlot()
 {
-	projectWidget->refreshDeffacts(clips->factsListSlot());
+	projectWidget->refreshDeffacts(clips->itemsSlot("factsList"));
 }
 
 //Rules
@@ -675,7 +653,7 @@ void MainWindow::addRuleSlot()
 
 void MainWindow::viewRuleSlot(QString name)
 {
-	QString info = clips->getRulePPF(name);
+	QString info = clips->getPPF(name, "rule");
 	if(info.isEmpty())
 		info = tr("This rule haven't pretty print representation");
 	QMessageBox::information(this, tr("Information About Rule"), info);
@@ -683,7 +661,7 @@ void MainWindow::viewRuleSlot(QString name)
 
 void MainWindow::refreshRulesSlot()
 {
-	projectWidget->refreshRules(clips->rulesSlot());
+	projectWidget->refreshRules(clips->itemsSlot("rule"));
 }
 
 //Agenda
@@ -729,7 +707,7 @@ void MainWindow::setConflictStrategySlot()
 
 void MainWindow::refreshActivationsSlot()
 {
-	projectWidget->refreshActivations(clips->agendaSlot());
+	projectWidget->refreshActivations(clips->itemsSlot("agenda"));
 }
 
 //Globals
@@ -740,7 +718,7 @@ void MainWindow::addGlobalSlot()
 	int variablesCount = QInputDialog::getInt(this, tr("Globals count"), tr("Enter globals count:"), 1, 1, 100, 1, &ok);
 	if(ok)
 	{
-		QStringList modulesList = clips->modulesSlot();
+		QStringList modulesList = clips->itemsSlot("module");
 		addGlobalsDialog dialog(this, variablesCount, modulesList);
 		if(dialog.exec() == QDialog::Accepted)
 		{
@@ -760,7 +738,7 @@ void MainWindow::addGlobalSlot()
 
 void MainWindow::viewGlobalSlot(QString name)
 {
-	QString info = clips->getGlobalPPF(name);
+	QString info = clips->getPPF(name, "global");
 	if(info.isEmpty())
 		info = tr("This global haven't pretty print representation");
 	QMessageBox::information(this, tr("Information About Global"), info);
@@ -768,7 +746,7 @@ void MainWindow::viewGlobalSlot(QString name)
 
 void MainWindow::refreshGlobalsSlot()
 {
-	projectWidget->refreshGlobals(clips->globalsSlot());
+	projectWidget->refreshGlobals(clips->itemsSlot("global"));
 }
 
 //Functions
@@ -790,7 +768,7 @@ void MainWindow::addFunctionSlot()
 
 void MainWindow::viewFunctionSlot(QString name)
 {
-	QString info = clips->getFunctionPPF(name);
+	QString info = clips->getPPF(name, "function");
 	if(info.isEmpty())
 		info = tr("This function haven't pretty print representation");
 	QMessageBox::information(this, tr("Information About Function"), info);
@@ -798,7 +776,7 @@ void MainWindow::viewFunctionSlot(QString name)
 
 void MainWindow::refreshFunctionsSlot()
 {
-	projectWidget->refreshFunctions(clips->functionsSlot());
+	projectWidget->refreshFunctions(clips->itemsSlot("function"));
 }
 
 //Generic Functions
@@ -813,7 +791,7 @@ void MainWindow::addGenericSlot()
 
 void MainWindow::viewGenericSlot(QString name)
 {
-	QString info = clips->getGenericPPF(name);
+	QString info = clips->getPPF(name, "generic");
 	if(info.isEmpty())
 		info = tr("This generic function haven't pretty print representation");
 	QMessageBox::information(this, tr("Information About Generic Function"), info);
@@ -821,7 +799,7 @@ void MainWindow::viewGenericSlot(QString name)
 
 void MainWindow::refreshGenericSlot()
 {
-	projectWidget->refreshGeneric(clips->genericSlot());
+	projectWidget->refreshGeneric(clips->itemsSlot("generic"));
 }
 
 //Methods
@@ -844,7 +822,7 @@ void MainWindow::addMethodSlot()
 
 void MainWindow::viewMethodSlot(QString name, int index)
 {
-	QString info = clips->getMethodPPF(name, index);
+	QString info = clips->getPPF(name, "method", index);
 	if(info.isEmpty())
 		info = tr("This method haven't pretty print representation");
 	QMessageBox::information(this, tr("Information About Method"), info);
@@ -869,7 +847,7 @@ void MainWindow::addClassSlot()
 			int handlersCount = QInputDialog::getInt(this, tr("Handlers count"), tr("Enter handlers count:"), 0, 0, 100, 1, &ok);
 			if(ok)
 			{
-				QStringList classesList = clips->classesSlot();
+				QStringList classesList = clips->itemsSlot("class");
 				addClassDialog dialog(this, parentsCount, slotsCount, handlersCount, classesList);
 				if(dialog.exec() == QDialog::Accepted)
 				{
@@ -904,7 +882,7 @@ void MainWindow::addClassSlot()
 
 void MainWindow::viewClassSlot(QString name)
 {
-	QString info = clips->getClassPPF(name);
+	QString info = clips->getPPF(name, "class");
 	if(info.isEmpty())
 		info = tr("This class haven't pretty print representation");
 	QMessageBox::information(this, tr("Information About Class"), info);
@@ -912,7 +890,7 @@ void MainWindow::viewClassSlot(QString name)
 
 void MainWindow::refreshClassesSlot()
 {
-	projectWidget->refreshClasses(clips->classesSlot());
+	projectWidget->refreshClasses(clips->itemsSlot("class"));
 }
 
 void MainWindow::metaInformationSlot(QString name)
@@ -967,7 +945,7 @@ void MainWindow::setDefaultsModeSlot()
 
 void MainWindow::addMessageHandlerSlot()
 {
-	QStringList classesList = clips->classesSlot();
+	QStringList classesList = clips->itemsSlot("class");
 	QStringList handlerTypeList = clips->getHandlerTypesSlot();
 	addMessageHandlerDialog dialog(this, classesList, handlerTypeList);
 	if(dialog.exec() == QDialog::Accepted)
@@ -987,7 +965,7 @@ void MainWindow::addMessageHandlerSlot()
 
 void MainWindow::viewMessageHandlerSlot(QString name, unsigned int index)
 {
-	QString info = clips->getMessageHandlerPPF(name, index);
+	QString info = clips->getPPF(name, "messageHandler", index);
 	if(info.isEmpty())
 		info = tr("This message handler haven't pretty print representation");
 	QMessageBox::information(this, tr("Information About Message Handler"), info);
@@ -1017,7 +995,7 @@ void MainWindow::addInstanceSlot()
 
 void MainWindow::viewInstanceSlot(QString name)
 {
-	QString info = clips->getInstancePPF(name);
+	QString info = clips->getPPF(name, "instance");
 	if(info.isEmpty())
 		info = tr("This instance haven't pretty print representation");
 	QMessageBox::information(this, tr("Information About Instance"), info);
@@ -1025,7 +1003,7 @@ void MainWindow::viewInstanceSlot(QString name)
 
 void MainWindow::refreshInstancesSlot()
 {
-	projectWidget->refreshInstancesSlot(clips->instancesSlot());
+	projectWidget->refreshInstancesSlot(clips->itemsSlot("instance"));
 }
 
 //Modules
@@ -1044,7 +1022,7 @@ void MainWindow::addModuleSlot()
 
 void MainWindow::viewModuleSlot(QString name)
 {
-	QString info = clips->getModulePPF(name);
+	QString info = clips->getPPF(name, "module");
 	if(info.isEmpty())
 		info = tr("This module haven't pretty print representation");
 	QMessageBox::information(this, tr("Information About Module"), info);
@@ -1052,13 +1030,13 @@ void MainWindow::viewModuleSlot(QString name)
 
 void MainWindow::refreshModulesSlot()
 {
-	projectWidget->refreshModulesSlot(clips->modulesSlot());
+	projectWidget->refreshModulesSlot(clips->itemsSlot("module"));
 }
 
 void MainWindow::setCurrentModuleSlot()
 {
 	QString currentModule = clips->getCurrentModule();
-	QStringList modulesList = clips->modulesSlot();
+	QStringList modulesList = clips->itemsSlot("module");
 	int index=0;
 	for(int i=0; i<modulesList.count();i++)
 	{

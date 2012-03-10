@@ -11,6 +11,7 @@ int main(int argc, char *argv[])
 	app.installTranslator(&qtTranslator);
 	QTranslator myappTranslator;
 	myappTranslator.load(":/translations/CLIPS-GUI_" + QLocale::system().name());
+	qDebug()<<QLocale::system().name();
 	app.installTranslator(&myappTranslator);
 	MainWindow w;
 	w.show();

@@ -369,6 +369,11 @@ void ProjectStackedWidget::clearSlot()
 	duplicationPushButton->setChecked(false);
 }
 
+//void ProjectStackedWidget::setExpertSystem(QObject obj)
+//{
+//	//
+//}
+
 //Templates
 
 void ProjectStackedWidget::refreshTemplates(QStringList templates)
@@ -393,7 +398,7 @@ void ProjectStackedWidget::removeTemplateSlot()
 {
 	QList<QListWidgetItem*> templates = templatesListWidget->selectedItems();
 	if(!templates.isEmpty())
-		emit removeTemplateSignal(templates.at(0)->text());
+		emit removeSignal(templates.at(0)->text(), "template", 0);
 }
 
 //Facts
@@ -450,7 +455,7 @@ void ProjectStackedWidget::removeDeffactsSlot()
 {
 	QList<QListWidgetItem*> deffacts = deffactsListWidget->selectedItems();
 	if(!deffacts.isEmpty())
-		emit removeFactsListSignal(deffacts.at(0)->text());
+		emit removeSignal(deffacts.at(0)->text(), "factsList", 0);
 }
 
 //Rules
@@ -482,7 +487,7 @@ void ProjectStackedWidget::removeDefruleSlot()
 {
 	QList<QListWidgetItem*> rules = rulesListWidget->selectedItems();
 	if(!rules.isEmpty())
-		emit removeRuleSignal(rules.at(0)->text());
+		emit removeSignal(rules.at(0)->text(), "rules", 0);
 }
 
 void ProjectStackedWidget::setBreakpointSlot()
@@ -543,7 +548,7 @@ void ProjectStackedWidget::removeGlobalSlot()
 {
 	QList<QListWidgetItem*> globals = globalsListWidget->selectedItems();
 	if(!globals.isEmpty())
-		emit removeGlobalSignal(globals.at(0)->text());
+		emit removeSignal(globals.at(0)->text(), "global", 0);
 }
 
 //Functions
@@ -570,7 +575,7 @@ void ProjectStackedWidget::removeFunctionSlot()
 {
 	QList<QListWidgetItem*> functions = functionsListWidget->selectedItems();
 	if(!functions.isEmpty())
-		emit removeFunctionSignal(functions.at(0)->text());
+		emit removeSignal(functions.at(0)->text(), "function", 0);
 }
 
 //Generic
@@ -597,7 +602,7 @@ void ProjectStackedWidget::removeGenericSlot()
 {
 	QList<QListWidgetItem*> generic = genericListWidget->selectedItems();
 	if(!generic.isEmpty())
-		emit removeGenericSignal(generic.at(0)->text());
+		emit removeSignal(generic.at(0)->text(), "generic", 0);
 }
 
 //Methods
@@ -626,7 +631,7 @@ void ProjectStackedWidget::removeMethodSlot()
 {
 	QList<QListWidgetItem*> methods = methodsListWidget->selectedItems();
 	if(!methods.isEmpty())
-		emit removeMethodSignal(methods.at(0)->text(), methods.at(0)->data(Qt::UserRole).toInt());
+		emit removeSignal(methods.at(0)->text(), "method", methods.at(0)->data(Qt::UserRole).toInt());
 }
 
 //Classes
@@ -653,7 +658,7 @@ void ProjectStackedWidget::removeClassSlot()
 {
 	QList<QListWidgetItem*> classes = classesListWidget->selectedItems();
 	if(!classes.isEmpty())
-		emit removeClassSignal(classes.at(0)->text());
+		emit removeSignal(classes.at(0)->text(), "class", 0);
 }
 
 void ProjectStackedWidget::metaInformationSlot()
@@ -703,7 +708,7 @@ void ProjectStackedWidget::removeMessageHandlerSlot()
 {
 	QList<QListWidgetItem*> messageHandlers = messageHandlersListWidget->selectedItems();
 	if(!messageHandlers.isEmpty())
-		emit removeMessageHandlerSignal(messageHandlers.at(0)->text(), unsigned(messageHandlers.at(0)->data(Qt::UserRole).toInt()));
+		emit removeSignal(messageHandlers.at(0)->text(), "messageHandler", messageHandlers.at(0)->data(Qt::UserRole).toInt());
 }
 
 //Instances
@@ -730,7 +735,7 @@ void ProjectStackedWidget::removeInstanceSlot()
 {
 	QList<QListWidgetItem*> instances = instancesListWidget->selectedItems();
 	if(!instances.isEmpty())
-		emit removeInstanceSignal(instances.at(0)->text());
+		emit removeSignal(instances.at(0)->text(), "instance", 0);
 }
 
 //Modules

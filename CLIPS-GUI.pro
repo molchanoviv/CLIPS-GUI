@@ -69,7 +69,8 @@ OTHER_FILES += \
 RESOURCES += \
     resources.qrc
 
-TRANSLATIONS += translations/CLIPS-GUI_ru.ts
+TRANSLATIONS += translations/CLIPS-GUI_ru.ts \
+		translations/CLIPS-GUI_ja.ts
 
 
 

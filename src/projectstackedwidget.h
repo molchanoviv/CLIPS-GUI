@@ -97,35 +97,29 @@ public:
 	QPushButton *currentModulePushButton;
 
 signals:
+	void removeSignal(QString, QString, int);
 	//Templates
-	void removeTemplateSignal(QString);
 	void viewTemplateSignal(QString);
 	//Facts
 	void removeFactSignal(int);
 	//Facts List
-	void removeFactsListSignal(QString);
 	void viewFactsListSignal(QString);
 	//Rules
-	void removeRuleSignal(QString);
 	void viewRuleSignal(QString);
 	void setBreakpointSignal(QString);
 	void removeBreakpointSignal(QString);
 	//Agenda
 	void removeActivationSignal(QString);
 	//Globals
-	void removeGlobalSignal(QString);
 	void viewGlobalSignal(QString);
 	//Function
-	void removeFunctionSignal(QString);
 	void viewFunctionSignal(QString);
 	//Generic Functions
-	void removeGenericSignal(QString);
 	void viewGenericSignal(QString);
 	//Methods
 	void removeMethodSignal(QString, int);
 	void viewMethodSignal(QString, int);
 	//Classes
-	void removeClassSignal(QString);
 	void viewClassSignal(QString);
 	void metaInformationSignal(QString);
 	void subClassesSignal(QString);
@@ -134,13 +128,13 @@ signals:
 	void removeMessageHandlerSignal(QString, unsigned int);
 	void viewMessageHandlerSignal(QString, unsigned int);
 	//Instances
-	void removeInstanceSignal(QString);
 	void viewInstanceSignal(QString);
 	//Modules
 	void viewModuleSignal(QString);
 
 public slots:
 	void clearSlot();
+//	void setExpertSystem(QObject);
 	//Templates
 	void refreshTemplates(QStringList);
 	void viewTemplateSlot();

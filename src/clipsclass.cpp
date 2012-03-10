@@ -11,6 +11,7 @@ CLIPSClass::CLIPSClass(QObject *parent) :
 	EnvAddRouter(Environment,"IORouter",40,queryFunction,printFunction,NULL,NULL,NULL);
 	EnvActivateRouter(Environment,"IORouter");
 	SetPrintWhileLoading(Environment,false);
+	fillHashes();
 }
 
 CLIPSClass::~CLIPSClass()
@@ -59,9 +60,9 @@ void CLIPSClass::saveSlot(QString path)
 	QString dataPath = path+QString("/data.clp");
 	QString binaryPath = path+QString("/data.bin");
 	QString configPath = path+QString("/data.cnf");
-	SaveFacts(factsPath.toUtf8().data(),LOCAL_SAVE,NULL);
-	Save(dataPath.toUtf8().data());
-	Bsave(binaryPath.toUtf8().data());
+	EnvSaveFacts(Environment, factsPath.toUtf8().data(),LOCAL_SAVE,NULL);
+	EnvSave(Environment, dataPath.toUtf8().data());
+	EnvBsave(Environment, binaryPath.toUtf8().data());
 	QFile file(configPath);
 	file.remove();
 	QSettings settings(configPath, QSettings::IniFormat);
@@ -70,12 +71,12 @@ void CLIPSClass::saveSlot(QString path)
 	void* ptr=NULL;
 	do
 	{
-		ptr = GetNextDefrule(ptr);
+		ptr = EnvGetNextDefrule(Environment, ptr);
 		if(ptr!=NULL)
 		{
-			char* buf = GetDefruleName(ptr);
+			char* buf = EnvGetDefruleName(Environment, ptr);
 			QString name = QString(buf);
-			if(DefruleHasBreakpoint(ptr))
+			if(EnvDefruleHasBreakpoint(Environment, ptr))
 			{
 				settings.setValue("bp_"+QString::number(i), name);
 				i++;
@@ -89,7 +90,7 @@ void CLIPSClass::saveSlot(QString path)
 	settings.setValue("strategy", getStrategy());
 	settings.endGroup();
 	settings.beginGroup("Facts");
-	settings.setValue("duplication", GetFactDuplication());
+	settings.setValue("duplication", EnvGetFactDuplication(Environment));
 	settings.endGroup();
 	settings.beginGroup("Classes");
 	settings.setValue("defaultMode", getCurrentDefaultsMode());
@@ -105,16 +106,16 @@ void CLIPSClass::loadSlot(QString path)
 	QString dataPath = path+QString("/data.clp");
 	QString binaryPath = path+QString("/data.bin");
 	QString configPath = path+QString("/data.cnf");
-	LoadFacts(factsPath.toUtf8().data());
-	Load(dataPath.toUtf8().data());
-	BloadData(binaryPath.toUtf8().data());
+	EnvLoadFacts(Environment, factsPath.toUtf8().data());
+	EnvLoad(Environment, dataPath.toUtf8().data());
+	EnvBload(Environment,binaryPath.toUtf8().data());
 	QSettings settings(configPath, QSettings::IniFormat);
 	settings.beginGroup("Breakpoints");
 	int bp_count = settings.value("bp_count").toInt();
 	for(int i=0; i<bp_count; i++)
 	{
 		QString name = settings.value("bp_"+QString::number(i)).toString();
-		SetBreak(FindDefrule(name.toUtf8().data()));
+		EnvSetBreak(Environment, findFunctionsHash["rule"](Environment, name.simplified().toUtf8().data()));
 	}
 	settings.endGroup();
 	settings.beginGroup("Rules");
@@ -137,8 +138,141 @@ void CLIPSClass::loadSlot(QString path)
 
 void CLIPSClass::clearSlot()
 {
-	Clear();
+	EnvClear(Environment);
 	emit clearSignal();
+}
+
+void CLIPSClass::fillHashes()
+{
+	removeFunctionsHash.insert("template", EnvUndeftemplate);
+	removeFunctionsHash.insert("factsList", EnvUndeffacts);
+	removeFunctionsHash.insert("rule", EnvUndefrule);
+	removeFunctionsHash.insert("global", EnvUndefglobal);
+	removeFunctionsHash.insert("function", EnvUndeffunction);
+	removeFunctionsHash.insert("generic", EnvUndefgeneric);
+	removeFunctionsHash.insert("class", EnvUndefclass);
+	removeFunctionsHash.insert("instance", EnvUndefinstances);
+
+	findFunctionsHash.insert("template", EnvFindDeftemplate);
+	findFunctionsHash.insert("factsList", EnvFindDeffacts);
+	findFunctionsHash.insert("rule", EnvFindDefrule);
+	findFunctionsHash.insert("global", EnvFindDefglobal);
+	findFunctionsHash.insert("function", EnvFindDeffunction);
+	findFunctionsHash.insert("generic", EnvFindDefgeneric);
+	findFunctionsHash.insert("class", EnvFindDefclass);
+	findFunctionsHash.insert("instance", EnvFindDefinstances);
+	findFunctionsHash.insert("module", EnvFindDefmodule);
+
+	isDeletableFunctionsHash.insert("template", EnvIsDeftemplateDeletable);
+	isDeletableFunctionsHash.insert("factsList", EnvIsDeffactsDeletable);
+	isDeletableFunctionsHash.insert("rule", EnvIsDefruleDeletable);
+	isDeletableFunctionsHash.insert("global", EnvIsDefglobalDeletable);
+	isDeletableFunctionsHash.insert("function", EnvIsDeffunctionDeletable);
+	isDeletableFunctionsHash.insert("generic", EnvIsDefgenericDeletable);
+	isDeletableFunctionsHash.insert("class", EnvIsDefclassDeletable);
+	isDeletableFunctionsHash.insert("instance", EnvIsDefinstancesDeletable);
+
+	getNextFunctionsHash.insert("template", EnvGetNextDeftemplate);
+	getNextFunctionsHash.insert("fact", EnvGetNextFact);
+	getNextFunctionsHash.insert("factsList", EnvGetNextDeffacts);
+	getNextFunctionsHash.insert("rule", EnvGetNextDefrule);
+	getNextFunctionsHash.insert("agenda", EnvGetNextActivation);
+	getNextFunctionsHash.insert("global", EnvGetNextDefglobal);
+	getNextFunctionsHash.insert("function", EnvGetNextDeffunction);
+	getNextFunctionsHash.insert("generic", EnvGetNextDefgeneric);
+	getNextFunctionsHash.insert("class", EnvGetNextDefclass);
+	getNextFunctionsHash.insert("instance", EnvGetNextDefinstances);
+	getNextFunctionsHash.insert("module", EnvGetNextDefmodule);
+}
+
+void CLIPSClass::removeSlot(QString name, QString function, int index)
+{
+	if(function == "method")
+	{
+		void* ptr = findFunctionsHash["generic"](Environment, name.simplified().toUtf8().data());
+		if(!EnvIsDefmethodDeletable(Environment, ptr,index))
+			return;
+		EnvUndefmethod(Environment, ptr, index);
+	}
+	else if(function == "messageHandler")
+	{
+		name = name.remove(name.lastIndexOf("  "), name.length());
+		void* ptr = findFunctionsHash["class"](Environment, name.simplified().toUtf8().data());
+		if(!EnvIsDefmessageHandlerDeletable(Environment, ptr, index))
+			return;
+		EnvUndefmessageHandler(Environment, ptr, (unsigned int)index);
+	}
+	else
+	{
+		void* ptr = findFunctionsHash[function](Environment, name.simplified().toUtf8().data());
+		if(!isDeletableFunctionsHash[function](Environment, ptr))
+			return;
+		removeFunctionsHash[function](Environment, ptr);
+	}
+	emit refreshAll();
+	emit dataChanged();
+}
+
+QString CLIPSClass::getPPF(QString name, QString function, int index)
+{
+	char *ppf;
+	if(function=="method")
+	{
+		void* ptr = findFunctionsHash["generic"](Environment, name.simplified().toUtf8().data());
+		ppf = EnvGetDefmethodPPForm(Environment, ptr, index);
+	}
+	else if(function == "messageHandler")
+	{
+		name = name.remove(name.lastIndexOf("  "), name.length());
+		void* ptr = findFunctionsHash["class"](Environment, name.simplified().toUtf8().data());
+		ppf = EnvGetDefmessageHandlerPPForm(Environment, ptr, (unsigned int)index);
+	}
+	else
+	{
+		void* ptr = findFunctionsHash[function](Environment, name.simplified().toUtf8().data());
+		ppf = GetConstructPPForm(Environment, (struct constructHeader *) ptr);
+	}
+	return QString(ppf).simplified();
+}
+
+QStringList CLIPSClass::itemsSlot(QString function)
+{
+	EnvRefreshAgenda(Environment, NULL);
+	QStringList list;
+	void* ptr=NULL;
+	do
+	{
+		ptr = getNextFunctionsHash[function](Environment, ptr);
+		if(ptr!=NULL)
+		{
+			QString name;
+			if(function == "fact")
+			{
+				char buf[16384]={0};
+				EnvGetFactPPForm(Environment, buf,sizeof(buf), ptr);
+				name = QString(buf);
+			}
+			else if(function == "agenda")
+			{
+				char buf[16384]={0};
+				EnvGetActivationPPForm(Environment, buf,sizeof(buf), ptr);
+				name = QString(buf);
+			}
+			else
+			{
+				char* buf = EnvGetConstructNameString(Environment, (struct constructHeader *) ptr);
+				name = QString(buf);
+			}
+			if(function == "rule")
+			{
+				if(EnvDefruleHasBreakpoint(Environment, ptr))
+					name = "[bp]/"+name;
+			}
+			list<<name;
+		}
+	}
+	while(ptr!=NULL);
+	return list;
 }
 
 //Templates
@@ -157,18 +291,7 @@ void CLIPSClass::deftemplateSlot(QString name, QList<slotsPair> slotsList)
 	}
 	QString command = "(deftemplate "+name+" "+slotsstr+")";
 	executeCommand(command);
-	QStringList templates = templatesSlot();
-	emit templatesChangedSignal(templates);
-}
-
-void CLIPSClass::unDeftemplateSlot(QString name)
-{
-	void* tmplPtr = FindDeftemplate(name.simplified().toUtf8().data());
-	if(!IsDeftemplateDeletable(tmplPtr))
-		return;
-	Undeftemplate(tmplPtr);
-	QStringList templates = templatesSlot();
-	emit templatesChangedSignal(templates);
+	emit refreshAll();
 	emit dataChanged();
 }
 
@@ -176,45 +299,21 @@ QList<slotsPair> CLIPSClass::getTemplateInformation(QString name)
 {
 	QList<slotsPair> info;
 	DATA_OBJECT sltVal;
-	void* tmplPtr = FindDeftemplate(name.toUtf8().data());
-	DeftemplateSlotNames(tmplPtr, &sltVal);
+	void* tmplPtr = findFunctionsHash["template"](Environment, name.simplified().toUtf8().data());
+	EnvDeftemplateSlotNames(Environment, tmplPtr, &sltVal);
 	void *multifieldPtr;
 	char *sltName;
-	multifieldPtr = GetValue(sltVal);
-	for (int i = GetDOBegin(sltVal); i <= GetDOEnd(sltVal); i++)
+	multifieldPtr = EnvGetValue(Environment, sltVal);
+	for (int i = EnvGetDOBegin(Environment, sltVal); i <= EnvGetDOEnd(Environment, sltVal); i++)
 	{
-		if ((GetMFType(multifieldPtr,i) == STRING) ||(GetMFType(multifieldPtr,i) == SYMBOL))
+		if ((EnvGetMFType(Environment, multifieldPtr,i) == STRING) ||(EnvGetMFType(Environment, multifieldPtr,i) == SYMBOL))
 		{
-			sltName = ValueToString(GetMFValue(multifieldPtr,i));
-			bool ok = DeftemplateSlotMultiP(tmplPtr, sltName);
+			sltName = EnvValueToString(Environment, EnvGetMFValue(Environment, multifieldPtr,i));
+			bool ok = EnvDeftemplateSlotMultiP(Environment, tmplPtr, sltName);
 			info.append(slotsPair(ok, QString(sltName)));
 		}
 	}
 	return info;
-}
-
-QString CLIPSClass::getTemplatePPF(QString name)
-{
-	void* deftemplatePtr = FindDeftemplate(name.simplified().toUtf8().data());
-	char *deftemplateName = GetDeftemplatePPForm(deftemplatePtr);
-	return QString(deftemplateName).simplified();
-}
-
-QStringList CLIPSClass::templatesSlot()
-{
-	QStringList templatesList;
-	void* ptr=NULL;
-	do
-	{
-		ptr = GetNextDeftemplate(ptr);
-		if(ptr!=NULL)
-		{
-			char* buf = GetDeftemplateName(ptr);
-			templatesList<<QString(buf);
-		}
-	}
-	while(ptr!=NULL);
-	return templatesList;
 }
 
 //Facts
@@ -222,13 +321,8 @@ QStringList CLIPSClass::templatesSlot()
 void CLIPSClass::assertStringSlot(QString fact)
 {
 	fact.append(")").prepend("(");
-	void* factPtr = AssertString(fact.toUtf8().data());
-	QStringList facts = factsSlot();
-	emit factsChangedSignal(facts);
-	QStringList templates = templatesSlot();
-	emit templatesChangedSignal(templates);
-	QStringList activations = agendaSlot();
-	emit activationsChangedSignal(activations);
+	void* factPtr = EnvAssertString(Environment, fact.toUtf8().data());
+	emit refreshAll();
 	emit dataChanged();
 }
 
@@ -240,22 +334,22 @@ void CLIPSClass::assertSlot(QString templateName, QList<slotsPair> slotsList)
 	void *templatePtr;
 	void *theMultifield;
 	DATA_OBJECT theValue;
-	IncrementGCLocks();
-	templatePtr = FindDeftemplate(templateName.toUtf8().data());
-	newFact = CreateFact(templatePtr);
+	EnvIncrementGCLocks(Environment);
+	templatePtr = findFunctionsHash["template"](Environment, templateName.simplified().toUtf8().data());
+	newFact = EnvCreateFact(Environment, templatePtr);
 	if (newFact == NULL)
 		return;
 	DATA_OBJECT sltVal;
 	QStringList sltNames;
-	DeftemplateSlotNames(templatePtr, &sltVal);
+	EnvDeftemplateSlotNames(Environment, templatePtr, &sltVal);
 	void *multifieldPtr;
 	char *sltName;
-	multifieldPtr = GetValue(sltVal);
-	for (int i = GetDOBegin(sltVal); i <= GetDOEnd(sltVal); i++)
+	multifieldPtr = EnvGetValue(Environment, sltVal);
+	for (int i = EnvGetDOBegin(Environment, sltVal); i <= EnvGetDOEnd(Environment, sltVal); i++)
 	{
-		if ((GetMFType(multifieldPtr,i) == STRING) ||(GetMFType(multifieldPtr,i) == SYMBOL))
+		if ((EnvGetMFType(Environment, multifieldPtr,i) == STRING) ||(EnvGetMFType(Environment, multifieldPtr,i) == SYMBOL))
 		{
-			sltName = ValueToString(GetMFValue(multifieldPtr,i));
+			sltName = EnvValueToString(Environment, EnvGetMFValue(Environment, multifieldPtr,i));
 			sltNames.append(QString(sltName));
 		}
 	}
@@ -272,20 +366,20 @@ void CLIPSClass::assertSlot(QString templateName, QList<slotsPair> slotsList)
 				if(validator.validate(slotVal, pos) != QValidator::Acceptable)
 				{
 					theValue.type = SYMBOL;
-					theValue.value = AddSymbol(slotVal.toUtf8().data());
+					theValue.value = EnvAddSymbol(Environment, slotVal.toUtf8().data());
 				}
 				else
 				{
 					theValue.type = FLOAT;
-					theValue.value = AddDouble(slotVal.toFloat());
+					theValue.value = EnvAddDouble(Environment, slotVal.toFloat());
 				}
 			}
 			else
 			{
 				theValue.type = INTEGER;
-				theValue.value = AddLong(slotVal.toInt());
+				theValue.value = EnvAddLong(Environment, slotVal.toInt());
 			}
-			PutFactSlot(newFact, sltNames.at(i).toUtf8().data(), &theValue);
+			EnvPutFactSlot(Environment, newFact, sltNames.at(i).toUtf8().data(), &theValue);
 		}
 		else
 		{
@@ -302,8 +396,7 @@ void CLIPSClass::assertSlot(QString templateName, QList<slotsPair> slotsList)
 			}
 			if(mltSltVal.isEmpty())
 				return;
-			theMultifield = CreateMultifield(mltSltVal.count());
-
+			theMultifield = EnvCreateMultifield(Environment, mltSltVal.count());
 			for(int t=0; t<mltSltVal.count(); t++)
 			{
 				QRegExpValidator validator(floatRx, 0);
@@ -314,37 +407,32 @@ void CLIPSClass::assertSlot(QString templateName, QList<slotsPair> slotsList)
 					QRegExpValidator validator(intRx, 0);
 					if(validator.validate(slotVal, pos) != QValidator::Acceptable)
 					{
-						SetMFType(theMultifield,t+1,SYMBOL);
-						SetMFValue(theMultifield,t+1,AddSymbol(mltSltVal.at(t).toUtf8().data()));
+						EnvSetMFType(Environment, theMultifield,t+1,SYMBOL);
+						EnvSetMFValue(Environment, theMultifield, t+1, EnvAddSymbol(Environment, mltSltVal.at(t).toUtf8().data()));
 					}
 					else
 					{
-						SetMFType(theMultifield,t+1,FLOAT);
-						SetMFValue(theMultifield,t+1,AddDouble(mltSltVal.at(t).toFloat()));
+						EnvSetMFType(Environment, theMultifield, t+1, FLOAT);
+						EnvSetMFValue(Environment, theMultifield, t+1, EnvAddDouble(Environment, mltSltVal.at(t).toFloat()));
 					}
 				}
 				else
 				{
-					SetMFType(theMultifield,t+1,INTEGER);
-					SetMFValue(theMultifield,t+1,AddLong(mltSltVal.at(t).toInt()));
+					EnvSetMFType(Environment, theMultifield, t+1, INTEGER);
+					EnvSetMFValue(Environment, theMultifield, t+1, EnvAddLong(Environment, mltSltVal.at(t).toInt()));
 				}
 			}
-			SetDOBegin(theValue,1);
-			SetDOEnd(theValue,mltSltVal.count()+1);
+			EnvSetDOBegin(Environment, theValue,1);
+			EnvSetDOEnd(Environment, theValue, mltSltVal.count()+1);
 			theValue.type = MULTIFIELD;
 			theValue.value = theMultifield;
-			PutFactSlot(newFact, sltNames.at(i).toUtf8().data(), &theValue);
+			EnvPutFactSlot(Environment, newFact, sltNames.at(i).toUtf8().data(), &theValue);
 		}
 	}
-	AssignFactSlotDefaults(newFact);
-	DecrementGCLocks();
-	Assert(newFact);
-	QStringList facts = factsSlot();
-	emit factsChangedSignal(facts);
-	QStringList templates = templatesSlot();
-	emit templatesChangedSignal(templates);
-	QStringList activations = agendaSlot();
-	emit activationsChangedSignal(activations);
+	EnvAssignFactSlotDefaults(Environment, newFact);
+	EnvDecrementGCLocks(Environment);
+	EnvAssert(Environment, newFact);
+	emit refreshAll();
 	emit dataChanged();
 }
 
@@ -353,16 +441,13 @@ void CLIPSClass::retractSlot(int factNumber)
 	void* ptr=NULL;
 	do
 	{
-		ptr = GetNextFact(ptr);
+		ptr = EnvGetNextFact(Environment, ptr);
 		if(ptr!=NULL)
 		{
-			if(factNumber == FactIndex(ptr))
+			if(factNumber == EnvFactIndex(Environment, ptr))
 			{
-				Retract(ptr);
-				QStringList facts = factsSlot();
-				emit factsChangedSignal(facts);
-				QStringList activations = agendaSlot();
-				emit activationsChangedSignal(activations);
+				EnvRetract(Environment, ptr);
+				emit refreshAll();
 				emit dataChanged();
 			}
 		}
@@ -370,27 +455,9 @@ void CLIPSClass::retractSlot(int factNumber)
 	while(ptr!=NULL);
 }
 
-QStringList CLIPSClass::factsSlot()
-{
-	QStringList factsList;
-	void* ptr=NULL;
-	do
-	{
-		ptr = GetNextFact(ptr);
-		char buf[16384]={0};
-		if(ptr!=NULL)
-		{
-			GetFactPPForm(buf,sizeof(buf), ptr);
-			factsList<<QString(buf);
-		}
-	}
-	while(ptr!=NULL);
-	return factsList;
-}
-
 void CLIPSClass::setFactDuplicationSlot(bool state)
 {
-	SetFactDuplication(state);
+	EnvSetFactDuplication(Environment, state);
 }
 
 //Facts Lists
@@ -405,51 +472,8 @@ void CLIPSClass::deffactsSlot(QString name, QStringList factsList)
 	}
 	QString command = "(deffacts "+name+" "+factsstr+")";
 	executeCommand(command);
-	QStringList deffacts = factsListSlot();
-	emit deffactsChangedSignal(deffacts);
-	QStringList templates = templatesSlot();
-	emit templatesChangedSignal(templates);
-	QStringList activations = agendaSlot();
-	emit activationsChangedSignal(activations);
-}
-
-void CLIPSClass::unDeffactsSlot(QString name)
-{
-	void* tmplPtr = FindDeffacts(name.simplified().toUtf8().data());
-	if(!IsDeffactsDeletable(tmplPtr))
-		return;
-	Undeffacts(tmplPtr);
-	QStringList deffacts = factsListSlot();
-	emit deffactsChangedSignal(deffacts);
-	QStringList templates = templatesSlot();
-	emit templatesChangedSignal(templates);
-	QStringList activations = agendaSlot();
-	emit activationsChangedSignal(activations);
+	emit refreshAll();
 	emit dataChanged();
-}
-
-QString CLIPSClass::getDeffactsPPF(QString name)
-{
-	void* deffactsPtr = FindDeffacts(name.simplified().toUtf8().data());
-	char *deffactsName = GetDeffactsPPForm(deffactsPtr);
-	return QString(deffactsName).simplified();
-}
-
-QStringList CLIPSClass::factsListSlot()
-{
-	QStringList deffactsList;
-	void* ptr=NULL;
-	do
-	{
-		ptr = GetNextDeffacts(ptr);
-		if(ptr!=NULL)
-		{
-			char* buf = GetDeffactsName(ptr);
-			deffactsList<<QString(buf);
-		}
-	}
-	while(ptr!=NULL);
-	return deffactsList;
 }
 
 //Rules
@@ -468,85 +492,30 @@ void CLIPSClass::defRuleSlot(QString name, QString comment, QString declaration,
 		declaration = "("+declaration+")";
 	QString command = "(defrule "+name+" "+comment+" "+declaration+" "+antecedentsStr+"=>"+consequentsStr+")";
 	executeCommand(command);
-	QStringList rules = rulesSlot();
-	emit rulesChangedSignal(rules);
-	QStringList templates = templatesSlot();
-	emit templatesChangedSignal(templates);
-	QStringList activations = agendaSlot();
-	emit activationsChangedSignal(activations);
-}
-
-void CLIPSClass::unDefruleSlot(QString name)
-{
-	void* tmplPtr = FindDefrule(name.simplified().toUtf8().data());
-	if(!IsDefruleDeletable(tmplPtr))
-		return;
-	Undefrule(tmplPtr);
-	QStringList rules = rulesSlot();
-	emit rulesChangedSignal(rules);
-	QStringList activations = agendaSlot();
-	emit activationsChangedSignal(activations);
+	emit refreshAll();
 	emit dataChanged();
 }
 
 void CLIPSClass::SetBreakSlot(QString name)
 {
-	SetBreak(FindDefrule(name.toUtf8().data()));
-	QStringList rules = rulesSlot();
-	emit rulesChangedSignal(rules);
+	EnvSetBreak(Environment, findFunctionsHash["rule"](Environment, name.simplified().toUtf8().data()));
+	emit refreshAll();
 	emit dataChanged();
 }
 
 void CLIPSClass::RemoveBreakSlot(QString name)
 {
-	RemoveBreak(FindDefrule(name.toUtf8().data()));
-	QStringList rules = rulesSlot();
-	emit rulesChangedSignal(rules);
+	EnvRemoveBreak(Environment, findFunctionsHash["rule"](Environment, name.simplified().toUtf8().data()));
+	emit refreshAll();
 	emit dataChanged();
-}
-
-QString CLIPSClass::getRulePPF(QString name)
-{
-	void* rulePtr = FindDefrule(name.simplified().toUtf8().data());
-	char *ruleName = GetDefrulePPForm(rulePtr);
-	return QString(ruleName).simplified();
-}
-
-QStringList CLIPSClass::rulesSlot()
-{
-	QStringList rulesList;
-	void* ptr=NULL;
-	do
-	{
-		ptr = GetNextDefrule(ptr);
-		if(ptr!=NULL)
-		{
-			char* buf = GetDefruleName(ptr);
-			QString name = QString(buf);
-			if(DefruleHasBreakpoint(ptr))
-				name = "[bp]/"+name;
-			rulesList<<name;
-		}
-	}
-	while(ptr!=NULL);
-	return rulesList;
 }
 
 //Agenda
 
 void CLIPSClass::runSlot()
 {
-	Run(-1);
-	QStringList templates = templatesSlot();
-	emit templatesChangedSignal(templates);
-	QStringList facts = factsSlot();
-	emit factsChangedSignal(facts);
-	QStringList deffacts = factsListSlot();
-	emit deffactsChangedSignal(deffacts);
-	QStringList rules = rulesSlot();
-	emit rulesChangedSignal(rules);
-	QStringList activations = agendaSlot();
-	emit activationsChangedSignal(activations);
+	EnvRun(Environment, -1);
+	emit refreshAll();
 	emit dataChanged();
 }
 
@@ -555,22 +524,21 @@ void CLIPSClass::removeActivationSlot(QString name)
 	void* ptr=NULL;
 	do
 	{
-		ptr = GetNextActivation(ptr);
+		ptr = EnvGetNextActivation(Environment, ptr);
 		char buf[16384]={0};
 		if(ptr!=NULL)
 		{
-			GetActivationPPForm(buf,sizeof(buf), ptr);
+			EnvGetActivationPPForm(Environment, buf,sizeof(buf), ptr);
 			QString bufVal(buf);
 			if(bufVal == name)
 			{
-				DeleteActivation(ptr);
-				QStringList activations = agendaSlot();
-				emit activationsChangedSignal(activations);
+				EnvDeleteActivation(Environment, ptr);
+				emit refreshAll();
+				emit dataChanged();
 			}
 		}
 	}
 	while(ptr!=NULL);
-	emit dataChanged();
 }
 
 int CLIPSClass::getActivationSalienceSlot(QString name)
@@ -578,15 +546,15 @@ int CLIPSClass::getActivationSalienceSlot(QString name)
 	void* ptr=NULL;
 	do
 	{
-		ptr = GetNextActivation(ptr);
+		ptr = EnvGetNextActivation(Environment, ptr);
 		char buf[16384]={0};
 		if(ptr!=NULL)
 		{
-			GetActivationPPForm(buf,sizeof(buf), ptr);
+			EnvGetActivationPPForm(Environment, buf,sizeof(buf), ptr);
 			QString bufVal(buf);
 			if(bufVal == name)
 			{
-				int salience = GetActivationSalience(ptr);
+				int salience = EnvGetActivationSalience(Environment, ptr);
 				return salience;
 			}
 		}
@@ -600,18 +568,17 @@ void CLIPSClass::setActivationSalienceSlot(QString name, int salience)
 	void* ptr=NULL;
 	do
 	{
-		ptr = GetNextActivation(ptr);
+		ptr = EnvGetNextActivation(Environment, ptr);
 		char buf[16384]={0};
 		if(ptr!=NULL)
 		{
-			GetActivationPPForm(buf,sizeof(buf), ptr);
+			EnvGetActivationPPForm(Environment, buf,sizeof(buf), ptr);
 			QString bufVal(buf);
 			if(bufVal == name)
 			{
-				SetActivationSalience(ptr, salience);
-				ReorderAgenda(NULL);
-				QStringList activations = agendaSlot();
-				emit activationsChangedSignal(activations);
+				EnvSetActivationSalience(Environment, ptr, salience);
+				EnvReorderAgenda(Environment, NULL);
+				emit refreshAll();
 				emit dataChanged();
 			}
 		}
@@ -634,31 +601,12 @@ QHash<QString, int> CLIPSClass::getStrategyes()
 
 int CLIPSClass::getStrategy()
 {
-	return GetStrategy();
+	return EnvGetStrategy(Environment);
 }
 
 void CLIPSClass::setStrategySlot(int strategy)
 {
-	SetStrategy(strategy);
-}
-
-QStringList CLIPSClass::agendaSlot()
-{
-	RefreshAgenda(NULL);
-	QStringList activationsList;
-	void* ptr=NULL;
-	do
-	{
-		ptr = GetNextActivation(ptr);
-		char buf[16384]={0};
-		if(ptr!=NULL)
-		{
-			GetActivationPPForm(buf,sizeof(buf), ptr);
-			activationsList<<QString(buf);
-		}
-	}
-	while(ptr!=NULL);
-	return activationsList;
+	EnvSetStrategy(Environment, strategy);
 }
 
 //Globals
@@ -678,43 +626,8 @@ void CLIPSClass::defglobalSlot(QString moduleName, QHash<QString, QString> defgl
 	}
 	QString command = "(defglobal "+moduleName+" "+globalsStr+")";
 	executeCommand(command);
-	QStringList globals = globalsSlot();
-	emit globalsChangedSignal(globals);
-}
-
-void CLIPSClass::unDefglobalSlot(QString name)
-{
-	void* globalPtr = FindDefglobal(name.simplified().toUtf8().data());
-	if(!IsDefglobalDeletable(globalPtr))
-		return;
-	Undefglobal(globalPtr);
-	QStringList globals = globalsSlot();
-	emit globalsChangedSignal(globals);
+	emit refreshAll();
 	emit dataChanged();
-}
-
-QString CLIPSClass::getGlobalPPF(QString name)
-{
-	void* globalPtr = FindDefglobal(name.simplified().toUtf8().data());
-	char *globalsName = GetDefglobalPPForm(globalPtr);
-	return QString(globalsName).simplified();
-}
-
-QStringList CLIPSClass::globalsSlot()
-{
-	QStringList globalsList;
-	void* ptr=NULL;
-	do
-	{
-		ptr = GetNextDefglobal(ptr);
-		if(ptr!=NULL)
-		{
-			char *globalsStr = GetDefglobalName(ptr);
-			globalsList<<QString(globalsStr).simplified();
-		}
-	}
-	while(ptr!=NULL);
-	return globalsList;
 }
 
 //Functions
@@ -725,43 +638,8 @@ void CLIPSClass::deffunctionSlot(QString name, QString comment, QString regular,
 		comment = "\""+comment+"\"";
 	QString command = "(deffunction "+name+" "+comment+" ("+regular+" "+wildcard+") "+expression+")";
 	executeCommand(command);
-	QStringList functions = functionsSlot();
-	emit functionsChangedSignal(functions);
-}
-
-void CLIPSClass::unDeffunctionSlot(QString name)
-{
-	void* functionPtr = FindDeffunction(name.simplified().toUtf8().data());
-	if(!IsDeffunctionDeletable(functionPtr))
-		return;
-	Undeffunction(functionPtr);
-	QStringList functions = functionsSlot();
-	emit functionsChangedSignal(functions);
+	emit refreshAll();
 	emit dataChanged();
-}
-
-QString CLIPSClass::getFunctionPPF(QString name)
-{
-	void* functionPtr = FindDeffunction(name.simplified().toUtf8().data());
-	char *functionName = GetDeffunctionPPForm(functionPtr);
-	return QString(functionName).simplified();
-}
-
-QStringList CLIPSClass::functionsSlot()
-{
-	QStringList functionsList;
-	void* ptr=NULL;
-	do
-	{
-		ptr = GetNextDeffunction(ptr);
-		if(ptr!=NULL)
-		{
-			char *functionStr = GetDeffunctionName(ptr);
-			functionsList<<QString(functionStr).simplified();
-		}
-	}
-	while(ptr!=NULL);
-	return functionsList;
 }
 
 //Generic Functions
@@ -770,47 +648,8 @@ void CLIPSClass::defgenericSlot(QString name)
 {
 	QString command = "(defgeneric "+name+")";
 	executeCommand(command);
-	QStringList generic = genericSlot();
-	emit genericChangedSignal(generic);
-	QHash<QString, int> methods = methodsSlot();
-	emit methodsChangedSignal(methods);
-}
-
-void CLIPSClass::unDefgenericSlot(QString name)
-{
-	void* genericPtr = FindDefgeneric(name.simplified().toUtf8().data());
-	if(!IsDefgenericDeletable(genericPtr))
-		return;
-	Undefgeneric(genericPtr);
-	QStringList generic = genericSlot();
-	emit genericChangedSignal(generic);
-	QHash<QString, int> methods = methodsSlot();
-	emit methodsChangedSignal(methods);
+	emit refreshAll();
 	emit dataChanged();
-}
-
-QString CLIPSClass::getGenericPPF(QString name)
-{
-	void* genericPtr = FindDefgeneric(name.simplified().toUtf8().data());
-	char *genericName = GetDefgenericPPForm(genericPtr);
-	return QString(genericName).simplified();
-}
-
-QStringList CLIPSClass::genericSlot()
-{
-	QStringList genericList;
-	void* ptr=NULL;
-	do
-	{
-		ptr = GetNextDefgeneric(ptr);
-		if(ptr!=NULL)
-		{
-			char *genericStr = GetDefgenericName(ptr);
-			genericList<<QString(genericStr).simplified();
-		}
-	}
-	while(ptr!=NULL);
-	return genericList;
 }
 
 //Methods
@@ -821,43 +660,22 @@ void CLIPSClass::defmethodSlot(QString name, QString index, QString comment, QSt
 		comment = "\""+comment+"\"";
 	QString command = "(defmethod "+name+" "+index+" "+comment+" ("+regular+" "+wildcard+") "+expression+")";
 	executeCommand(command);
-	QStringList generic = genericSlot();
-	emit genericChangedSignal(generic);
-	QHash<QString, int> methods = methodsSlot();
-	emit methodsChangedSignal(methods);
-}
-
-void CLIPSClass::unDefmethodSlot(QString name, int index)
-{
-
-	void* genericPtr = FindDefgeneric(name.simplified().toUtf8().data());
-	if(IsDefmethodDeletable(genericPtr,index))
-		return;
-	Undefmethod(genericPtr, index);
-	QHash<QString, int> methods = methodsSlot();
-	emit methodsChangedSignal(methods);
+	emit refreshAll();
 	emit dataChanged();
-}
-
-QString CLIPSClass::getMethodPPF(QString name, int index)
-{
-	void* genericPtr = FindDefgeneric(name.simplified().toUtf8().data());
-	char *methodName = GetDefmethodPPForm(genericPtr,index);
-	return QString(methodName).simplified();
 }
 
 QHash<QString, int> CLIPSClass::methodsSlot()
 {
 	QHash<QString, int> methodsHash;
-	QStringList generics = genericSlot();
+	QStringList generics = itemsSlot("generic");
 	QString str;
 	foreach(str, generics)
 	{
-		void* genericPtr = FindDefgeneric(str.simplified().toUtf8().data());
+		void* genericPtr = findFunctionsHash["generic"](Environment, str.simplified().toUtf8().data());
 		int index=0;
 		do
 		{
-			index = GetNextDefmethod(genericPtr, index);
+			index = EnvGetNextDefmethod(Environment, genericPtr, index);
 			if(index!=0)
 				methodsHash.insert(str, index);
 		}
@@ -888,55 +706,8 @@ void CLIPSClass::defclassSlot(QString name, QString comment, QString role, QStri
 	}
 	command += ")";
 	executeCommand(command);
-	QStringList classes = classesSlot();
-	emit classesChangedSignal(classes);
-	QStringList templates = templatesSlot();
-	emit templatesChangedSignal(templates);
-	QStringList activations = agendaSlot();
-	emit activationsChangedSignal(activations);
-	QHash<QString, uint> messageHandlers = messageHandlersSlot();
-	emit messageHandlersChangedSignal(messageHandlers);
-}
-
-void CLIPSClass::unDefclassSlot(QString name)
-{
-	void* classPtr = FindDefclass(name.simplified().toUtf8().data());
-	if(!IsDefclassDeletable(classPtr))
-		return;
-	Undefclass(classPtr);
-	QStringList classes = classesSlot();
-	emit classesChangedSignal(classes);
-	QStringList templates = templatesSlot();
-	emit templatesChangedSignal(templates);
-	QStringList activations = agendaSlot();
-	emit activationsChangedSignal(activations);
-	QHash<QString, uint> messageHandlers = messageHandlersSlot();
-	emit messageHandlersChangedSignal(messageHandlers);
+	emit refreshAll();
 	emit dataChanged();
-}
-
-QString CLIPSClass::getClassPPF(QString name)
-{
-	void* classPtr = FindDefclass(name.simplified().toUtf8().data());
-	char *className = GetDefclassPPForm(classPtr);
-	return QString(className).simplified();
-}
-
-QStringList CLIPSClass::classesSlot()
-{
-	QStringList classesList;
-	void* ptr=NULL;
-	do
-	{
-		ptr = GetNextDefclass(ptr);
-		if(ptr!=NULL)
-		{
-			char *classStr = GetDefclassName(ptr);
-			classesList<<QString(classStr).simplified();
-		}
-	}
-	while(ptr!=NULL);
-	return classesList;
 }
 
 QString CLIPSClass::getMetaInformation(QString name)
@@ -946,26 +717,26 @@ QString CLIPSClass::getMetaInformation(QString name)
 	answer.clear();
 	if(name.isEmpty())
 		name = "OBJECT";
-	void* classPtr = FindDefclass(name.simplified().toUtf8().data());
-	if(ClassAbstractP(classPtr))
+	void* classPtr = findFunctionsHash["class"](Environment, name.simplified().toUtf8().data());
+	if(EnvClassAbstractP(Environment, classPtr))
 		val = tr("yes");
 	else
 		val = tr("no");
 	ret += tr("Abstract: ")+val+tr("\n");
-	if(ClassReactiveP(classPtr))
+	if(EnvClassReactiveP(Environment, classPtr))
 		val = tr("yes");
 	else
 		val = tr("no");
 	ret += tr("Reactive: ")+val+tr("\n");
 
-	if(IsDefclassDeletable(classPtr))
+	if(EnvIsDefclassDeletable(Environment, classPtr))
 		val = tr("yes");
 	else
 		val = tr("no");
 	ret += tr("Deletable: ")+val+tr("\n");
-	char* moduleName = DefclassModule(classPtr);
+	char* moduleName = EnvDefclassModule(Environment, classPtr);
 	ret += tr("Module: ")+QString(moduleName)+tr("\n");
-	DescribeClass("stdout", classPtr);
+	EnvDescribeClass(Environment, "stdout", classPtr);
 	ret += answer;
 	return ret;
 }
@@ -975,8 +746,8 @@ QString CLIPSClass::getSubclasses(QString name)
 	answer.clear();
 	if(name.isEmpty())
 		name = "OBJECT";
-	void* classPtr = FindDefclass(name.simplified().toUtf8().data());
-	BrowseClasses("stdout", classPtr);
+	void* classPtr = findFunctionsHash["class"](Environment, name.simplified().toUtf8().data());
+	EnvBrowseClasses(Environment, "stdout", classPtr);
 	return answer;
 }
 
@@ -985,17 +756,17 @@ QString CLIPSClass::getSuperclasses(QString name)
 	QString ret = "";
 	if(name.isEmpty())
 		name = "OBJECT";
-	void* classPtr = FindDefclass(name.simplified().toUtf8().data());
+	void* classPtr = findFunctionsHash["class"](Environment, name.simplified().toUtf8().data());
 	DATA_OBJECT result;
-	ClassSuperclasses(classPtr,&result,1);
+	EnvClassSuperclasses(Environment, classPtr,&result,1);
 	void *multifieldPtr;
 	char *sltName;
-	multifieldPtr = GetValue(result);
-	for (int i = GetDOBegin(result); i <= GetDOEnd(result); i++)
+	multifieldPtr = EnvGetValue(Environment, result);
+	for (int i = EnvGetDOBegin(Environment, result); i <= EnvGetDOEnd(Environment, result); i++)
 	{
-		if ((GetMFType(multifieldPtr,i) == STRING) ||(GetMFType(multifieldPtr,i) == SYMBOL))
+		if ((EnvGetMFType(Environment, multifieldPtr,i) == STRING) ||(EnvGetMFType(Environment, multifieldPtr,i) == SYMBOL))
 		{
-			sltName = ValueToString(GetMFValue(multifieldPtr,i));
+			sltName = EnvValueToString(Environment, GetMFValue(multifieldPtr,i));
 			ret += QString(sltName)+tr("\n");
 		}
 	}
@@ -1005,7 +776,7 @@ QString CLIPSClass::getSuperclasses(QString name)
 
 unsigned short CLIPSClass::getCurrentDefaultsMode()
 {
-	return GetClassDefaultsMode();
+	return EnvGetClassDefaultsMode(Environment);
 }
 
 QHash<QString, unsigned short> CLIPSClass::getDefaultsModes()
@@ -1018,7 +789,7 @@ QHash<QString, unsigned short> CLIPSClass::getDefaultsModes()
 
 unsigned short CLIPSClass::setDefaultsMode(unsigned short mode)
 {
-	return SetClassDefaultsMode(mode);
+	return EnvSetClassDefaultsMode(Environment, mode);
 }
 
 //Message Handlers
@@ -1042,25 +813,6 @@ void CLIPSClass::defmessageHandlerSlot(QString className, QString messageName, Q
 	emit messageHandlersChangedSignal(messageHandlers);
 }
 
-void CLIPSClass::unDefmessageHandlerSlot(QString name, unsigned int index)
-{
-	name = name.remove(name.lastIndexOf("  "), name.length());
-	void* classPtr = FindDefclass(name.simplified().toUtf8().data());
-	if(IsDefmessageHandlerDeletable(classPtr, index))
-		UndefmessageHandler(classPtr, index);
-	QHash<QString, uint> messageHandlers = messageHandlersSlot();
-	emit messageHandlersChangedSignal(messageHandlers);
-	emit dataChanged();
-}
-
-QString CLIPSClass::getMessageHandlerPPF(QString name, unsigned int index)
-{
-	name = name.remove(name.lastIndexOf("  "), name.length());
-	void* classPtr = FindDefclass(name.simplified().toUtf8().data());
-	char *messageHandlerPPForm = GetDefmessageHandlerPPForm(classPtr, index);
-	return QString(messageHandlerPPForm).simplified();
-}
-
 QStringList CLIPSClass::getHandlerTypesSlot()
 {
 	QStringList list;
@@ -1071,19 +823,19 @@ QStringList CLIPSClass::getHandlerTypesSlot()
 QHash<QString, unsigned int> CLIPSClass::messageHandlersSlot()
 {
 	QHash<QString, unsigned int> messageHandlersHash;
-	QStringList classes = classesSlot();
+	QStringList classes = itemsSlot("class");
 	QString str;
 	foreach(str, classes)
 	{
-		void* classPtr = FindDefclass(str.simplified().toUtf8().data());
+		void* classPtr = findFunctionsHash["class"](Environment, str.simplified().toUtf8().data());
 		unsigned int index=0;
 		do
 		{
-			index = GetNextDefmessageHandler(classPtr, index);
+			index = EnvGetNextDefmessageHandler(Environment, classPtr, index);
 			if(index!=0)
 			{
-				char* messageHandlerName = GetDefmessageHandlerName(classPtr, index);
-				char* messageHandlerType = GetDefmessageHandlerType(classPtr, index);
+				char* messageHandlerName = EnvGetDefmessageHandlerName(Environment, classPtr, index);
+				char* messageHandlerType = EnvGetDefmessageHandlerType(Environment, classPtr, index);
 				messageHandlersHash.insertMulti(str+QString("  ")+QString(messageHandlerName)+QString(" ")+QString(messageHandlerType), index);
 			}
 		}
@@ -1100,43 +852,8 @@ void CLIPSClass::definstanceSlot(QString name, QString active, QString comment, 
 		comment = "\""+comment+"\"";
 	QString command = "(definstances "+name+" "+active+" "+comment+" "+instanceTemplate+")";
 	executeCommand(command);
-	QStringList instances = instancesSlot();
-	emit instancesChangedSignal(instances);
-}
-
-void CLIPSClass::unDefinstancesSlot(QString name)
-{
-	void* instancePtr = FindDefinstances(name.simplified().toUtf8().data());
-	if(!IsDefinstancesDeletable(instancePtr))
-		return;
-	Undefinstances(instancePtr);
-	QStringList instances = instancesSlot();
-	emit instancesChangedSignal(instances);
+	emit refreshAll();
 	emit dataChanged();
-}
-
-QString CLIPSClass::getInstancePPF(QString name)
-{
-	void* instancePtr = FindDefinstances(name.simplified().toUtf8().data());
-	char *instanceName = GetDefinstancesPPForm(instancePtr);
-	return QString(instanceName).simplified();
-}
-
-QStringList CLIPSClass::instancesSlot()
-{
-	QStringList instancesList;
-	void* ptr=NULL;
-	do
-	{
-		ptr = GetNextDefinstances(ptr);
-		if(ptr!=NULL)
-		{
-			char *instanceStr = GetDefinstancesName(ptr);
-			instancesList<<QString(instanceStr).simplified();
-		}
-	}
-	while(ptr!=NULL);
-	return instancesList;
 }
 
 //Modules
@@ -1147,46 +864,21 @@ void CLIPSClass::defmoduleSlot(QString name, QString comment, QString specificat
 		comment = "\""+comment+"\"";
 	QString command = "(defmodule "+name+" "+comment+" "+specification+")";
 	executeCommand(command);
-	QStringList modules = modulesSlot();
-	emit modulesChangedSignal(modules);
 	emit refreshAll();
-}
-
-QString CLIPSClass::getModulePPF(QString name)
-{
-	void* modulePtr = FindDefmodule(name.simplified().toUtf8().data());
-	char *moduleName = GetDefmodulePPForm(modulePtr);
-	return QString(moduleName).simplified();
+	emit dataChanged();
 }
 
 QString CLIPSClass::getCurrentModule()
 {
-	void* modulePtr = GetCurrentModule();
-	char* moduleName = GetDefmoduleName(modulePtr);
+	void* modulePtr = EnvGetCurrentModule(Environment);
+	char* moduleName = EnvGetDefmoduleName(Environment, modulePtr);
 	return QString(moduleName).simplified();
 }
 
 void CLIPSClass::setCurrentModule(QString name)
 {
-	void* modulePtr = FindDefmodule(name.simplified().toUtf8().data());
-	SetCurrentModule(modulePtr);
+	void* modulePtr = findFunctionsHash["module"](Environment, name.simplified().toUtf8().data());
+	EnvSetCurrentModule(Environment, modulePtr);
 	emit refreshAll();
 	emit dataChanged();
-}
-
-QStringList CLIPSClass::modulesSlot()
-{
-	QStringList modulesList;
-	void* ptr=NULL;
-	do
-	{
-		ptr = GetNextDefmodule(ptr);
-		if(ptr!=NULL)
-		{
-			char *moduleStr = GetDefmoduleName(ptr);
-			modulesList<<QString(moduleStr).simplified();
-		}
-	}
-	while(ptr!=NULL);
-	return modulesList;
 }
